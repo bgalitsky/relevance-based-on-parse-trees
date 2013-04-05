@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.    
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.apache</groupId>
+		<artifactId>apache</artifactId>
+		<version>9</version>
+		<relativePath />
+	</parent>
+
+	<groupId>org.apache.opennlp</groupId>
+	<artifactId>opennlp-similarity</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+
+	<name>OpenNLP Tool Similarity distribution</name>
+
+	<scm>
+  		<connection>scm:svn:http://svn.apache.org/repos/asf/opennlp/sandbox/opennlp-similarity/tags/opennlp-similarity-0.0.1</connection> 
+  		<developerConnection>scm:svn:https://svn.apache.org/repos/asf/opennlp/sandbox/opennlp-similarity/tags/opennlp-similarity-0.0.1</developerConnection> 
+  		<url>http://svn.apache.org/viewvc/opennlp/tags/opennlp-similarity-0.0.1</url> 
+	</scm>
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+	
+	<repositories>
+		<repository>
+		 <id>net.billylieurance</id>
+        <name>BillyLieuranceNet</name>
+        <url>http://www.billylieurance.net/maven2</url>	
+        </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+		  <groupId>org.apache.opennlp</groupId>
+		  <artifactId>opennlp-tools</artifactId>
+		  <version>1.5.2-incubating</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20090211</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>4.0.0-BETA</version>
+		</dependency>
+            
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-core</artifactId>
+			<version>4.0.0-BETA</version>
+		</dependency>
+		<dependency>
+			 <groupId>commons-codec</groupId>
+			 <artifactId>commons-codec</artifactId>
+			 <version>1.7</version>
+		</dependency>
+		<dependency>
+			 <groupId>commons-logging</groupId>
+			 <artifactId>commons-logging</artifactId>
+			 <version>1.1.1</version>
+		</dependency>
+		<dependency>
+			 <groupId>org.apache.httpcomponents</groupId>
+			 <artifactId>httpclient</artifactId>
+			 <version>4.2.1</version>
+        </dependency>
+        <dependency>
+			 <groupId>org.apache.httpcomponents</groupId>
+			 <artifactId>httpclient-cache</artifactId>
+			 <version>4.2.1</version>
+		</dependency>
+		<dependency>
+			 <groupId>org.apache.httpcomponents</groupId>
+			 <artifactId>httpcore</artifactId>
+			 <version>4.2.1</version>
+		</dependency>
+		<dependency>
+			 <groupId>org.apache.httpcomponents</groupId>
+			 <artifactId>httpmime</artifactId>
+			 <version>4.2.1</version>
+        </dependency>
+		<dependency>
+			 <groupId>org.apache.httpcomponents</groupId>
+			 <artifactId>fluent-hc</artifactId>
+			 <version>4.2.1</version>
+        </dependency>
+		<dependency>
+	        <groupId>net.billylieurance.azuresearch</groupId>
+	        <artifactId>azure-bing-search-java</artifactId>
+        <version>0.11.0</version>
+		</dependency>
+		<dependency>
+	        <groupId>edu.stanford.nlp</groupId>
+	        <artifactId>stanford-corenlp</artifactId>
+	        <version>1.3.4</version>
+        </dependency>
+        <dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-jdk1.5</artifactId>
+			<version>0.7.3</version>
+		 </dependency>
+		 <dependency>
+			<groupId>de.jollyday</groupId>
+			<artifactId>jollyday</artifactId>
+			<version>0.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>jgraph</groupId>
+			<artifactId>jgraph</artifactId>
+			<version>5.13.0.0</version>
+		</dependency>
+ 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+          			<compilerArgument>-Xlint</compilerArgument>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-source-jar</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-javadoc-jar</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<show>public</show>
+							<quiet>true</quiet>
+							<use>false</use> <!-- Speeds up the build of the javadocs -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin> 
+	        <artifactId>maven-antrun-plugin</artifactId> 
+	        <version>1.6</version> 
+	        <executions> 
+	          <execution> 
+	            <id>generate checksums for binary artifacts</id> 
+	            <goals><goal>run</goal></goals> 
+	            <phase>verify</phase> 
+	            <configuration> 
+	              <target> 
+	                <checksum algorithm="sha1" format="MD5SUM"> 
+	                  <fileset dir="${project.build.directory}"> 
+	                    <include name="*.zip" /> 
+	                    <include name="*.gz" /> 
+	                  </fileset> 
+	                </checksum> 
+	                <checksum algorithm="md5" format="MD5SUM"> 
+	                  <fileset dir="${project.build.directory}"> 
+	                    <include name="*.zip" /> 
+	                    <include name="*.gz" /> 
+	                  </fileset> 
+	                </checksum> 
+	              </target> 
+	            </configuration> 
+	          </execution> 
+	        </executions> 
+	      </plugin>
+	      <plugin>
+			  <artifactId>maven-assembly-plugin</artifactId> 
+				 <executions>
+					 <execution>
+					  <id>src</id> 
+					 <goals>
+					  	<goal>single</goal> 
+					  </goals>
+					  <phase>package</phase> 
+					 	<configuration>
+					 		<descriptors>
+					  			<descriptor>src/main/assembly/assembly.xml</descriptor> 
+					  		</descriptors>
+					  	</configuration>
+					  </execution>
+					 <execution>
+					  <id>source-release-assembly</id> 
+					 <configuration>
+					  <skipAssembly>true</skipAssembly> 
+					  <mavenExecutorId>forked-path</mavenExecutorId>
+					  </configuration>
+					  </execution>
+				  </executions>
+			  </plugin>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-gpg-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>sign-artifacts</id>
+	            <phase>verify</phase>
+	            <goals>
+	              <goal>sign</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+      </plugin>
+		</plugins>
+	</build>
+</project>
