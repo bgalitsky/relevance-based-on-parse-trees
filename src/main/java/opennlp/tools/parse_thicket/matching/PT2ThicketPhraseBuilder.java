@@ -14,7 +14,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-
 import edu.stanford.nlp.trees.Tree;
 
 public class PT2ThicketPhraseBuilder {
@@ -117,7 +116,7 @@ public class PT2ThicketPhraseBuilder {
 	}
 
 
-	private List<List<ParseTreeNode>> buildPT2ptPhrasesForASentence(Tree tree, List<ParseTreeNode> sentence ) {
+	public List<List<ParseTreeNode>> buildPT2ptPhrasesForASentence(Tree tree, List<ParseTreeNode> sentence ) {
 		List<List<ParseTreeNode>> phrases;
 
 		phrases = new ArrayList<List<ParseTreeNode>>();		
@@ -187,6 +186,9 @@ public class PT2ThicketPhraseBuilder {
 	
 	private List<ParseTreeNode> assignIndexToNodes(List<ParseTreeNode> node,
 			List<ParseTreeNode> sentence) {
+		if (sentence==null || sentence.size()<1)
+			return node;
+		
 		List<ParseTreeNode> results = new ArrayList<ParseTreeNode>();
 		
 		for(int i= 0; i<node.size(); i++){
