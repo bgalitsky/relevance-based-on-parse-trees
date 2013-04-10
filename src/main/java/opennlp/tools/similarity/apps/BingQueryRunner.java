@@ -26,19 +26,60 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.billylieurance.azuresearch.AzureSearchResultSet;
+import net.billylieurance.azuresearch.AzureSearchWebQuery;
+import net.billylieurance.azuresearch.AzureSearchWebResult;
+
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 public class BingQueryRunner {
-  protected static final String APP_ID = "e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=";
-    //"DD4E2A5DF8B7E5801ED443E47DC600D5F3E62713";
-  // TODO user needs to have own APP_ID from Bing API
+	
+	private static String BING_KEY = "e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=";
+	private static final Logger LOG = Logger
+		      .getLogger("opennlp.tools.similarity.apps.BingQueryRunner");
+	private AzureSearchWebQuery aq = new AzureSearchWebQuery();
+	
+	public void setKey(String key){
+		BING_KEY = key;
+	}
+  
+	public List<HitBase> runSearch(String query, int nRes) {
+		aq.setAppid(BING_KEY);
+		aq.setQuery(query);		                        
+		aq.doQuery();
+		
+		List<HitBase> results = new ArrayList<HitBase> ();
+		AzureSearchResultSet<AzureSearchWebResult> ars = aq.getQueryResult();
+		
+		for (AzureSearchWebResult anr : ars){
+		    HitBase h = new HitBase();
+		    h.setAbstractText(anr.getDescription());
+		    h.setTitle(anr.getTitle());
+		    h.setUrl(anr.getUrl());
+		    results.add(h);
+		}
+		return results;
+	}
+	
+	public int getTotalPagesAtASite(String site)
+	{
+		return runSearch("site:"+site, 1000000).size();
+	}
+	
+
+	public List<HitBase> runSearch(String query) {
+		return runSearch(query, 10);
+	}	
+	
+	
+	
 
   private float snapshotSimilarityThreshold = 0.4f;
 
-  private static final Logger LOG = Logger
-      .getLogger("opennlp.tools.similarity.apps.BingQueryRunner");
+  
 
   public void setSnapshotSimilarityThreshold(float thr) {
     snapshotSimilarityThreshold = thr;
@@ -53,8 +94,7 @@ public class BingQueryRunner {
   }
 
   /*
-   * 
-   */
+ 
 
   private String constructBingUrl(String query, String domainWeb, String lang,
       int numbOfHits) throws Exception {
@@ -73,9 +113,8 @@ public class BingQueryRunner {
     return yahooRequest;
   }
 
-  /*
-     *  
-     */
+ 
+    
   public ArrayList<String> search(String query, String domainWeb, String lang,
       int numbOfHits) throws Exception {
     URL url = new URL(constructBingUrl(query, domainWeb, lang, numbOfHits));
@@ -145,6 +184,7 @@ public class BingQueryRunner {
     hits = HitBase.removeDuplicates(hits);
     return hits;
   }
+  */
 
   // TODO comment back when dependencies resolved (CopyrightViolations)
   /*

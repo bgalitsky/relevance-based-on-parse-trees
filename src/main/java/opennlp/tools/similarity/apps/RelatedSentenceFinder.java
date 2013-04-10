@@ -68,7 +68,7 @@ public class RelatedSentenceFinder {
 
   public List<HitBase> findRelatedOpinionsForSentenceFastAndDummy(String word,
       List<String> sents) throws Exception {
-    BingWebQueryRunner yrunner = new BingWebQueryRunner();
+    BingQueryRunner yrunner = new BingQueryRunner();
     List<HitBase> searchResult = yrunner.runSearch(word, 100);
     return searchResult;
   }
@@ -79,7 +79,7 @@ public class RelatedSentenceFinder {
     System.out.println(" \n\n=== Sentence  = " + sentence);
     List<String> nounPhraseQueries = buildSearchEngineQueryFromSentence(sentence);
 
-    BingWebQueryRunner yrunner = new BingWebQueryRunner();
+    BingQueryRunner yrunner = new BingQueryRunner();
     for (String query : nounPhraseQueries) {
       System.out.println("\nquery = " + query);
       // query += " "+join(MENTAL_VERBS, " OR ") ;
@@ -120,7 +120,7 @@ public class RelatedSentenceFinder {
 
     // nounPhraseQueries.add(sentence + frequentPerformingVerbs);
 
-    BingWebQueryRunner yrunner = new BingWebQueryRunner();
+    BingQueryRunner yrunner = new BingQueryRunner();
     for (String verbAddition : StoryDiscourseNavigator.frequentPerformingVerbs) {
       List<HitBase> searchResult = yrunner.runSearch(sentence + " "
           + verbAddition, 100);

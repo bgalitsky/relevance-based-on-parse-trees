@@ -3,7 +3,7 @@ package opennlp.tools.parse_thicket.matching;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import opennlp.tools.parse_thicket.IGeneralizer;
 import opennlp.tools.parse_thicket.ParseCorefsBuilder;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
@@ -12,7 +12,7 @@ import opennlp.tools.textsimilarity.ParseTreeChunk;
 import opennlp.tools.textsimilarity.ParseTreeMatcherDeterministic;
 import opennlp.tools.textsimilarity.SentencePairMatchResult;
 
-public class Matcher {
+public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 	ParseTreeMatcherDeterministic md = new ParseTreeMatcherDeterministic();
 	ParseCorefsBuilder ptBuilder = ParseCorefsBuilder.getInstance();
 	PT2ThicketPhraseBuilder phraseBuilder = new PT2ThicketPhraseBuilder();
@@ -42,6 +42,18 @@ public class Matcher {
 				.matchTwoSentencesGroupedChunksDeterministic(sent1GrpLst, sent2GrpLst);
 		return res;
 
+	}
+	
+	public List<List<ParseTreeChunk>> generalize(List<List<ParseTreeNode>> phrs1,
+			List<List<ParseTreeNode>> phrs2) {
+		// group phrases by type
+				List<List<ParseTreeChunk>> sent1GrpLst = formGroupedPhrasesFromChunksForPara(phrs1), 
+						sent2GrpLst = formGroupedPhrasesFromChunksForPara(phrs2);
+
+				
+				List<List<ParseTreeChunk>> res = md
+						.matchTwoSentencesGroupedChunksDeterministic(sent1GrpLst, sent2GrpLst);
+				return res;
 	}
 	private List<List<ParseTreeChunk>> formGroupedPhrasesFromChunksForPara(
 			List<List<ParseTreeNode>> phrs) {
@@ -94,4 +106,11 @@ public class Matcher {
 				"Iran envoy to UN states its nuclear development is for peaceful purpose, and the evidence against its claim is fabricated by the US. ");
 		System.out.print(res);
 	}
+
+	@Override
+	public List<List<List<ParseTreeNode>>> generalize(Object o1, Object o2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
