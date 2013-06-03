@@ -48,40 +48,44 @@ public class ParseCorefsBuilder {
 		List<List<ParseTreeNode>> nodesThicket = new ArrayList<List<ParseTreeNode>>();
 		
 		annotation = new Annotation(text);
-		pipeline.annotate(annotation);
-		List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
-	    if (sentences != null && sentences.size() > 0) 
-	    for(CoreMap sentence: sentences){
-	    	List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
-	    	
-	    	// traversing the words in the current sentence
-	        // a CoreLabel is a CoreMap with additional token-specific methods
-	    	Class<TokensAnnotation> tokenAnn = TokensAnnotation.class;
-	    	List<CoreLabel> coreLabelList = sentence.get(tokenAnn);
-	    	int count=1;
-	        for (CoreLabel token: coreLabelList ) {
-	          // this is the text of the token
-	          String lemma = token.get(TextAnnotation.class);
-	          // this is the POS tag of the token
-	          String pos = token.get(PartOfSpeechAnnotation.class);
-	          // this is the NER label of the token
-	          String ne = token.get(NamedEntityTagAnnotation.class);     
-	          nodes.add(new ParseTreeNode(lemma, pos, ne, count));
-	          count++;
-	        }	
-	        nodesThicket.add(nodes);
-	      Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-	      ptTrees.add(tree);
-	    }
+		try {
+			pipeline.annotate(annotation);
+			List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
+			if (sentences != null && sentences.size() > 0) 
+			for(CoreMap sentence: sentences){
+				List<ParseTreeNode> nodes = new ArrayList<ParseTreeNode>();
+				
+				// traversing the words in the current sentence
+			    // a CoreLabel is a CoreMap with additional token-specific methods
+				Class<TokensAnnotation> tokenAnn = TokensAnnotation.class;
+				List<CoreLabel> coreLabelList = sentence.get(tokenAnn);
+				int count=1;
+			    for (CoreLabel token: coreLabelList ) {
+			      // this is the text of the token
+			      String lemma = token.get(TextAnnotation.class);
+			      // this is the POS tag of the token
+			      String pos = token.get(PartOfSpeechAnnotation.class);
+			      // this is the NER label of the token
+			      String ne = token.get(NamedEntityTagAnnotation.class);     
+			      nodes.add(new ParseTreeNode(lemma, pos, ne, count));
+			      count++;
+			    }	
+			    nodesThicket.add(nodes);
+			  Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+			  ptTrees.add(tree);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	    
 	  
 	    // now coreferences
 	    Map<Integer, CorefChain> corefs = annotation.get(CorefCoreAnnotations.CorefChainAnnotation.class);
 	    List<CorefChain> chains = new ArrayList<CorefChain>(corefs.values());
 	    for(CorefChain c: chains){
-	      System.out.println(c);
+	      //System.out.println(c);
 	      List<CorefMention> mentions = c.getMentionsInTextualOrder();
-	      System.out.println(mentions);
+	      //System.out.println(mentions);
 	      if (mentions.size()>1)
 	      for(int i=0; i<mentions.size(); i++){
 	    	  for(int j=i+1; j<mentions.size(); j++){

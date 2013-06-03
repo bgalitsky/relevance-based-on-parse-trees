@@ -48,4 +48,7 @@ public class ArcType{
 		this.subtype_id = subtype_id;
 	}
 	
+	public String toString(){
+		return type+":"+subtype;
+	}
 }

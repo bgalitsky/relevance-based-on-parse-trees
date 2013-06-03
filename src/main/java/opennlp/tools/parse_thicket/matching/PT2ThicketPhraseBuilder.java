@@ -14,6 +14,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
+
 import edu.stanford.nlp.trees.Tree;
 
 public class PT2ThicketPhraseBuilder {
@@ -42,7 +43,7 @@ public class PT2ThicketPhraseBuilder {
 
 		}
 		
-		// discover and add RST links
+		// discover and add RST arcs
 		List<WordWordInterSentenceRelationArc> arcsRST =
 				rstBuilder.buildRSTArcsFromMarkersAndCorefs(pt.getArcs(), sentNumPhrases, pt);
 		
@@ -55,7 +56,13 @@ public class PT2ThicketPhraseBuilder {
 		return expandedPhrases;
 	}
 
-
+/* Take all phrases, all arcs and merge phrases into Thicket phrases.
+ * Then add the set of generalized (Thicket) phrases to the input set of phrases
+ * phrasesAllSent - list of lists of phrases for each sentence
+ * sentNumPhrase - map , gives for each sentence id, the above list
+ * arcs - arcs formed so far
+ * pt - the built Parse Thicket
+ */
 	private List<List<ParseTreeNode>> expandTowardsThicketPhrases(
 			List<List<ParseTreeNode>> phrasesAllSent,
 			List<WordWordInterSentenceRelationArc> arcs,
@@ -75,7 +82,7 @@ public class PT2ThicketPhraseBuilder {
 						if (nSent==fromIndex && mSent==toIndex){
 							int sentPosFrom = arc.getCodeFrom().getSecond();
 							int sentPosTo = arc.getCodeTo().getSecond();
-							// find phrases which 
+							// for the given arc arc, find phrases which are connected by it
 							List<ParseTreeNode> lFromFound = null, lToFound = null;
 							for(List<ParseTreeNode> lFrom: phrasesFrom){
 								if (lToFound!=null)
@@ -169,6 +176,14 @@ public class PT2ThicketPhraseBuilder {
 					node = assignIndexToNodes(node, sentence);
 					if (!node.isEmpty())
 						phrases.add(node);
+					try {
+						if (node.size()>0 && node.get(0).getId()==null){
+							System.out.println(node);
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 			Tree[] kids = t.children();
@@ -219,6 +234,17 @@ public class PT2ThicketPhraseBuilder {
 				n.setNe(sentence.get(j).getNe());
 			}
 			results.add(n);
+		}
+		
+		try {
+			if (results.size()>1 && results.get(0).getId()==null && results.get(1).getId()>0){
+				ParseTreeNode p = results.get(0);
+				p.setId(results.get(1).getId()-1);
+				results.set(0, p);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return results;
 	}
@@ -312,7 +338,7 @@ public class PT2ThicketPhraseBuilder {
 		return node;
 	}
 	
-	private List<ParseTreeNode> parsePhrase(String value, String fullDump) {
+	public List<ParseTreeNode> parsePhrase(String value, String fullDump) {
 		
 		List<ParseTreeNode> nlist = new ArrayList<ParseTreeNode>(); 
 		if (value.equals("S")|| value.equals("ROOT"))
@@ -359,6 +385,7 @@ public class PT2ThicketPhraseBuilder {
 			return sb.append(')');
 		}
 	}
+	
   public static void main(String[] args){
 	  String line = "(NP (NNP Iran)) (VP (VBZ refuses) (S (VP (TO to) (VP (VB accept) (S (NP (DT the) " +
 	  		"(NNP UN) (NN proposal)) (VP (TO to) (VP (VB end) (NP (PRP$ its) (NN dispute))))))))";
