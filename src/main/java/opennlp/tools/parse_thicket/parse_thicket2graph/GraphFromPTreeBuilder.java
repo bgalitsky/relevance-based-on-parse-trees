@@ -6,6 +6,7 @@ import java.util.List;
 import opennlp.tools.parse_thicket.PTTree;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
+import opennlp.tools.parse_thicket.thicket2graph.ParseGraphNode;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
@@ -19,34 +20,35 @@ import edu.stanford.nlp.trees.Tree;
 public class GraphFromPTreeBuilder {
 	
 	
-	public Graph<Object, DefaultEdge> buildGraphFromPT(ParseThicket pt){
+	public Graph<ParseGraphNode, DefaultEdge> buildGraphFromPT(ParseThicket pt){
 		PrintWriter out = new PrintWriter(System.out);
 
 		
 		List<Tree> ts = pt.getSentences();
 		ts.get(0).pennPrint(out);
-		Graph<Object, DefaultEdge> gfragment = buildGGraphFromTree(ts.get(0));
+		Graph<ParseGraphNode, DefaultEdge> gfragment = buildGGraphFromTree(ts.get(0));
 		
-		ParseTreeVisualizer applet = new ParseTreeVisualizer();
-		applet.showGraph(gfragment);
+		//ParseTreeVisualizer applet = new ParseTreeVisualizer();
+		//applet.showGraph(gfragment);
 		
-		return null;
+		return gfragment;
 		
 	}
 	
 	
-	private Graph<Object, DefaultEdge> buildGGraphFromTree(Tree tree) {
-		Graph<Object, DefaultEdge> g =
-				new SimpleGraph<Object, DefaultEdge>(DefaultEdge.class);
-		g.addVertex("S 0");
-		navigate(tree, g, 0, "S 0");
+	private Graph<ParseGraphNode, DefaultEdge> buildGGraphFromTree(Tree tree) {
+		Graph<ParseGraphNode, DefaultEdge> g =
+				new SimpleGraph<ParseGraphNode, DefaultEdge>(DefaultEdge.class);
+		ParseGraphNode root = new ParseGraphNode(tree,"S 0");
+		g.addVertex(root);
+		navigate(tree, g, 0, root);
 	        
 		return g;
 	}
 
 
 
-	private void navigate(Tree tree, Graph<Object, DefaultEdge> g, int l, String currParent) {
+	private void navigate(Tree tree, Graph<ParseGraphNode, DefaultEdge> g, int l, ParseGraphNode currParent) {
 		//String currParent = tree.label().value()+" $"+Integer.toString(l);
 		//g.addVertex(currParent);
 		if (tree.getChildrenAsList().size()==1)
@@ -57,6 +59,7 @@ public class GraphFromPTreeBuilder {
 		
 		for(Tree child: tree.getChildrenAsList()){
 			String currChild = null;
+			ParseGraphNode currChildNode = null;
 			try {
 				if (child.isLeaf()) 
 					continue;
@@ -67,14 +70,14 @@ public class GraphFromPTreeBuilder {
 					currChild = child.toString()+" #"+Integer.toString(l);
 				else 
 					currChild = child.label().value()+" #"+Integer.toString(l);
-				
-				g.addVertex(currChild);
-				g.addEdge(currParent, currChild);
+				currChildNode = new ParseGraphNode(child, currChild);
+				g.addVertex(currChildNode);
+				g.addEdge(currParent, currChildNode);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			navigate(child, g, l+1, currChild);
+			navigate(child, g, l+1, currChildNode);
 		}
 	}
 

@@ -48,6 +48,7 @@ import java.util.Set;
 
 import javax.swing.*;
 
+
 import org.jgraph.*;
 import org.jgraph.graph.*;
 
@@ -84,6 +85,7 @@ extends JApplet
 		frame.setVisible(true);
 	}
 
+	// TODO cast to ParseGraphNode
 	private void importGraph(Graph g) {
 		// create a visualization using JGraph, via an adapter
 		jgAdapter = new JGraphModelAdapter<String, DefaultEdge>(g);
