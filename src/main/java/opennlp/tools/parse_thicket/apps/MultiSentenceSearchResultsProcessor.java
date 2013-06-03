@@ -70,7 +70,7 @@ public class MultiSentenceSearchResultsProcessor  {
 					textFromOriginalPage = textFromOriginalPage.substring(2);
 				}
 				textFromOriginalPage = textFromOriginalPage.replace(" . .", ". ").replace(". . ", ". ").
-						replace(".  . “", ". ").replace("“", "").
+						replace(".  . â€œ", ". ").replace("â€œ", "").
 						replace("..", ". ").trim();
 			} catch (Exception e1) {
 				e1.printStackTrace();
