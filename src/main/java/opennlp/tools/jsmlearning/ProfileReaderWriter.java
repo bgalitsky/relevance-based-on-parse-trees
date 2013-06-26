@@ -24,7 +24,7 @@ public class ProfileReaderWriter {
 		}
 		return profiles;
 	}
-	
+
 	public static void writeReportArr( String[][] allLines, String reportName){
 		List<String[]> rep = new ArrayList<String[]>();
 		for(String[] line: allLines){
@@ -32,7 +32,7 @@ public class ProfileReaderWriter {
 		}
 		writeReport( rep, reportName);
 	}
-	
+
 	public static void writeReport( List<String[]> allLines, String reportName){
 		CSVWriter writer = null;
 		try {	
@@ -41,7 +41,25 @@ public class ProfileReaderWriter {
 			e.printStackTrace();
 		}		
 		writer.writeAll(allLines);
-		
+
+		try {
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeReport( List<String[]> allLines, String reportName, char delimiter){
+		CSVWriter writer = null;
+		try {	
+			writer = new CSVWriter(new PrintWriter(reportName), delimiter, delimiter, delimiter);			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}	
+
+		writer.writeAll(allLines);
+
 		try {
 			writer.flush();
 			writer.close();
@@ -52,6 +70,15 @@ public class ProfileReaderWriter {
 
 	public static void writeReportListStr(List<String> res, String string) {
 		// TODO Auto-generated method stub
-		
+
 	}
+
+	public static void main(String[] args){
+		List<String[]> allLines = new ArrayList<String[]>();
+		allLines.add(new String[] {"aa " , "  bb", "ccc" });
+		ProfileReaderWriter.writeReport( allLines, "reportName.txt", ' ');
+
+	}
+
+
 }
