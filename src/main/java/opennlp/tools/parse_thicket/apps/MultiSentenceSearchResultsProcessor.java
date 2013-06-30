@@ -49,7 +49,7 @@ public class MultiSentenceSearchResultsProcessor  {
 	 */
 
 
-	private List<HitBase> calculateMatchScoreResortHits(List<HitBase> hits,
+	protected List<HitBase> calculateMatchScoreResortHits(List<HitBase> hits,
 			String searchQuery) {
 
 		List<HitBase> newHitList = new ArrayList<HitBase>();
@@ -58,48 +58,25 @@ public class MultiSentenceSearchResultsProcessor  {
 			if (count>10)
 				break;
 			count++;
-			HitBase hitWithFullSents = snp.formTextFromOriginalPageGivenSnippet(hit);
-			String textFromOriginalPage = "";
-			try {
-				List<String> sents = hitWithFullSents.getOriginalSentences();
-				for(String s: sents){
-					textFromOriginalPage+=s+" ";
-				}
-
-				if (textFromOriginalPage.startsWith(".")){
-					textFromOriginalPage = textFromOriginalPage.substring(2);
-				}
-				textFromOriginalPage = textFromOriginalPage.replace(" . .", ". ").replace(". . ", ". ").
-						replace(".  . â€œ", ". ").replace("â€œ", "").
-						replace("..", ". ").trim();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				LOG.info("Problem processing snapshot "+hit.getAbstractText());
-			}
-			hit.setPageContent(textFromOriginalPage);
-			String snapshot = hit.getAbstractText().replace("<b>...</b>", ". ").replace("<span class='best-phrase'>", " ").replace("<span>", " ").replace("<span>", " ")
-					.replace("<b>", "").replace("</b>", "");
-			snapshot = snapshot.replace("</B>", "").replace("<B>", "")
-					.replace("<br>", "").replace("</br>", "").replace("...", ". ")
-					.replace("|", " ").replace(">", " ").replace(". .", ". ");
-			snapshot += " . " + hit.getTitle();
+			String[] pageSentsAndSnippet = formTextForReRankingFromHit(hit);
+					
 			Double score = 0.0;
 			try {
 				List<List<ParseTreeChunk>> match = null;
-				if (textFromOriginalPage!=null && textFromOriginalPage.length()>50){
-					match = matcher.assessRelevanceCache(textFromOriginalPage ,
+				if (pageSentsAndSnippet!=null && pageSentsAndSnippet[0].length()>50){
+					match = matcher.assessRelevanceCache(pageSentsAndSnippet[0] ,
 							searchQuery);
 					score = parseTreeChunkListScorer.getParseTreeChunkListScore(match);
 					hit.setSource(match.toString());
 				}
 				if (score < 2){ // attempt to match with snippet, if not much luck with original text
-					match = matcher.assessRelevanceCache(textFromOriginalPage ,
+					match = matcher.assessRelevanceCache(pageSentsAndSnippet[0] ,
 							searchQuery);
 					score = parseTreeChunkListScorer.getParseTreeChunkListScore(match);
 				}
-				LOG.info(score + " | " + snapshot);
+				LOG.info(score + " | " +pageSentsAndSnippet[1]);
 			} catch (Exception e) {
-				LOG.severe("Problem processing snapshot " + snapshot);
+				LOG.severe("Problem processing snapshot " + pageSentsAndSnippet[1]);
 				e.printStackTrace();
 			}
 			hit.setGenerWithQueryScore(score);
@@ -120,6 +97,36 @@ public class MultiSentenceSearchResultsProcessor  {
 		}
 
 		return newHitList;
+	}
+
+	protected String[] formTextForReRankingFromHit(HitBase hit) {
+		HitBase hitWithFullSents = snp.formTextFromOriginalPageGivenSnippet(hit);
+		String textFromOriginalPage = "";
+		try {
+			List<String> sents = hitWithFullSents.getOriginalSentences();
+			for(String s: sents){
+				textFromOriginalPage+=s+" ";
+			}
+
+			if (textFromOriginalPage.startsWith(".")){
+				textFromOriginalPage = textFromOriginalPage.substring(2);
+			}
+			textFromOriginalPage = textFromOriginalPage.replace(" . .", ". ").replace(". . ", ". ").
+					replace(".  . “", ". ").replace("“", "").
+					replace("..", ". ").trim();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			LOG.info("Problem processing snapshot "+hit.getAbstractText());
+		}
+		hit.setPageContent(textFromOriginalPage);
+		String snapshot = hit.getAbstractText().replace("<b>...</b>", ". ").replace("<span class='best-phrase'>", " ").replace("<span>", " ").replace("<span>", " ")
+				.replace("<b>", "").replace("</b>", "");
+		snapshot = snapshot.replace("</B>", "").replace("<B>", "")
+				.replace("<br>", "").replace("</br>", "").replace("...", ". ")
+				.replace("|", " ").replace(">", " ").replace(". .", ". ");
+		snapshot += " . " + hit.getTitle();
+		
+		return new String[] { textFromOriginalPage, snapshot };
 	}
 
 	public void close() {

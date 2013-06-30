@@ -237,7 +237,8 @@ public class PT2ThicketPhraseBuilder {
 		}
 		
 		try {
-			if (results.size()>1 && results.get(0).getId()==null && results.get(1).getId()>0){
+			if (results!=null && results.size()>1 && results.get(0)!=null && results.get(0).getId()!=null &&
+					results.get(1) !=null && results.get(1).getId()!=null &&  results.get(1).getId()>0){
 				ParseTreeNode p = results.get(0);
 				p.setId(results.get(1).getId()-1);
 				results.set(0, p);
@@ -297,8 +298,10 @@ public class PT2ThicketPhraseBuilder {
 	}
 
 
-	private List<ParseTreeNode> parsePhrase(String value) {
+	protected List<ParseTreeNode> parsePhrase(String value) {
 		List<ParseTreeNode> nlist = new ArrayList<ParseTreeNode>(); 
+		if (value==null)
+			return nlist;
 		if (value.equals("ROOT")|| value.equals("S")) 
 			return nlist;
 		
