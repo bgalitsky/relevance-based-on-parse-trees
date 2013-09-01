@@ -14,6 +14,7 @@ import opennlp.tools.textsimilarity.LemmaPair;
 import opennlp.tools.textsimilarity.ParseTreeChunk;
 import opennlp.tools.textsimilarity.ParseTreeMatcherDeterministic;
 import opennlp.tools.textsimilarity.SentencePairMatchResult;
+import opennlp.tools.textsimilarity.chunker2matcher.ParserChunker2MatcherProcessor;
 
 public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 	ParseTreeMatcherDeterministic md = new ParseTreeMatcherDeterministic();
@@ -125,20 +126,7 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 		phraseBuilder.buildPT2ptPhrases(pt);
 		return pt;	
 	}
-	
-	public static void main(String[] args){
-		Matcher m = new Matcher();
-		List<List<ParseTreeChunk>> res = m.assessRelevance("Iran refuses to accept the UN proposal to end its dispute over its work on nuclear weapons."+
-				"UN nuclear watchdog passes a resolution condemning Iran for developing its second uranium enrichment site in secret. " +
-				"A recent IAEA report presented diagrams that suggested Iran was secretly working on nuclear weapons. " +
-				"Iran envoy says its nuclear development is for peaceful purpose, and the material evidence against it has been fabricated by the US. "
 
-				, "Iran refuses the UN offer to end a conflict over its nuclear weapons."+
-						"UN passes a resolution prohibiting Iran from developing its uranium enrichment site. " +
-						"A recent UN report presented charts saying Iran was working on nuclear weapons. " +
-				"Iran envoy to UN states its nuclear development is for peaceful purpose, and the evidence against its claim is fabricated by the US. ");
-		System.out.print(res);
-	}
 
 	@Override
 	public List<List<List<ParseTreeNode>>> generalize(Object o1, Object o2) {

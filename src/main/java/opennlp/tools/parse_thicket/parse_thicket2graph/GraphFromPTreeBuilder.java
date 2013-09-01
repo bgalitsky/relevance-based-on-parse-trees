@@ -6,8 +6,6 @@ import java.util.List;
 import opennlp.tools.parse_thicket.PTTree;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
-import opennlp.tools.parse_thicket.thicket2graph.ParseGraphNode;
-
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultEdge;

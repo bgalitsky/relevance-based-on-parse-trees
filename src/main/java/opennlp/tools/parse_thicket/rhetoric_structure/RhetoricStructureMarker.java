@@ -10,7 +10,7 @@ import opennlp.tools.parse_thicket.ParseTreeNode;
 
 
 public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
-	private static String rstRelations[] = {"antithesis", "concession", "contrast", "elaboration"};
+	//private static String rstRelations[] = {"antithesis", "concession", "contrast", "elaboration"};
 	List<Pair<String, ParseTreeNode[]>> rstMarkers = new ArrayList<Pair<String, ParseTreeNode[]>>();
 
 	public  RhetoricStructureMarker(){
@@ -21,16 +21,29 @@ public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "contrast", new ParseTreeNode[]{new ParseTreeNode("however","*"), new ParseTreeNode(",",","),
 					new ParseTreeNode("*","prp"),   }));
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "elaboration", new ParseTreeNode[]{new ParseTreeNode(",",","),  new ParseTreeNode("*","NN")  }));
+		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "elaboration", new ParseTreeNode[]{new ParseTreeNode("as","*"),  new ParseTreeNode("a","*")  }));
 	
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>("explanation", new ParseTreeNode[]{new ParseTreeNode(",",","),  new ParseTreeNode("because",",")  }));
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "example", new ParseTreeNode[]{new ParseTreeNode("for","IN"),  new ParseTreeNode("example","NN")  }));
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "contrast", new ParseTreeNode[]{new ParseTreeNode(",",","),  new ParseTreeNode("ye","*")  }));
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "contrast", new ParseTreeNode[]{new ParseTreeNode("yet","*"), new ParseTreeNode(",",","),
 					new ParseTreeNode("*","prp"),   }));
+		
+		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "contrast", new ParseTreeNode[]{new ParseTreeNode("yet","*"), new ParseTreeNode("i","*"),
+				  }));
+		
 		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "explanation", new ParseTreeNode[]{new ParseTreeNode(",",","),  new ParseTreeNode("where","*")  }));
+		//as long as
+		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "temp_sequence", new ParseTreeNode[]{/*new ParseTreeNode("as","*"),*/ new ParseTreeNode("*","RB"), 
+				new ParseTreeNode("as","IN"),}));
+		rstMarkers.add(new Pair<String, ParseTreeNode[]>( "temp_sequence", new ParseTreeNode[]{/*new ParseTreeNode("as","*"),*/ new ParseTreeNode("*","VB*"), 
+				new ParseTreeNode("until","IN"),}));
 
 	}
 
+	/* For a sentence, we obtain a list of markers with the CA word and position in the sentence
+	 * Output span is an integer array with start/end occurrence of an RST marker in a sentence
+	 * */
 	public List<Pair<String, Integer[]>> extractRSTrelationInSentenceGetBoundarySpan(List<ParseTreeNode> sentence){
 		List<Pair<String, Integer[]>> results = new ArrayList<Pair<String, Integer[]>> ();
 		
@@ -42,9 +55,12 @@ public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
 		return results;
 	}
 
-	/* rule application in the form of generalization
-	 * 
-	 * @see com.become.parse_thicket.IGeneralizer#generalize(java.lang.Object, java.lang.Object)
+	/* Rule application in the form of generalization
+	 * Generalizing a sentence with a rule (a template), we obtain the occurrence of rhetoric marker
+	 *
+	 * o1 - sentence
+	 * o2 - rule/template, specifying lemmas and/or POS, including punctuation
+	 * @see opennlp.tools.parse_thicket.IGeneralizer#generalize(java.lang.Object, java.lang.Object)
 	 * returns the span Integer[] 
 	 */
 	@Override
@@ -74,7 +90,7 @@ public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
 				templateIterator++;
 			}
 			// template iteration is done
-			// the only condition for successful match is that we are at the end of template
+			// the only condition for successful match is IF we are at the end of template
 			if (templateIterator == template.length){
 				result.add(new Integer[]{wordIndexInSentence, wordIndexInSentenceEnd-1});
 				return result;
@@ -82,8 +98,21 @@ public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
 
 			// no match for current sentence word: proceed to the next
 		}
-		return result; //[]
-
+		return result; 
+	}
+	
+	public String markerToString(List<Pair<String, Integer[]>> res){
+		StringBuffer buf = new StringBuffer();
+		buf.append("[");
+		for(Pair<String, Integer[]> marker: res){
+			buf.append(marker.getFirst()+":");
+			for(int a: marker.getSecond()){
+				buf.append(a+" ");
+			}
+			buf.append (" | ");
+		}
+		buf.append("]");
+		return buf.toString();
 	}
 
 	public static void main(String[] args){
@@ -95,6 +124,6 @@ public class RhetoricStructureMarker implements IGeneralizer<Integer[]>  {
 		};
 		
 		List<Pair<String, Integer[]>> res = new RhetoricStructureMarker().extractRSTrelationInSentenceGetBoundarySpan(Arrays.asList(sent));
-		System.out.println(res);
-	}
+		System.out.println( new RhetoricStructureMarker().markerToString(res));
+	} 
 }
