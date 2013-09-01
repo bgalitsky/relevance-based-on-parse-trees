@@ -121,8 +121,19 @@ public class RhetoricStructureArcsBuilder {
 	}
 
 // check if the word positions occur in sentence in the order Integer[]
-	
+// TODO make more sensitive algo	
 	private static boolean isSequence(Integer[] integers) {
+		//TODO better construction of array
+		if (integers==null || integers.length<3)
+			return false;
+		try {
+			for(Integer i: integers)
+				if (i==0)
+					return false;
+		} catch (Exception e) {
+			return false;
+		}
+		
 		Boolean bWrongOrder = false;
 		for(int i=1; i< integers.length; i++){
 			if (integers[i-1]>integers[i]){

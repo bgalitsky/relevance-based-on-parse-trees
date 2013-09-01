@@ -26,6 +26,7 @@ import edu.stanford.nlp.trees.Tree;
 
 import opennlp.tools.jsmlearning.ProfileReaderWriter;
 import opennlp.tools.parse_thicket.ParseThicket;
+import opennlp.tools.parse_thicket.apps.BingQueryRunnerMultipageSearchResults;
 import opennlp.tools.parse_thicket.apps.MultiSentenceSearchResultsProcessor;
 import opennlp.tools.parse_thicket.apps.SnippetToParagraph;
 import opennlp.tools.parse_thicket.matching.Matcher;
@@ -45,7 +46,7 @@ public class MultiSentenceKernelBasedSearchResultsProcessor  extends MultiSenten
 	private WebSearchEngineResultsScraper scraper = new WebSearchEngineResultsScraper();
 	protected Matcher matcher = new Matcher();
 	private ParseTreeChunkListScorer parseTreeChunkListScorer = new ParseTreeChunkListScorer();
-	private BingQueryRunner bingSearcher = new BingQueryRunner();
+	protected BingQueryRunnerMultipageSearchResults bingSearcher = new BingQueryRunnerMultipageSearchResults();
 	private SnippetToParagraph snp = new SnippetToParagraph();
 	private TreeKernelRunner tkRunner = new TreeKernelRunner();
 
@@ -53,10 +54,13 @@ public class MultiSentenceKernelBasedSearchResultsProcessor  extends MultiSenten
 	public void setKernelPath (String path){
 		this.path=path;
 	}
-	private static final String modelFileName = "model.txt",
-			trainingFileName = "training.txt", 
-			unknownToBeClassified = "unknown.txt", 
-			classifierOutput = "classifier_output.txt";
+	protected static final String modelFileName = "model.txt";
+
+	private static final String trainingFileName = "training.txt";
+
+	protected static final String unknownToBeClassified = "unknown.txt";
+
+	private static final String classifierOutput = "classifier_output.txt";
 
 
 	public List<HitBase> runSearchViaAPI(String query) {

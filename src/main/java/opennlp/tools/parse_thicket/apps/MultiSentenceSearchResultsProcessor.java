@@ -112,7 +112,6 @@ public class MultiSentenceSearchResultsProcessor  {
 				textFromOriginalPage = textFromOriginalPage.substring(2);
 			}
 			textFromOriginalPage = textFromOriginalPage.replace(" . .", ". ").replace(". . ", ". ").
-					replace(".  . “", ". ").replace("“", "").
 					replace("..", ". ").trim();
 		} catch (Exception e1) {
 			e1.printStackTrace();
