@@ -122,6 +122,7 @@ Using Knowledge in QA (
  Download and run SOLR
  [lucene.apache.org/solr]
 
+[http://lucene.apache.org/solr/4_4_0/tutorial.html] - demo application
 
  == Download, Run and explore features of linguistic processors
 
