@@ -12,7 +12,8 @@ Video Lectures
   Week 1 - Course Introduction
   
 Course Introduction (14:11)
-  Week 1 - Basic Text Processing
+  
+Week 1 - Basic Text Processing
   
 Regular Expressions (11:25)
 Regular Expressions in Practical NLP (6:04)
@@ -41,6 +42,8 @@ State of the Art Systems (7:10)
   Week 3 - Text Classification
   
 What is Text Classification? (8:12)
+
+[Optional]
 Naive Bayes (3:19)
 Formalizing the Naive Bayes Classifier (9:28)
 Naive Bayes: Learning (5:22)
@@ -49,7 +52,9 @@ Multinomial Naive Bayes: A Worked Example (8:58)
 Precision, Recall, and the F measure (16:16)
 Text Classification: Evaluation (7:17)
 Practical Issues in Text Classification (5:56)
-  Week 3 - Sentiment Analysis
+[] 
+
+ Week 3 - Sentiment Analysis
   
 What is Sentiment Analysis? (7:17)
 Sentiment Analysis: A baseline algorithm (13:27)
@@ -111,10 +116,12 @@ Answer Types and Query Formulation (8:47)
 Passage Retrieval and Answer Extraction (6:38)
 Using Knowledge in QA (
 
-
+====================================================
 = You practical steps in building Comp Ling systems =
  == Make sure you have an environment for Java Development ==
- Eclipse
+ jre, jdk
+
+  Eclipse
   [www.eclipse.org]   
 
  == Download and run a search engine ==
@@ -123,6 +130,7 @@ Using Knowledge in QA (
  [lucene.apache.org/solr]
 
 [http://lucene.apache.org/solr/4_4_0/tutorial.html] - demo application
+[http://www.solrtutorial.com/] - tutorial
 
  == Download, Run and explore features of linguistic processors
 
