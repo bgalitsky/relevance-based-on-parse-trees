@@ -1,10 +1,11 @@
-#summary One-sentence summary of this page.
+#summary Here we enumerate theory and practice for the course
 
 = What you need to learn by viewing online course =
 
 [https://class.coursera.org/nlp/lecture/index]
 
-
+Natural Language Processing 
+by Dan Jurafsky, Christopher Manning
 Video Lectures
 
 
@@ -111,9 +112,26 @@ Passage Retrieval and Answer Extraction (6:38)
 Using Knowledge in QA (
 
 
-= Details =
+= You practical steps in building Comp Ling systems =
+ == Make sure you have an environment for Java Development ==
+ Eclipse
+  [www.eclipse.org]   
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+ == Download and run a search engine ==
+
+ Download and run SOLR
+ [lucene.apache.org/solr]
+
+
+ == Download, Run and explore features of linguistic processors
+
+OpenNLP
+[http://opennlp.apache.org/]
+
+StanfordNLP
+[http://nlp.stanford.edu/]
+
+
+ == Working with this project ==
+  * Learn SVM
+[http://www.divvun.no/doc/tools/docu-svn-user.html]
