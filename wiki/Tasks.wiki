@@ -1,4 +1,4 @@
-#summary Tasks for the first week
+#summary Tasks for the course
 
 = First week =
 
