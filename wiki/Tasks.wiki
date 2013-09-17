@@ -2,8 +2,8 @@
 
 = First week =
 
-* Install Java enviroment
-* Install SVN tool
+-Install Java enviroment
+-Install SVN tool
 * Download full project and libs (alternative - Maven)
 * Download OpeNLP and StanfordNLP
 * Try to compile the project
