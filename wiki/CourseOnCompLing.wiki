@@ -110,7 +110,7 @@ WordNet and Other Online Thesauri (6:23)
 Word Similarity and Thesaurus Methods (16:17)
 
   Week 8 - Question Answering
-  
+   
 What is Question Answering? (7:28)
 Answer Types and Query Formulation (8:47)
 Passage Retrieval and Answer Extraction (6:38)
@@ -119,7 +119,11 @@ Using Knowledge in QA
 = Additional online course: useful parts =
 [https://class.coursera.org/nlangp-001/lecture/index]
 
-Week 1
+Natural Language Processing 
+by Mike Collins
+Video Lectures
+
+    Week 1
 
 Introduction to the Language Modeling Problem (Part 1) (6:17)
 
@@ -131,11 +135,11 @@ Markov Processes (Part 2) (6:28)
 
 Trigram Language Models (9:40)
 
-Week 9
+   Week 9
 
 All parts
 ====================================================
-= You practical steps in building Comp Ling systems =
+= Your practical steps in building Comp Ling systems =
  == Make sure you have an environment for Java Development ==
  jre, jdk
 
