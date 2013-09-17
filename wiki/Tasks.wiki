@@ -2,9 +2,14 @@
 
 = First week =
 
--Install Java enviroment
--Install SVN tool
-* Download full project and libs (alternative - Maven)
-* Download OpeNLP and StanfordNLP
-* Try to compile the project
-* Start listen to online lections
+1. Install Java enviroment
+
+2. Install SVN tool
+
+3. Download full project and libs (alternative - Maven)
+
+4. Download OpeNLP and StanfordNLP
+
+5. Try to compile the project
+
+5. Start listen to online lections
