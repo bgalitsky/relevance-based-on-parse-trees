@@ -3,13 +3,12 @@
 = First week =
 
 # Install Java enviroment
-
 # Install SVN tool
 
-# Download full project and libs (alternative - Maven)
+3 Download full project and libs (alternative - Maven)
 
-# Download OpeNLP and StanfordNLP
+4 Download OpeNLP and StanfordNLP
 
-# Try to compile the project
+5 Try to compile the project
 
-# Start online lections
+6 Start online lections
