@@ -1,0 +1,14 @@
+#summary Contacts of your teachers
+
+= Boris Galitsky =
+
+*email*: bgalitsky@hotmail.com
+
+*skype*: bgalitsky
+
+
+= Dmitry Ilvovsky =
+
+*email*: dilv_ru@yahoo.com
+
+*skype*: dilv_ru
