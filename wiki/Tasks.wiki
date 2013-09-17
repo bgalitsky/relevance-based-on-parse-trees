@@ -1,0 +1,10 @@
+#summary Tasks for the first week
+
+= First week =
+
+* Install Java enviroment
+* Install SVN tool
+* Download full project and libs (alternative - Maven)
+* Download OpeNLP and StanfordNLP
+* Try to compile the project
+* Start listen to online lections
