@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
+import opennlp.tools.jsmlearning.ProfileReaderWriter;
 import opennlp.tools.parse_thicket.matching.Matcher;
 import opennlp.tools.similarity.apps.BingQueryRunner;
 import opennlp.tools.similarity.apps.HitBase;
@@ -41,6 +42,8 @@ public class MultiSentenceSearchResultsProcessor  {
 	private ParseTreeChunkListScorer parseTreeChunkListScorer = new ParseTreeChunkListScorer();
 	private BingQueryRunner bingSearcher = new BingQueryRunner();
 	private SnippetToParagraph snp = new SnippetToParagraph();
+
+	protected static final int NUM_OF_SEARCH_RESULTS = 10;
 
 	/*
 	 * Takes a search engine API (or scraped) search results and calculates the parse tree similarity
@@ -143,20 +146,31 @@ public class MultiSentenceSearchResultsProcessor  {
 
 
 	public List<HitBase> runSearchViaAPI(String query) {
+		List<String[]> reportData = new ArrayList<String[]>(); 
+		reportData.add(new String[]{query});
 		List<HitBase> hits = null;
 		try {
-			List<HitBase> resultList = bingSearcher.runSearch(query);
+			List<HitBase> resultList = bingSearcher.runSearch(query, NUM_OF_SEARCH_RESULTS);
+			reportData.add(convertListHitBaseIntoStringAr(resultList));
+			
 			// now we apply our own relevance filter
 			hits = calculateMatchScoreResortHits(resultList, query);
-
+			reportData.add(convertListHitBaseIntoStringAr(resultList));
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOG.info("No search results for query '" + query);
 			return null;
 		}
-
-
+		ProfileReaderWriter.writeReport(reportData, "resultsForQuery_"+query.replace(' ', '_')+".csv");
 		return hits;
+	}
+	
+	private String[] convertListHitBaseIntoStringAr(List<HitBase> list){
+		List<String> results = new  ArrayList<String>(); 
+		for(HitBase h: list ){
+			results.add(h.getTitle()+ " | "+h.getAbstractText());
+		}
+		return results.toArray(new String[0]);
 	}
 
 	public static void main(String[] args){
