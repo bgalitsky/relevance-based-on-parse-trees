@@ -229,7 +229,7 @@ public class SnippetToParagraph extends RelatedSentenceFinder {
 
 	}
 
-	protected String[] extractSentencesFromPage(String url)
+	public String[] extractSentencesFromPage(String url)
 	{
 
 		int maxSentsFromPage= 100;
@@ -355,6 +355,10 @@ public class SnippetToParagraph extends RelatedSentenceFinder {
 			else return 0;
 
 		}
+	}
+	
+	public static void main(String[] args){
+		
 	}
 
 }

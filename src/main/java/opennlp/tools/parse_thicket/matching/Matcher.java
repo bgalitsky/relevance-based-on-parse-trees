@@ -31,6 +31,11 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 	 *          text 2
 	 * @return the matching results structure, which includes the similarity score
 	 */
+	
+	public Matcher(){
+		
+	}
+	
 	public List<List<ParseTreeChunk>> assessRelevance(String para1, String para2) {
 		// first build PTs for each text
 		ParseThicket pt1 = ptBuilder.buildParseThicket(para1);

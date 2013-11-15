@@ -194,7 +194,7 @@ public class HitBase {
         if (pBreak)
           buf.append(fragm + " | 	");
         else
-          buf.append(fragm + " | \n");
+          buf.append(fragm + " | <br>\n");
         // switch to opposite
         if (pBreak)
           pBreak = false;

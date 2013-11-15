@@ -587,13 +587,14 @@ public class ParserChunker2MatcherProcessor {
       SentenceModel model = new SentenceModel(is);
       sentenceDetector = new SentenceDetectorME(model);
     } catch (IOException e) {
-      //e.printStackTrace();
+      e.printStackTrace();
     } finally {
       if (is != null) {
         try {
           is.close();
         } catch (IOException e) {
            // we swallow exception to support the cached run
+        	e.printStackTrace();
         }
       }
     }
