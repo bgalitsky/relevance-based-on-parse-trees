@@ -30,11 +30,16 @@ public class GeneratedSentenceProcessor {
 
     String[] commas = StringUtils.split(sent, ',');
     String[] spaces = StringUtils.split(sent, ' ');
-    if ((float) commas.length / (float) spaces.length > 0.7) {
+    if ((float) commas.length / (float) spaces.length > 0.5) {
       System.out.println("Rejection: too many commas");
       return null;
     }
-
+    
+    String[] periods = StringUtils.split(sent.replace('.', '#'), '#');
+    if ((float) periods.length / (float) spaces.length > 0.4) {
+        System.out.println("Rejection: too many periods");
+        return null;
+     }
     String[] pipes = StringUtils.split(sent, '|');
     if (StringUtils.split(sent, '|').length > 2
         || StringUtils.split(sent, '>').length > 2) {
@@ -112,6 +117,9 @@ public class GeneratedSentenceProcessor {
         .replace("(more.)", "").replace("more.", "").replace("<more>", "")
         .replace("[more]", "").replace(".,", ".").replace("&lt;", "")
         .replace("p&gt;", "").replace("product description", "");
+    
+    //sent = sent.replace("Click here. ","").replace("Share this:.","").replace("Facebook.",""). 
+    //		replace("Twitter." Email. Google. Print. Tumblr. Pinterest. More. Digg. LinkedIn. StumbleUpon. Reddit. Like this: Like Loading.. ")
 
     // TODO .replace("a.", ".");
 

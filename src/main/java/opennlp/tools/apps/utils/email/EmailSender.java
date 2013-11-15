@@ -3,7 +3,6 @@ package opennlp.tools.apps.utils.email;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.log4j.Logger;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.*;
@@ -14,9 +13,8 @@ import javax.activation.*;
  *
  */
 public class EmailSender {
-		private static org.apache.log4j.Logger log = Logger.getLogger(EmailSender.class);
 		private static final long serialVersionUID = 1L;
-		private static final String mailboxAddress="valami@gmail.com";
+		private static final String mailboxAddress="bgalitsky@hotmail.com";
 
 		public  boolean sendMail(String smtp, String user, String pass, InternetAddress from, InternetAddress[] to, InternetAddress[] cc, InternetAddress[] bcc, String subject, String body, String file) throws Exception
 		{
@@ -75,7 +73,7 @@ public class EmailSender {
 				    }
 		
 					Transport tr = session.getTransport("smtp");			
-					tr.connect(smtp,mailboxAddress, pass);
+					tr.connect(smtp, mailboxAddress, pass);
 					message.saveChanges();
 					tr.sendMessage(message, message.getAllRecipients());
 					tr.close();
@@ -83,7 +81,7 @@ public class EmailSender {
 		    }
 			catch(Exception e)
 			{
-				log.error(e);
+				e.printStackTrace();
 				correct=false;
 			}
 			return correct;
@@ -141,7 +139,7 @@ public class EmailSender {
 				}
 				
 			}catch(Exception e){
-				log.error(e);
+				e.printStackTrace();
 				correct=false;
 			}
 			return correct;
@@ -156,4 +154,18 @@ public class EmailSender {
 			return address;
 		}		
 
+		
+		public static void main(String[] args){
+			EmailSender s = new EmailSender();
+			try {
+				s.sendMail("smtp.live.com", "bgalitsky@hotmail.com", "******", new InternetAddress("bgalitsky@hotmail.com"), new InternetAddress[]{new InternetAddress("bgalitsky@hotmail.com")}, new InternetAddress[]{}, new InternetAddress[]{}, 
+						"Generated content for you", "body", null);
+			} catch (AddressException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 }
