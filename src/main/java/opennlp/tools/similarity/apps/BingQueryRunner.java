@@ -35,10 +35,15 @@ public class BingQueryRunner {
 	public void setKey(String key){
 		BING_KEY = key;
 	}
+	
+	public void setLang(String language){
+		aq.setMarket(language);
+	}
   
 	public List<HitBase> runSearch(String query, int nRes) {
 		aq.setAppid(BING_KEY);
-		aq.setQuery(query);		                        
+		aq.setQuery(query);		
+		aq.setPerPage(nRes);
 		aq.doQuery();
 		
 		List<HitBase> results = new ArrayList<HitBase> ();
@@ -61,7 +66,7 @@ public class BingQueryRunner {
 	
 
 	public List<HitBase> runSearch(String query) {
-		return runSearch(query, 10);
+		return runSearch(query, 100);
 	}	
 	
 	
@@ -216,15 +221,24 @@ public class BingQueryRunner {
   public static void main(String[] args) {
     BingQueryRunner self = new BingQueryRunner();
     try {
+    	self.setLang("es-MX");
+    	self.setKey(
+    			"e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=");
       List<HitBase> resp = self
-          .runSearch("Rates rise at weekly Treasury auction");
-      // "British Actress Lynn Redgrave dies at 67");
+          .runSearch(//"art scene");
+        		  "biomecanica las palancas");
       System.out.print(resp.get(0));
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
+    /*
+     * 
+     * de-DE
+     * es-MX
+     * es-SP
+     */
     /*
      * String[] submittedNews = new String[]{
      * "Asian airports had already increased security following the Christmas Day attack, but South Korea and Pakistan are thinking about additional measures."

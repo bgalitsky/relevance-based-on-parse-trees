@@ -189,18 +189,24 @@ public class HitBase {
     StringBuffer buf = new StringBuffer();
     Boolean pBreak = true;
     for (HitBase hit : hits) {
-      String fragm = hit.getFragments().toString();
-      if (fragm.length() > 15) {
-        if (pBreak)
-          buf.append(fragm + " | 	");
-        else
-          buf.append(fragm + " | <br>\n");
-        // switch to opposite
-        if (pBreak)
-          pBreak = false;
-        else
-          pBreak = true;
-      }
+      try {
+		if (hit.getFragments()==null)	
+			 continue;
+		  String fragm = hit.getFragments().toString();
+		  if (fragm.length() > 15) {
+		    if (pBreak)
+		      buf.append(fragm + " | 	");
+		    else
+		      buf.append(fragm + " | <br>\n");
+		    // switch to opposite
+		    if (pBreak)
+		      pBreak = false;
+		    else
+		      pBreak = true;
+		  }
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
 
     }
     return buf.toString().replace("[", "").replace("]", "").replace(" | ", "")

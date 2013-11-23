@@ -19,81 +19,58 @@ package opennlp.tools.similarity.apps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
 import opennlp.tools.parse_thicket.Triple;
-import opennlp.tools.parse_thicket.apps.SnippetToParagraph;
-import opennlp.tools.parse_thicket.apps.SnippetToParagraph.TextChunk;
-import opennlp.tools.parse_thicket.apps.SnippetToParagraph.TextChunkComparable;
 import opennlp.tools.similarity.apps.utils.PageFetcher;
 import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
 import opennlp.tools.similarity.apps.utils.Utils;
 import opennlp.tools.textsimilarity.ParseTreeChunk;
 import opennlp.tools.textsimilarity.ParseTreeChunkListScorer;
 import opennlp.tools.textsimilarity.SentencePairMatchResult;
-import opennlp.tools.textsimilarity.TextProcessor;
 import opennlp.tools.textsimilarity.chunker2matcher.ParserChunker2MatcherProcessor;
 
-import org.apache.commons.lang.StringUtils;
-
 /*
- * This class does content generation by using web mining and syntactic generalization to get sentences from the web, convert and combine them in the form 
- * expected to be readable by humans.
- * 
- * These are examples of generated articles, given the article title
- * http://www.allvoices.com/contributed-news/9423860/content/81937916-ichie-sings-jazz-blues-contemporary-tunes
- * http://www.allvoices.com/contributed-news/9415063-britney-spears-femme-fatale-in-north-sf-bay-area
+ * This class does content generation by using web mining and syntactic generalization to get sentences from the web, convert and combine 
+ * them in the form 
+ * expected to be readable by humans and not distinguishable from genuine content by search engines
  * 
  */
 
-public class RelatedSentenceFinder {
+public class ContentGenerator {
 	private static Logger LOG = Logger
-			.getLogger("opennlp.tools.similarity.apps.RelatedSentenceFinder");
+			.getLogger("opennlp.tools.similarity.apps.ContentGenerator");
 	PageFetcher pFetcher = new PageFetcher();
 	ParserChunker2MatcherProcessor sm = ParserChunker2MatcherProcessor
 			.getInstance();
 	protected ParseTreeChunkListScorer parseTreeChunkListScorer = new ParseTreeChunkListScorer();
 	protected ParseTreeChunk parseTreeChunk = new ParseTreeChunk();
 	protected static StringDistanceMeasurer stringDistanceMeasurer = new StringDistanceMeasurer();
-	public BingQueryRunner yrunner = new BingQueryRunner();
+	protected BingQueryRunner yrunner = new BingQueryRunner();
+	protected ContentGeneratorSupport support = new ContentGeneratorSupport();
 	protected int MAX_STEPS = 1;
 	protected int MAX_SEARCH_RESULTS = 1;
 	protected float RELEVANCE_THRESHOLD = 1.1f;
 
-	// used to indicate that a sentence is an opinion, so more appropriate
-	static List<String> MENTAL_VERBS = new ArrayList<String>(
-			Arrays.asList(new String[] { "want", "know", "believe", "appeal", "ask",
-					"accept", "agree", "allow", "appeal", "ask", "assume", "believe",
-					"check", "confirm", "convince", "deny", "disagree", "explain",
-					"ignore", "inform", "remind", "request", "suggest", "suppose",
-					"think", "threaten", "try", "understand" }));
+	//private static final int MAX_FRAGMENT_SENTS = 10;
 
-	private static final int MAX_FRAGMENT_SENTS = 10;
-
-	public RelatedSentenceFinder(int ms, int msr, float thresh, String key) {
+	public ContentGenerator(int ms, int msr, float thresh, String key) {
 		this.MAX_STEPS = ms;
 		this.MAX_SEARCH_RESULTS = msr;
 		this.RELEVANCE_THRESHOLD=thresh;
 		yrunner.setKey(key);
 	}
 
-	public RelatedSentenceFinder() {
+	public ContentGenerator() {
 		// TODO Auto-generated constructor stub
 	}
 	public void setLang(String lang) {
 		yrunner.setLang(lang);
 
 	}
-	public List<HitBase> findRelatedOpinionsForSentenceFastAndDummy(String word,
-			List<String> sents) throws Exception {
 
-		List<HitBase> searchResult = yrunner.runSearch(word, 100);
-		return searchResult;
-	}
-
+/*
 	public List<HitBase> findRelatedOpinionsForSentence(String sentence,
 			List<String> sents) throws Exception {
 		List<HitBase> opinionSentencesToAdd = new ArrayList<HitBase>();
@@ -121,6 +98,7 @@ public class RelatedSentenceFinder {
 		opinionSentencesToAdd = removeDuplicatesFromResultantHits(opinionSentencesToAdd);
 		return opinionSentencesToAdd;
 	}
+	*/
 
 	/**
 	 * Main content generation function which takes a seed as a person, rock
@@ -137,15 +115,9 @@ public class RelatedSentenceFinder {
 	public List<HitBase> generateContentAbout(String sentence) throws Exception {
 		List<HitBase> opinionSentencesToAdd = new ArrayList<HitBase>();
 		System.out.println(" \n=== Entity to write about = " + sentence);
-		List<String> nounPhraseQueries = new ArrayList<String>();
-
-		String[] extraKeywords = new StoryDiscourseNavigator().obtainAdditionalKeywordsForAnEntity(sentence);
-		System.out.println("Found  extraKeywords "+ Arrays.asList(extraKeywords));
-		if (extraKeywords==null || extraKeywords.length<1)
-			extraKeywords = StoryDiscourseNavigator.frequentPerformingVerbs;
-
+	
 		int stepCount=0;
-		for (String verbAddition : extraKeywords) {
+		for (String verbAddition : StoryDiscourseNavigator.frequentPerformingVerbs) {
 			List<HitBase> searchResult = yrunner.runSearch(sentence + " "
 					+ verbAddition, MAX_SEARCH_RESULTS); //100);
 			if (MAX_SEARCH_RESULTS<searchResult.size())
@@ -156,7 +128,7 @@ public class RelatedSentenceFinder {
 					if (item.getAbstractText() != null
 							&& !(item.getUrl().indexOf(".pdf") > 0)) { // exclude pdf
 						opinionSentencesToAdd
-						.add(augmentWithMinedSentencesAndVerifyRelevance(item,
+						.add(buildParagraphOfGeneratedText(item,
 								sentence, null));
 					}
 				}
@@ -166,7 +138,7 @@ public class RelatedSentenceFinder {
 				break;
 		}
 
-		opinionSentencesToAdd = removeDuplicatesFromResultantHits(opinionSentencesToAdd);
+		opinionSentencesToAdd = ContentGeneratorSupport.removeDuplicatesFromResultantHits(opinionSentencesToAdd);
 		return opinionSentencesToAdd;
 	}
 
@@ -248,22 +220,14 @@ public class RelatedSentenceFinder {
 			}
 		}
 
-		queryArrayStr = removeDuplicatesFromQueries(queryArrayStr);
+		queryArrayStr = ContentGeneratorSupport.removeDuplicatesFromQueries(queryArrayStr);
 		queryArrayStr.add(sentence);
 
 		return queryArrayStr;
 
 	}
 
-	/**
-	 * remove dupes from queries to easy cleaning dupes and repetitive search
-	 * afterwards
-	 * 
-	 * @param List
-	 *          <String> of sentences (search queries, or search results
-	 *          abstracts, or titles
-	 * @return List<String> of sentences where dupes are removed
-	 */
+	/*
 	public static List<String> removeDuplicatesFromQueries(List<String> hits) {
 		StringDistanceMeasurer meas = new StringDistanceMeasurer();
 		double dupeThresh = 0.8; // if more similar, then considered dupes was
@@ -301,13 +265,7 @@ public class RelatedSentenceFinder {
 
 	}
 
-	/**
-	 * remove dupes from search results
-	 * 
-	 * @param List
-	 *          <HitBase> of search results objects
-	 * @return List<String> of search results objects where dupes are removed
-	 */
+	
 	public static List<HitBase> removeDuplicatesFromResultantHits(
 			List<HitBase> hits) {
 		StringDistanceMeasurer meas = new StringDistanceMeasurer();
@@ -344,20 +302,7 @@ public class RelatedSentenceFinder {
 		return hits;
 	}
 
-	/**
-	 * Takes single search result for an entity which is the subject of the essay
-	 * to be written and forms essey sentences from the title, abstract, and
-	 * possibly original page
-	 * 
-	 * @param HitBase
-	 *          item : search result
-	 * @param originalSentence
-	 *          : seed for the essay to be written
-	 * @param sentsAll
-	 *          : list<String> of other sentences in the seed if it is
-	 *          multi-sentence
-	 * @return search result
-	 */
+	
 
 	public HitBase augmentWithMinedSentencesAndVerifyRelevance(HitBase item,
 			String originalSentence, List<String> sentsAll) {
@@ -412,7 +357,7 @@ public class RelatedSentenceFinder {
 		}
 
 		for (String fragment : allFragms) {
-			String followSent = "";
+			String followSent = null;
 			if (fragment.length() < 50)
 				continue;
 			String pageSentence = "";
@@ -440,8 +385,7 @@ public class RelatedSentenceFinder {
 					if (mainAndFollowSent!=null || mainAndFollowSent[0]!=null){
 						pageSentence = mainAndFollowSent[0];
 						for(int i = 1; i< mainAndFollowSent.length; i++)
-							if (mainAndFollowSent[i]!=null)
-								followSent+= mainAndFollowSent[i];
+							followSent+= mainAndFollowSent[i];
 					}
 
 				} catch (Exception e) {
@@ -595,7 +539,7 @@ public class RelatedSentenceFinder {
 		return new String[] { result, followSent };
 	}
 
-	// given a fragment from snippet, finds an original sentence at a webpage by
+	 given a fragment from snippet, finds an original sentence at a webpage by
 	// optimizing alignmemt score
 	public static String[] getBestFullOriginalSentenceFromWebpageBySnippetFragment(
 			String fragment, String[] sents) {
@@ -628,7 +572,8 @@ public class RelatedSentenceFinder {
 
 		return new String[] { result, followSent };
 	}
-
+	*/
+/*
 	public String[] extractSentencesFromPage(String downloadedPage)
 	{
 
@@ -659,35 +604,15 @@ public class RelatedSentenceFinder {
 			j++;
 		}
 
-		sents = cleanSplitListOfSents(longestSents);
+		sents = ContentGeneratorSupport.cleanSplitListOfSents(longestSents);
 
 		//sents = removeDuplicates(sents);
 		//sents = verifyEnforceStartsUpperCase(sents);
 
 		return sents;
 	}
-
-	public class TextChunk {
-		public TextChunk(String s, int length) {
-			this.text = s;
-			this.len = length;
-		}
-		public String text;
-		public int len;
-	}
-
-	public class TextChunkComparable implements Comparator<TextChunk>
-	{
-		public int compare(TextChunk ch1, TextChunk ch2)
-		{
-			if (ch1.len>ch2.len)
-				return 1;
-			else if (ch1.len<ch2.len)
-				return  -1;
-			else return 0;
-
-		}
-	}
+*/
+	/*
 
 	protected String[] cleanSplitListOfSents(String[] longestSents){
 		float minFragmentLength = 40, minFragmentLengthSpace=4;
@@ -698,7 +623,7 @@ public class RelatedSentenceFinder {
 			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
 				continue;
 			if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
-				//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
+				System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 				continue;
 			}
 			// aaa. hhh hhh.  kkk . kkk ll hhh. lll kkk n.
@@ -728,7 +653,7 @@ public class RelatedSentenceFinder {
 		}
 		return (String[]) sentsClean.toArray(new String[0]);
 	}
-
+*/
 	private Triple<List<String>, String, String[]> formCandidateFragmentsForPage(HitBase item, String originalSentence, List<String> sentsAll){
 		if (sentsAll == null)
 			sentsAll = new ArrayList<String>();
@@ -769,7 +694,7 @@ public class RelatedSentenceFinder {
 					// we need to put '.'
 					sents = sm.splitSentences(pageContent);
 
-					sents = cleanListOfSents(sents);
+					sents = ContentGeneratorSupport.cleanListOfSents(sents);
 				}
 			}
 		} catch (Exception e) {
@@ -798,11 +723,11 @@ public class RelatedSentenceFinder {
 				&& sents.length > 0){
 			try { 
 				// first try sorted sentences from page by length approach
-				String[] sentsSortedByLength = extractSentencesFromPage(downloadedPage);
+				String[] sentsSortedByLength = support.extractSentencesFromPage(downloadedPage);
 
 
 				try {
-					mainAndFollowSent = getFullOriginalSentenceFromWebpageBySnippetFragment(
+					mainAndFollowSent = ContentGeneratorSupport.getFullOriginalSentenceFromWebpageBySnippetFragment(
 							fragment.replace("_should_find_orig_", ""), sentsSortedByLength);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -810,7 +735,7 @@ public class RelatedSentenceFinder {
 				}
 				// if the above gives null than try to match all sentences from snippet fragment
 				if (mainAndFollowSent==null || mainAndFollowSent[0]==null){
-					mainAndFollowSent = getFullOriginalSentenceFromWebpageBySnippetFragment(
+					mainAndFollowSent = ContentGeneratorSupport.getFullOriginalSentenceFromWebpageBySnippetFragment(
 							fragment.replace("_should_find_orig_", ""), sents);
 				}
 
@@ -926,7 +851,20 @@ public class RelatedSentenceFinder {
 
 	return result;
 }
-
+	/**
+	 * Takes single search result for an entity which is the subject of the essay
+	 * to be written and forms essey sentences from the title, abstract, and
+	 * possibly original page
+	 * 
+	 * @param HitBase
+	 *          item : search result
+	 * @param originalSentence
+	 *          : seed for the essay to be written
+	 * @param sentsAll
+	 *          : list<String> of other sentences in the seed if it is
+	 *          multi-sentence
+	 * @return search result
+	 */
 public HitBase buildParagraphOfGeneratedText(HitBase item,
 		String originalSentence, List<String> sentsAll) {
 	List<Fragment> results = new ArrayList<Fragment>() ;
@@ -955,7 +893,7 @@ public HitBase buildParagraphOfGeneratedText(HitBase item,
 
 
 public static void main(String[] args) {
-	RelatedSentenceFinder f = new RelatedSentenceFinder();
+	ContentGenerator f = new ContentGenerator();
 
 	List<HitBase> hits = null;
 	try {
