@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import opennlp.tools.similarity.apps.BingQueryRunner;
-import opennlp.tools.similarity.apps.BingResponse;
 import opennlp.tools.similarity.apps.HitBase;
 import opennlp.tools.similarity.apps.utils.StringCleaner;
 import opennlp.tools.stemmer.PorterStemmer;

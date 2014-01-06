@@ -126,7 +126,7 @@ public class RelatedSentenceFinderML extends RelatedSentenceFinder{
 					// we need to put '.'
 					sents = sm.splitSentences(pageContent);
 
-					sents = cleanListOfSents(sents);
+					sents = ContentGeneratorSupport.cleanListOfSents(sents);
 				}
 			}
 		} catch (Exception e) {

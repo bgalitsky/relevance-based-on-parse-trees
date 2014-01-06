@@ -21,7 +21,7 @@ import org.apache.solr.search.DocList;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.QParserPlugin;
 import org.apache.solr.search.QueryParsing;
-//import org.apache.solr.search.SyntaxError;
+
 
 public class IterativeQueryComponent extends QueryComponent{
 	public static final String COMPONENT_NAME = "iterative_query";
