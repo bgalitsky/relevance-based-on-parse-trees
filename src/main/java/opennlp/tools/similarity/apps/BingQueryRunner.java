@@ -21,16 +21,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.billylieurance.azuresearch.AzureSearchImageQuery;
+import net.billylieurance.azuresearch.AzureSearchImageResult;
 import net.billylieurance.azuresearch.AzureSearchResultSet;
 import net.billylieurance.azuresearch.AzureSearchWebQuery;
 import net.billylieurance.azuresearch.AzureSearchWebResult;
 
 public class BingQueryRunner {
 	
-	private static String BING_KEY = "e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=";
+	protected static String BING_KEY = "e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=";
 	private static final Logger LOG = Logger
 		      .getLogger("opennlp.tools.similarity.apps.BingQueryRunner");
-	private AzureSearchWebQuery aq = new AzureSearchWebQuery();
+	protected AzureSearchWebQuery aq = new AzureSearchWebQuery();
+	private AzureSearchImageQuery iq = new AzureSearchImageQuery();
 	
 	public void setKey(String key){
 		BING_KEY = key;
@@ -44,7 +47,20 @@ public class BingQueryRunner {
 		aq.setAppid(BING_KEY);
 		aq.setQuery(query);		
 		aq.setPerPage(nRes);
-		aq.doQuery();
+		try {
+			aq.doQuery();
+		} catch (Exception e) { // most likely exception is due to limit on bing key
+			aq.setAppid("pjtCgujmf9TtfjCVBdcQ2rBUQwGLmtLtgCG4Ex7kekw");
+			try {
+				aq.doQuery();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		}
+		
+		//org.xml.sax.SAXParseException
 		
 		List<HitBase> results = new ArrayList<HitBase> ();
 		AzureSearchResultSet<AzureSearchWebResult> ars = aq.getQueryResult();
@@ -59,6 +75,16 @@ public class BingQueryRunner {
 		return results;
 	}
 	
+	
+	public AzureSearchResultSet<AzureSearchImageResult> runImageSearch(String query) {
+		iq.setAppid(BING_KEY);
+		iq.setQuery(query);		
+		iq.doQuery();
+		
+		AzureSearchResultSet<AzureSearchImageResult> ars = iq.getQueryResult();
+
+		return ars;
+	}
 	public int getTotalPagesAtASite(String site)
 	{
 		return runSearch("site:"+site, 1000000).size();
@@ -220,6 +246,9 @@ public class BingQueryRunner {
 
   public static void main(String[] args) {
     BingQueryRunner self = new BingQueryRunner();
+    
+    AzureSearchResultSet<AzureSearchImageResult> res = self.runImageSearch("albert einstein");
+    System.out.println(res);
     try {
     	self.setLang("es-MX");
     	self.setKey(

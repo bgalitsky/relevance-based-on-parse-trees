@@ -26,10 +26,14 @@ import org.apache.commons.lang.StringUtils;
 
 public class GeneratedSentenceProcessor {
 
-	public static String[] occurs = new String[]{ "click here", "wikipedia",
-		"copyright",
-		"operating hours",
-		"days per week",
+	public static String[] occurs = new String[]{ "click here", "wikipedia", "retrieved", "isbn",
+		"http", "www.",
+		"copyright", "advertise",  "(accessed", "[edit]", "[citation needed]",
+		"site map",  "email updates",  "contact us", "rss feeds",  "cite this site",
+		"operating hours", "last modified", "product catalog",
+		"days per week", "leave a comment", "corporate information",  
+		"employment opportunities", "terms of use", "private policy", "parental guidelines", "copyright policy",  "ad choices",
+		"about us",  "about our ads",  "privacy policy",  "terms of use",
 		"click for", "photos",
 		"find the latest",		       
 		"terms of service",
@@ -42,7 +46,7 @@ public class GeneratedSentenceProcessor {
 		"not valid", "get discount",
 		"official site",
 		"this video",
-		"this book",
+		//"this book",
 		"this product",
 		"paperback", "hardcover",
 		"audio cd",
@@ -59,15 +63,18 @@ public class GeneratedSentenceProcessor {
 		"mailing list",  "purchase order",
 		"mon-fri",  "email us",  "privacy pol",  "back to top", 
 		"click here",  "for details",  "assistance?",  "chat live",
-		"free shipping",  "company info",  "satisfaction g",  "contact us" };
+		"free shipping",  "company info",  "satisfaction g",  "contact us",
+		"menu.", "search.",  "sign in", "home.",
+		"additional terms", "may apply"};
 
 	public static String[] occursStartsWith = new String[]{
-		"fax",  "write","email", "contuct",  "conditions",  "chat live",
+		"fax",  "write","email", "contact",  "conditions",  "chat live",
 		"we ",  "the recipient",  "day return",  "days return",
 		"refund it",  "your money",
 		"purchase orders",
 		"exchange it ",  "return it",  "day return",  "days return",
-		"subscribe","posted by", "below" };
+		"subscribe","posted by", "below" , "corporate",
+		"this book"};
 	public static String acceptableMinedSentence(String sent) {
 		if (sent==null || sent.length()<40)
 			return null;
@@ -85,8 +92,8 @@ public class GeneratedSentenceProcessor {
 			System.out.println("Rejection: too many periods in sent ='"+sent);
 			return null;
 		}
-		
-		String[] brakets = StringUtils.split(sent.replace('(', '#').replace(')', '#').replace('[', '#').replace(']', '#'), '#');
+		// commented [x], to avoid rejection sentences with refs[]
+		String[] brakets = StringUtils.split(sent.replace('(', '#').replace(')', '#')/*.replace('[', '#').replace(']', '#')*/, '#');
 		if ((float) periods.length / (float) spaces.length > 0.2) {
 			System.out.println("Rejection: too many brakets in sent ='"+sent);
 			return null;

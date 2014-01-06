@@ -47,7 +47,7 @@ import org.apache.commons.lang.StringUtils;
 public class ContentGeneratorSupport {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.similarity.apps.ContentGeneratorSupport");
-	
+
 	/**
 	 * Takes a sentence and extracts noun phrases and entity names to from search
 	 * queries for finding relevant sentences on the web, which are then subject
@@ -131,6 +131,28 @@ public class ContentGeneratorSupport {
 
 		return queryArrayStr;
 
+	}
+	
+	public static String[] cleanListOfSents(String[] sents) {
+		List<String> sentsClean = new ArrayList<String>();
+		for (String s : sents) {
+			if (s == null || s.trim().length() < 30 || s.length() < 20)
+				continue;
+			sentsClean.add(s);
+		}
+		return (String[]) sentsClean.toArray(new String[0]);
+	}
+
+	public static String cleanSpacesInCleanedHTMLpage(String pageContent){ //was 4 spaces 
+		 //was 3 spaces => now back to 2
+		//TODO - verify regexp!!
+		pageContent = pageContent.trim().replaceAll("([a-z])(\\s{2,3})([A-Z])", "$1. $3")
+				//replaceAll("[a-z]  [A-Z]", ". $0")// .replace("  ",
+				// ". ")
+				.replace("..", ".").replace(". . .", " ").
+				replace(".    .",". ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
+		// we need to put '.'
+		return pageContent;
 	}
 
 	/**
@@ -222,17 +244,7 @@ public class ContentGeneratorSupport {
 		return hits;
 	}
 
-	
 
-	public static String[] cleanListOfSents(String[] sents) {
-		List<String> sentsClean = new ArrayList<String>();
-		for (String s : sents) {
-			if (s == null || s.trim().length() < 30 || s.length() < 20)
-				continue;
-			sentsClean.add(s);
-		}
-		return (String[]) sentsClean.toArray(new String[0]);
-	}
 
 	// given a fragment from snippet, finds an original sentence at a webpage by
 	// optimizing alignmemt score
@@ -322,9 +334,7 @@ public class ContentGeneratorSupport {
 		String[] sents = downloadedPage.split("#");
 		List<TextChunk> sentsList = new ArrayList<TextChunk>();
 		for(String s: sents){
-			s = s.trim().replace("  ", ". ").replace("..", ".").replace(". . .", " ")
-					.replace(": ", ". ").replace("- ", ". ").
-					replace (". .",".").trim();
+			s = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(s);
 			sentsList.add(new TextChunk(s, s.length()));
 		}
 
@@ -369,7 +379,7 @@ public class ContentGeneratorSupport {
 		}
 	}
 
-	protected static String[] cleanSplitListOfSents(String[] longestSents){
+	protected String[] cleanSplitListOfSents(String[] longestSents){
 		float minFragmentLength = 40, minFragmentLengthSpace=4;
 
 		List<String> sentsClean = new ArrayList<String>();
@@ -408,8 +418,61 @@ public class ContentGeneratorSupport {
 		}
 		return (String[]) sentsClean.toArray(new String[0]);
 	}	
-	
+
+	protected String[] cleanSplitListOfSentsFirstSplit(String[] longestSents){
+		float minFragmentLength = 40, minFragmentLengthSpace=4;
+
+		List<String> sentsClean = new ArrayList<String>();
+		for (String sentenceOrMultSent : longestSents)
+		{
+			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<minFragmentLength)
+				continue;
+			List<String> furtherSplit = TextProcessor.splitToSentences(sentenceOrMultSent);
+			for(String sentence: furtherSplit ){
+				if (sentence==null || sentence.length()<20)
+					continue;
+				if (GeneratedSentenceProcessor.acceptableMinedSentence(sentence)==null){
+					//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
+					continue;
+				}
+				// aaa. hhh hhh.  kkk . kkk ll hhh. lll kkk n.
+				int numOfDots = sentence.replace('.','&').split("&").length;
+				float avgSentenceLengthInTextPortion = (float)sentenceOrMultSent.length() /(float) numOfDots;
+				if ( avgSentenceLengthInTextPortion<minFragmentLength)
+					continue;
+				// o oo o ooo o o o ooo oo ooo o o oo
+				numOfDots = sentence.replace(' ','&').split("&").length;
+				avgSentenceLengthInTextPortion = (float)sentence.length() /(float) numOfDots;
+				if ( avgSentenceLengthInTextPortion<minFragmentLengthSpace)
+					continue;
+
+
+
+				// forced split by ',' somewhere in the middle of sentence
+				// disused - Feb 26 13
+				//furtherSplit = furtherMakeSentencesShorter(furtherSplit);
+				//furtherSplit.remove(furtherSplit.size()-1);
+
+				if (sentence.indexOf('|')>-1)
+					continue;
+				sentence = Utils.convertToASCII(sentence);
+				sentsClean.add(sentence);
+			}
+		}
+		return (String[]) sentsClean.toArray(new String[0]);
 	}
+	
+	public static void main(String[] args){
+		String s = "You can grouP   parts  Of your regular expression  In your pattern   You grouP  elements";
+		//with round brackets, e.g., ()." +
+		//		" This allows you to assign a repetition operator to a complete group.";
+		String sr = s.replaceAll("([a-z])(\\s{2,3})([A-Z])", "$1. $3");
+		String sr1 = s.replaceAll("  [A-Z]", ". $0");
+		sr = s.replaceAll("[a-z]  [A-Z]", ". $1");
+		sr1 = s.replaceAll("  [A-Z]", ". $1");
+	}
+
+}
 
 
 

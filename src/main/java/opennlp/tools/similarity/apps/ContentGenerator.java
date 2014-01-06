@@ -38,7 +38,7 @@ import opennlp.tools.textsimilarity.chunker2matcher.ParserChunker2MatcherProcess
  * 
  */
 
-public class ContentGenerator {
+public class ContentGenerator /*extends RelatedSentenceFinder*/ {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.similarity.apps.ContentGenerator");
 	PageFetcher pFetcher = new PageFetcher();
@@ -70,35 +70,6 @@ public class ContentGenerator {
 
 	}
 
-/*
-	public List<HitBase> findRelatedOpinionsForSentence(String sentence,
-			List<String> sents) throws Exception {
-		List<HitBase> opinionSentencesToAdd = new ArrayList<HitBase>();
-		System.out.println(" \n\n=== Sentence  = " + sentence);
-		List<String> nounPhraseQueries = buildSearchEngineQueryFromSentence(sentence);
-
-		BingQueryRunner yrunner = new BingQueryRunner();
-		for (String query : nounPhraseQueries) {
-			System.out.println("\nquery = " + query);
-			// query += " "+join(MENTAL_VERBS, " OR ") ;
-			List<HitBase> searchResult = yrunner.runSearch(query, 100);
-			if (searchResult != null) {
-				for (HitBase item : searchResult) { // got some text from .html
-					if (item.getAbstractText() != null
-							&& !(item.getUrl().indexOf(".pdf") > 0)) { // exclude
-						// pdf
-						opinionSentencesToAdd
-						.add(augmentWithMinedSentencesAndVerifyRelevance(item,
-								sentence, sents));
-					}
-				}
-			}
-		}
-
-		opinionSentencesToAdd = removeDuplicatesFromResultantHits(opinionSentencesToAdd);
-		return opinionSentencesToAdd;
-	}
-	*/
 
 	/**
 	 * Main content generation function which takes a seed as a person, rock
@@ -128,8 +99,7 @@ public class ContentGenerator {
 					if (item.getAbstractText() != null
 							&& !(item.getUrl().indexOf(".pdf") > 0)) { // exclude pdf
 						opinionSentencesToAdd
-						.add(buildParagraphOfGeneratedText(item,
-								sentence, null));
+						.add(buildParagraphOfGeneratedText(item, sentence, null));
 					}
 				}
 			}
@@ -227,433 +197,6 @@ public class ContentGenerator {
 
 	}
 
-	/*
-	public static List<String> removeDuplicatesFromQueries(List<String> hits) {
-		StringDistanceMeasurer meas = new StringDistanceMeasurer();
-		double dupeThresh = 0.8; // if more similar, then considered dupes was
-		// 0.7
-		List<Integer> idsToRemove = new ArrayList<Integer>();
-		List<String> hitsDedup = new ArrayList<String>();
-		try {
-			for (int i = 0; i < hits.size(); i++)
-				for (int j = i + 1; j < hits.size(); j++) {
-					String title1 = hits.get(i);
-					String title2 = hits.get(j);
-					if (StringUtils.isEmpty(title1) || StringUtils.isEmpty(title2))
-						continue;
-					if (meas.measureStringDistance(title1, title2) > dupeThresh) {
-						idsToRemove.add(j); // dupes found, later list member to
-						// be deleted
-
-					}
-				}
-
-			for (int i = 0; i < hits.size(); i++)
-				if (!idsToRemove.contains(i))
-					hitsDedup.add(hits.get(i));
-
-			if (hitsDedup.size() < hits.size()) {
-				LOG.info("Removed duplicates from formed query, including "
-						+ hits.get(idsToRemove.get(0)));
-			}
-
-		} catch (Exception e) {
-			LOG.severe("Problem removing duplicates from query list");
-		}
-
-		return hitsDedup;
-
-	}
-
-	
-	public static List<HitBase> removeDuplicatesFromResultantHits(
-			List<HitBase> hits) {
-		StringDistanceMeasurer meas = new StringDistanceMeasurer();
-		double dupeThresh = // 0.8; // if more similar, then considered dupes was
-				0.7;
-		List<Integer> idsToRemove = new ArrayList<Integer>();
-		List<HitBase> hitsDedup = new ArrayList<HitBase>();
-		try {
-			for (int i = 0; i < hits.size(); i++)
-				for (int j = i + 1; j < hits.size(); j++) {
-					HitBase hit2 = hits.get(j);
-					List<Fragment> fragmList1 = hits.get(i).getFragments();
-					List<Fragment> fragmList2 = hits.get(j).getFragments();
-					List<Fragment> fragmList2Results = new ArrayList<Fragment>(fragmList2);
-					for (Fragment f1 : fragmList1)
-						for (Fragment f2 : fragmList2) {
-							String sf1 = f1.getResultText();
-							String sf2 = f2.getResultText();
-							if (StringUtils.isEmpty(sf1) || StringUtils.isEmpty(sf1))
-								continue;
-							if (meas.measureStringDistance(sf1, sf2) > dupeThresh) {
-								fragmList2Results.remove(f2);
-								LOG.info("Removed duplicates from formed fragments list: "
-										+ sf2);
-							}
-						}
-
-					hit2.setFragments(fragmList2Results);
-					hits.set(j, hit2);
-				}
-		} catch (Exception e) {
-			LOG.severe("Problem removing duplicates from list of fragment");
-		}
-		return hits;
-	}
-
-	
-
-	public HitBase augmentWithMinedSentencesAndVerifyRelevance(HitBase item,
-			String originalSentence, List<String> sentsAll) {
-		if (sentsAll == null)
-			sentsAll = new ArrayList<String>();
-		// put orig sentence in structure
-		List<String> origs = new ArrayList<String>();
-		origs.add(originalSentence);
-		item.setOriginalSentences(origs);
-		String title = item.getTitle().replace("<b>", " ").replace("</b>", " ")
-				.replace("  ", " ").replace("  ", " ");
-		// generation results for this sentence
-		List<Fragment> result = new ArrayList<Fragment>();
-		// form plain text from snippet
-		String snapshot = item.getAbstractText().replace("<b>", " ")
-				.replace("</b>", " ").replace("  ", " ").replace("  ", " ");
-
-
-		// fix a template expression which can be substituted by original if
-		// relevant
-		String snapshotMarked = snapshot.replace("...",
-				" _should_find_orig_ . _should_find_orig_");
-		String[] fragments = sm.splitSentences(snapshotMarked);
-		List<String> allFragms = new ArrayList<String>();
-		allFragms.addAll(Arrays.asList(fragments));
-
-		String[] sents = null;
-		String downloadedPage = null;
-		try {
-			if (snapshotMarked.length() != snapshot.length()) {
-				downloadedPage = pFetcher.fetchPage(item.getUrl());
-				if (downloadedPage != null && downloadedPage.length() > 100) {
-					item.setPageContent(downloadedPage);
-					String pageContent = Utils.fullStripHTML(item.getPageContent());
-					pageContent = GeneratedSentenceProcessor
-							.normalizeForSentenceSplitting(pageContent);
-					pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
-							// ". ")
-							.replace("..", ".").replace(". . .", " ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
-					// we need to put '.'
-					sents = sm.splitSentences(pageContent);
-
-					sents = cleanListOfSents(sents);
-				}
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			System.err
-			.println("Problem downloading  the page and splitting into sentences");
-			return item;
-		}
-
-		for (String fragment : allFragms) {
-			String followSent = null;
-			if (fragment.length() < 50)
-				continue;
-			String pageSentence = "";
-			// try to find original sentence from webpage
-			if (fragment.indexOf("_should_find_orig_") > -1 && sents != null
-					&& sents.length > 0){
-				try { 
-					// first try sorted sentences from page by length approach
-					String[] sentsSortedByLength = extractSentencesFromPage(downloadedPage);
-					String[] mainAndFollowSent = null;
-
-					try {
-						mainAndFollowSent = getFullOriginalSentenceFromWebpageBySnippetFragment(
-								fragment.replace("_should_find_orig_", ""), sentsSortedByLength);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					// if the above gives null than try to match all sentences from snippet fragment
-					if (mainAndFollowSent==null || mainAndFollowSent[0]==null){
-						mainAndFollowSent = getFullOriginalSentenceFromWebpageBySnippetFragment(
-								fragment.replace("_should_find_orig_", ""), sents);
-					}
-					
-					if (mainAndFollowSent!=null || mainAndFollowSent[0]!=null){
-						pageSentence = mainAndFollowSent[0];
-						for(int i = 1; i< mainAndFollowSent.length; i++)
-							followSent+= mainAndFollowSent[i];
-					}
-
-				} catch (Exception e) {
-
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-			else
-				// or get original snippet
-				pageSentence = fragment;
-			if (pageSentence != null)
-				pageSentence.replace("_should_find_orig_", "");
-
-			// resultant sentence SHOULD NOT be longer than for times the size of
-			// snippet fragment
-			if (pageSentence != null && pageSentence.length()>50 )
-			//		&& (float) pageSentence.length() / (float) fragment.length() < 4.0)
-			{ // was 2.0,
-
-				try { // get score from syntactic match between sentence in
-					// original text and mined sentence
-					double measScore = 0.0, syntScore = 0.0, mentalScore = 0.0;
-
-					SentencePairMatchResult matchRes = sm.assessRelevance(pageSentence
-							+ " " + title, originalSentence);
-					List<List<ParseTreeChunk>> match = matchRes.getMatchResult();
-					if (!matchRes.isVerbExists() || matchRes.isImperativeVerb()) {
-						System.out
-						.println("Rejected Sentence : No verb OR Yes imperative verb :"
-								+ pageSentence);
-						continue;
-					}
-
-					syntScore = parseTreeChunkListScorer
-							.getParseTreeChunkListScore(match);
-					System.out.println(parseTreeChunk.listToString(match) + " "
-							+ syntScore + "\n pre-processed sent = '" + pageSentence);
-
-					if (syntScore < RELEVANCE_THRESHOLD){ // 1.5) { // trying other sents
-						for (String currSent : sentsAll) {
-							if (currSent.startsWith(originalSentence))
-								continue;
-							match = sm.assessRelevance(currSent, pageSentence)
-									.getMatchResult();
-							double syntScoreCurr = parseTreeChunkListScorer
-									.getParseTreeChunkListScore(match);
-							if (syntScoreCurr > syntScore) {
-								syntScore = syntScoreCurr;
-							}
-						}
-						if (syntScore > RELEVANCE_THRESHOLD) {
-							System.out.println("Got match with other sent: "
-									+ parseTreeChunk.listToString(match) + " " + syntScore);
-						}
-					}
-
-					measScore = stringDistanceMeasurer.measureStringDistance(
-							originalSentence, pageSentence);
-
-
-					if ((syntScore > RELEVANCE_THRESHOLD || measScore > 0.5)
-							&& measScore < 0.8 && pageSentence.length() > 40) // >70
-					{
-						String pageSentenceProc = GeneratedSentenceProcessor
-								.acceptableMinedSentence(pageSentence);
-						if (pageSentenceProc != null) {
-							pageSentenceProc = GeneratedSentenceProcessor
-									.processSentence(pageSentenceProc);
-							followSent = GeneratedSentenceProcessor.processSentence(followSent);
-							if (followSent != null) {
-								pageSentenceProc += " "+ followSent;
-							}
-
-							pageSentenceProc = Utils.convertToASCII(pageSentenceProc);
-							Fragment f = new Fragment(pageSentenceProc, syntScore + measScore
-									+ mentalScore + (double) pageSentenceProc.length()
-									/ (double) 50);
-							f.setSourceURL(item.getUrl());
-							f.fragment = fragment;
-							result.add(f);
-							System.out.println("Accepted sentence: " + pageSentenceProc + " | "+followSent
-									+ "| with title= " + title);
-							System.out.println("For fragment = " + fragment);
-						} else
-							System.out
-							.println("Rejected sentence due to wrong area at webpage: "
-									+ pageSentence);
-					} else
-						System.out.println("Rejected sentence due to low score: "
-								+ pageSentence);
-					// }
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		}
-		item.setFragments(result);
-		return item;
-	}
-
-	public static String[] cleanListOfSents(String[] sents) {
-		List<String> sentsClean = new ArrayList<String>();
-		for (String s : sents) {
-			if (s == null || s.trim().length() < 30 || s.length() < 20)
-				continue;
-			sentsClean.add(s);
-		}
-		return (String[]) sentsClean.toArray(new String[0]);
-	}
-
-	// given a fragment from snippet, finds an original sentence at a webpage by
-	// optimizing alignmemt score
-	public static String[] getFullOriginalSentenceFromWebpageBySnippetFragment(
-			String fragment, String[] sents) {
-		if (fragment.trim().length() < 15)
-			return null;
-
-		StringDistanceMeasurer meas = new StringDistanceMeasurer();
-		Double dist = 0.0;
-		String result = null, followSent = "";
-		for (int i = 0; i < sents.length; i++) {
-			String s = sents[i];
-			if (s == null || s.length() < 30)
-				continue;
-			Double distCurr = meas.measureStringDistance(s, fragment);
-			if (distCurr > dist && distCurr > 0.4) {
-				result = s;
-				dist = distCurr;
-				try {
-					if (i < sents.length - 1 && sents[i + 1].length() > 60) { 
-						String f1 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+1]);
-						if (f1!=null){
-							followSent = f1;
-						}
-					}
-
-					if (i < sents.length - 2 && sents[i + 2].length() > 60) {
-						String f2 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+2]);
-						if (f2!=null){
-							followSent += " "+f2;
-						}
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		return new String[] { result, followSent };
-	}
-
-	 given a fragment from snippet, finds an original sentence at a webpage by
-	// optimizing alignmemt score
-	public static String[] getBestFullOriginalSentenceFromWebpageBySnippetFragment(
-			String fragment, String[] sents) {
-		if (fragment.trim().length() < 15)
-			return null;
-		int bestSentIndex = -1;
-		StringDistanceMeasurer meas = new StringDistanceMeasurer();
-		Double distBest = 10.0; // + sup
-		String result = null, followSent = null;
-		for (int i = 0; i < sents.length; i++) {
-			String s = sents[i];
-			if (s == null || s.length() < 30)
-				continue;
-			Double distCurr = meas.measureStringDistance(s, fragment);
-			if (distCurr > distBest) {
-				distBest = distCurr;
-				bestSentIndex = i;
-			}
-
-		}
-		if (distBest > 0.4) {
-			result = sents[bestSentIndex];
-
-			if (bestSentIndex < sents.length - 1
-					&& sents[bestSentIndex + 1].length() > 60) {
-				followSent = sents[bestSentIndex + 1];
-			}
-
-		}
-
-		return new String[] { result, followSent };
-	}
-	*/
-/*
-	public String[] extractSentencesFromPage(String downloadedPage)
-	{
-
-		int maxSentsFromPage= 100;
-		List<String[]> results = new ArrayList<String[]>();
-
-		//String pageOrigHTML = pFetcher.fetchOrigHTML(url);
-
-		downloadedPage= downloadedPage.replace("     ", "&");
-		downloadedPage = downloadedPage.replaceAll("(?:&)+", "#");
-		String[] sents = downloadedPage.split("#");
-		List<TextChunk> sentsList = new ArrayList<TextChunk>();
-		for(String s: sents){
-			s = s.trim().replace("  ", ". ").replace("..", ".").replace(". . .", " ")
-					.replace(": ", ". ").replace("- ", ". ").
-					replace (". .",".").trim();
-			sentsList.add(new TextChunk(s, s.length()));
-		}
-
-		Collections.sort(sentsList, new TextChunkComparable());
-		String[] longestSents = new String[maxSentsFromPage];
-		int j=0;
-		int initIndex = sentsList.size()-1 -maxSentsFromPage;
-		if (initIndex<0)
-			initIndex = 0;
-		for(int i=initIndex; i< sentsList.size() && j<maxSentsFromPage ; i++){
-			longestSents[j] = sentsList.get(i).text;
-			j++;
-		}
-
-		sents = ContentGeneratorSupport.cleanSplitListOfSents(longestSents);
-
-		//sents = removeDuplicates(sents);
-		//sents = verifyEnforceStartsUpperCase(sents);
-
-		return sents;
-	}
-*/
-	/*
-
-	protected String[] cleanSplitListOfSents(String[] longestSents){
-		float minFragmentLength = 40, minFragmentLengthSpace=4;
-
-		List<String> sentsClean = new ArrayList<String>();
-		for (String sentenceOrMultSent : longestSents)
-		{
-			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
-				continue;
-			if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
-				System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
-				continue;
-			}
-			// aaa. hhh hhh.  kkk . kkk ll hhh. lll kkk n.
-			int numOfDots = sentenceOrMultSent.replace('.','&').split("&").length;
-			float avgSentenceLengthInTextPortion = (float)sentenceOrMultSent.length() /(float) numOfDots;
-			if ( avgSentenceLengthInTextPortion<minFragmentLength)
-				continue;
-			// o oo o ooo o o o ooo oo ooo o o oo
-			numOfDots = sentenceOrMultSent.replace(' ','&').split("&").length;
-			avgSentenceLengthInTextPortion = (float)sentenceOrMultSent.length() /(float) numOfDots;
-			if ( avgSentenceLengthInTextPortion<minFragmentLengthSpace)
-				continue;
-
-			List<String> furtherSplit = TextProcessor.splitToSentences(sentenceOrMultSent);
-
-			// forced split by ',' somewhere in the middle of sentence
-			// disused - Feb 26 13
-			//furtherSplit = furtherMakeSentencesShorter(furtherSplit);
-			furtherSplit.remove(furtherSplit.size()-1);
-			for(String s : furtherSplit){
-				if (s.indexOf('|')>-1)
-					continue;
-				s = s.replace("<em>"," ").replace("</em>"," ");
-				s = Utils.convertToASCII(s);
-				sentsClean.add(s);
-			}
-		}
-		return (String[]) sentsClean.toArray(new String[0]);
-	}
-*/
 	private Triple<List<String>, String, String[]> formCandidateFragmentsForPage(HitBase item, String originalSentence, List<String> sentsAll){
 		if (sentsAll == null)
 			sentsAll = new ArrayList<String>();
@@ -688,10 +231,8 @@ public class ContentGenerator {
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
 					pageContent = GeneratedSentenceProcessor
 							.normalizeForSentenceSplitting(pageContent);
-					pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
-							// ". ")
-							.replace("..", ".").replace(". . .", " ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
-					// we need to put '.'
+					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
+			
 					sents = sm.splitSentences(pageContent);
 
 					sents = ContentGeneratorSupport.cleanListOfSents(sents);
@@ -865,29 +406,29 @@ public class ContentGenerator {
 	 *          multi-sentence
 	 * @return search result
 	 */
-public HitBase buildParagraphOfGeneratedText(HitBase item,
-		String originalSentence, List<String> sentsAll) {
-	List<Fragment> results = new ArrayList<Fragment>() ;
-	
-	Triple<List<String>, String, String[]> fragmentExtractionResults = formCandidateFragmentsForPage(item, originalSentence, sentsAll);
+	public HitBase buildParagraphOfGeneratedText(HitBase item,
+			String originalSentence, List<String> sentsAll) {
+		List<Fragment> results = new ArrayList<Fragment>() ;
+		
+		Triple<List<String>, String, String[]> fragmentExtractionResults = formCandidateFragmentsForPage(item, originalSentence, sentsAll);
 
-	List<String> allFragms = (List<String>)fragmentExtractionResults.getFirst();
-	String downloadedPage = (String)fragmentExtractionResults.getSecond();
-	String[] sents = (String[])fragmentExtractionResults.getThird();
+		List<String> allFragms = (List<String>)fragmentExtractionResults.getFirst();
+		String downloadedPage = (String)fragmentExtractionResults.getSecond();
+		String[] sents = (String[])fragmentExtractionResults.getThird();
 
-	for (String fragment : allFragms) {
-		String[] candidateSentences = formCandidateSentences(fragment, fragmentExtractionResults);
-		if (candidateSentences == null)
-			continue;
-		Fragment res = verifyCandidateSentencesAndFormParagraph(candidateSentences, item, fragment, originalSentence, sentsAll);
-		if (res!=null)
-			results.add(res);
+		for (String fragment : allFragms) {
+			String[] candidateSentences = formCandidateSentences(fragment, fragmentExtractionResults);
+			if (candidateSentences == null)
+				continue;
+			Fragment res = verifyCandidateSentencesAndFormParagraph(candidateSentences, item, fragment, originalSentence, sentsAll);
+			if (res!=null)
+				results.add(res);
 
+		}
+		
+		item.setFragments(results );
+		return item;
 	}
-	
-	item.setFragments(results );
-	return item;
-}
 
 
 

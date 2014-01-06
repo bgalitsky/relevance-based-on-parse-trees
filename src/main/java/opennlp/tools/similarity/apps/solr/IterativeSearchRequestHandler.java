@@ -56,7 +56,6 @@ import org.apache.solr.search.DocList;
 import org.apache.solr.search.DocSlice;
 import org.apache.solr.search.QParser;
 import org.apache.solr.search.SolrIndexSearcher;
-//import org.apache.solr.search.SyntaxError;
 import org.apache.solr.util.RTimer;
 import org.apache.solr.util.SolrPluginUtils;
 

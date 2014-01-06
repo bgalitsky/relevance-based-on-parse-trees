@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import opennlp.tools.parse_thicket.Triple;
@@ -58,10 +60,11 @@ public class RelatedSentenceFinder {
 	protected ParseTreeChunkListScorer parseTreeChunkListScorer = new ParseTreeChunkListScorer();
 	protected ParseTreeChunk parseTreeChunk = new ParseTreeChunk();
 	protected static StringDistanceMeasurer stringDistanceMeasurer = new StringDistanceMeasurer();
-	public BingQueryRunner yrunner = new BingQueryRunner();
+	protected BingQueryRunner yrunner = new BingQueryRunner();
 	protected int MAX_STEPS = 1;
 	protected int MAX_SEARCH_RESULTS = 1;
 	protected float RELEVANCE_THRESHOLD = 1.1f;
+	protected Set<String> visitedURLs = new HashSet();
 
 	// used to indicate that a sentence is an opinion, so more appropriate
 	static List<String> MENTAL_VERBS = new ArrayList<String>(
@@ -113,6 +116,7 @@ public class RelatedSentenceFinder {
 						opinionSentencesToAdd
 						.add(augmentWithMinedSentencesAndVerifyRelevance(item,
 								sentence, sents));
+						
 					}
 				}
 			}
@@ -154,10 +158,12 @@ public class RelatedSentenceFinder {
 			if (searchResult != null) {
 				for (HitBase item : searchResult) { // got some text from .html
 					if (item.getAbstractText() != null
-							&& !(item.getUrl().indexOf(".pdf") > 0)) { // exclude pdf
+							&& !(item.getUrl().indexOf(".pdf") > 0) && !visitedURLs.contains(item.getUrl())) { // exclude pdf
 						opinionSentencesToAdd
-						.add(augmentWithMinedSentencesAndVerifyRelevance(item,
-								sentence, null));
+						.add(//augmentWithMinedSentencesAndVerifyRelevance(item,
+							//	sentence, null));
+								buildParagraphOfGeneratedText(item,	sentence, null));
+						visitedURLs.add(item.getUrl());
 					}
 				}
 			}
@@ -394,13 +400,14 @@ public class RelatedSentenceFinder {
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
 					pageContent = GeneratedSentenceProcessor
 							.normalizeForSentenceSplitting(pageContent);
-					pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
-							// ". ")
-							.replace("..", ".").replace(". . .", " ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
+					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
+					//pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
+					//		// ". ")
+					//		.replace("..", ".").replace(". . .", " ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
 					// we need to put '.'
 					sents = sm.splitSentences(pageContent);
 
-					sents = cleanListOfSents(sents);
+					sents = ContentGeneratorSupport.cleanListOfSents(sents);
 				}
 			}
 		} catch (Exception e) {
@@ -544,15 +551,7 @@ public class RelatedSentenceFinder {
 		return item;
 	}
 
-	public static String[] cleanListOfSents(String[] sents) {
-		List<String> sentsClean = new ArrayList<String>();
-		for (String s : sents) {
-			if (s == null || s.trim().length() < 30 || s.length() < 20)
-				continue;
-			sentsClean.add(s);
-		}
-		return (String[]) sentsClean.toArray(new String[0]);
-	}
+	
 
 	// given a fragment from snippet, finds an original sentence at a webpage by
 	// optimizing alignmemt score
@@ -642,9 +641,10 @@ public class RelatedSentenceFinder {
 		String[] sents = downloadedPage.split("#");
 		List<TextChunk> sentsList = new ArrayList<TextChunk>();
 		for(String s: sents){
-			s = s.trim().replace("  ", ". ").replace("..", ".").replace(". . .", " ")
+			s = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(s);
+		/*	s = s.trim().replace("  ", ". ").replace("..", ".").replace(". . .", " ")
 					.replace(": ", ". ").replace("- ", ". ").
-					replace (". .",".").trim();
+					replace (". .",".").trim(); */
 			sentsList.add(new TextChunk(s, s.length()));
 		}
 
@@ -729,7 +729,7 @@ public class RelatedSentenceFinder {
 		return (String[]) sentsClean.toArray(new String[0]);
 	}
 
-	private Triple<List<String>, String, String[]> formCandidateFragmentsForPage(HitBase item, String originalSentence, List<String> sentsAll){
+	public Triple<List<String>, String, String[]> formCandidateFragmentsForPage(HitBase item, String originalSentence, List<String> sentsAll){
 		if (sentsAll == null)
 			sentsAll = new ArrayList<String>();
 		// put orig sentence in structure
@@ -763,13 +763,15 @@ public class RelatedSentenceFinder {
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
 					pageContent = GeneratedSentenceProcessor
 							.normalizeForSentenceSplitting(pageContent);
-					pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
-							// ". ")
-							.replace("..", ".").replace(". . .", " ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
+					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
+					//pageContent = pageContent.trim().replaceAll("    [A-Z]", ". $0")// .replace("  ",
+					//		// ". ")
+					//		.replace("..", ".").replace(". . .", " ").
+					//		replace(".    .",". ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
 					// we need to put '.'
 					sents = sm.splitSentences(pageContent);
 
-					sents = cleanListOfSents(sents);
+					sents = ContentGeneratorSupport.cleanListOfSents(sents);
 				}
 			}
 		} catch (Exception e) {
@@ -782,7 +784,7 @@ public class RelatedSentenceFinder {
 		return new Triple(allFragms, downloadedPage, sents);
 	}
 
-	private String[] formCandidateSentences(String fragment, Triple<List<String>, String, String[]> fragmentExtractionResults){
+	String[] formCandidateSentences(String fragment, Triple<List<String>, String, String[]> fragmentExtractionResults){
 		String[] mainAndFollowSent = null;
 
 		List<String> allFragms = (List<String>)fragmentExtractionResults.getFirst();
@@ -843,9 +845,12 @@ public class RelatedSentenceFinder {
 
 		// resultant sentence SHOULD NOT be longer than for times the size of
 		// snippet fragment
-		if (!(pageSentence != null && pageSentence.length()>50 
-				&& (float) pageSentence.length() / (float) fragment.length() < 4.0) )
+		if (!(pageSentence != null && pageSentence.length()>50) ){
+			System.out.println("Cannot accept the sentence = "+ pageSentence +
+					"!(pageSentence != null && pageSentence.length()>50 && (float) pageSentence.length() / (float) fragment.length() < 4.0) )");
+			
 			return null;
+		}
 
 
 		try { // get score from syntactic match between sentence in
@@ -855,6 +860,12 @@ public class RelatedSentenceFinder {
 			SentencePairMatchResult matchRes = sm.assessRelevance(pageSentence
 					+ " " + title, originalSentence);
 			List<List<ParseTreeChunk>> match = matchRes.getMatchResult();
+			if (match==null || match.size()<1){
+				System.out
+				.println("Rejected Sentence : empty match "+ pageSentence);
+				return null;
+			}
+			
 			if (!matchRes.isVerbExists() || matchRes.isImperativeVerb()) {
 				System.out
 				.println("Rejected Sentence : No verb OR Yes imperative verb :"
@@ -867,22 +878,26 @@ public class RelatedSentenceFinder {
 			System.out.println(parseTreeChunk.listToString(match) + " "
 					+ syntScore + "\n pre-processed sent = '" + pageSentence);
 
-			if (syntScore < RELEVANCE_THRESHOLD){ // 1.5) { // trying other sents
-				for (String currSent : sentsAll) {
-					if (currSent.startsWith(originalSentence))
-						continue;
-					match = sm.assessRelevance(currSent, pageSentence)
-							.getMatchResult();
-					double syntScoreCurr = parseTreeChunkListScorer
-							.getParseTreeChunkListScore(match);
-					if (syntScoreCurr > syntScore) {
-						syntScore = syntScoreCurr;
+			try {
+				if (sentsAll!=null && syntScore < RELEVANCE_THRESHOLD){ // 1.5) { // trying other sents
+					for (String currSent : sentsAll) {
+						if (currSent.startsWith(originalSentence))
+							continue;
+						match = sm.assessRelevance(currSent, pageSentence)
+								.getMatchResult();
+						double syntScoreCurr = parseTreeChunkListScorer
+								.getParseTreeChunkListScore(match);
+						if (syntScoreCurr > syntScore) {
+							syntScore = syntScoreCurr;
+						}
+					}
+					if (syntScore > RELEVANCE_THRESHOLD) {
+						System.out.println("Got match with other sent: "
+								+ parseTreeChunk.listToString(match) + " " + syntScore);
 					}
 				}
-				if (syntScore > RELEVANCE_THRESHOLD) {
-					System.out.println("Got match with other sent: "
-							+ parseTreeChunk.listToString(match) + " " + syntScore);
-				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
 			measScore = stringDistanceMeasurer.measureStringDistance(
