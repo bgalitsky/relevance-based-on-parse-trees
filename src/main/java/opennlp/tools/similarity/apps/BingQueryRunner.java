@@ -54,8 +54,12 @@ public class BingQueryRunner {
 			try {
 				aq.doQuery();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				aq.setAppid("Cec1TlE67kPGDA/1MbeqPfHzP0I1eJypf3o0pYxRsuU=");
+				try {
+					aq.doQuery();
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
 			}
 			e.printStackTrace();
 		}

@@ -2,6 +2,7 @@ package opennlp.tools.parse_thicket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
 	String word;
@@ -12,8 +13,19 @@ public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
     Integer id;
     //PhraseType 
     String phraseType;
+    Map<String, Object> attributes;
     
-    public enum PhraseType {NP("NP"), VP("VP"), PRP("PRP");
+    
+    
+    public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
+
+	public enum PhraseType {NP("NP"), VP("VP"), PRP("PRP");
     	private PhraseType(final String text) {
         this.text = text;
     	}
@@ -33,8 +45,7 @@ public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
 		super();
 		this.word = word;
 		this.pos = pos;
-		this.ne = ne;
-		this.id = id;
+		
 	}
 	
 	public String getPhraseType() {

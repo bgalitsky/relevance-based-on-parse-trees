@@ -73,7 +73,7 @@ public class MultiSentenceSearchResultsProcessor  {
 					hit.setSource(match.toString());
 				}
 				if (score < 2){ // attempt to match with snippet, if not much luck with original text
-					match = matcher.assessRelevanceCache(pageSentsAndSnippet[0] ,
+					match = matcher.assessRelevanceCache(pageSentsAndSnippet[1] ,
 							searchQuery);
 					score = parseTreeChunkListScorer.getParseTreeChunkListScore(match);
 				}

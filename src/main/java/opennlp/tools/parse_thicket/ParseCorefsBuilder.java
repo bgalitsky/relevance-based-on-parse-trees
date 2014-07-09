@@ -19,8 +19,8 @@ import edu.stanford.nlp.util.*;
 
 public class ParseCorefsBuilder {
 	protected static ParseCorefsBuilder instance;
-	private Annotation annotation;
-	StanfordCoreNLP pipeline;
+	protected Annotation annotation;
+	protected StanfordCoreNLP pipeline;
 	CommunicativeActionsArcBuilder caFinder = new CommunicativeActionsArcBuilder();
 	
 	  /**
@@ -35,7 +35,7 @@ public class ParseCorefsBuilder {
 	    return instance;
 	  }
 	
-	ParseCorefsBuilder(){
+	protected ParseCorefsBuilder(){
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 		pipeline = new StanfordCoreNLP(props);
@@ -127,7 +127,7 @@ public class ParseCorefsBuilder {
 	    return result;
 	}
 
-  private List<WordWordInterSentenceRelationArc> buildCAarcs(
+  protected List<WordWordInterSentenceRelationArc> buildCAarcs(
 			List<List<ParseTreeNode>> nodesThicket) {
 	  List<WordWordInterSentenceRelationArc> arcs = new ArrayList<WordWordInterSentenceRelationArc>();
 	  
