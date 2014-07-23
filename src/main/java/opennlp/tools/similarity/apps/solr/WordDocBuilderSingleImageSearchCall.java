@@ -34,8 +34,8 @@ import net.billylieurance.azuresearch.AzureSearchResultSet;
 import net.billylieurance.azuresearch.AzureSearchWebResult;
 
 import org.apache.commons.lang.StringUtils;
-import org.docx4j.Docx4J;
-import org.docx4j.convert.out.FOSettings;
+//import org.docx4j.Docx4J;
+//import org.docx4j.convert.out.FOSettings;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 
 import opennlp.tools.similarity.apps.ContentGeneratorSupport;
