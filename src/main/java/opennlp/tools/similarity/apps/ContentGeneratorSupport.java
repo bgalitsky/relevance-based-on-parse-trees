@@ -463,7 +463,7 @@ public class ContentGeneratorSupport {
 	}
 
 	public static String getPortionOfTitleWithoutDelimiters(String title){
-		String[] delimiters = new String[]{"\\+", "—","-", "=", "_", "\\)", "\\|"};
+		String[] delimiters = new String[]{"\\+","-", "=", "_", "\\)", "\\|"};
 		for(String delim: delimiters ){
 			String[] split = title.split(delim);
 			if (split.length>1){
