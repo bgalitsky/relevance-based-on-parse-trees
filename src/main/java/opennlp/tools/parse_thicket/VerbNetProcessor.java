@@ -1,5 +1,6 @@
 package opennlp.tools.parse_thicket;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,8 +26,14 @@ import edu.mit.jverbnet.index.VerbIndex;
 public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>> {
 
 	static VerbNetProcessor instance;
-	static private String pathToVerbnet = null;
+	static private String pathToVerbnet = null; //new File( "." ).getCanonicalPath()+"/src/test/resources";
 	public static VerbNetProcessor getInstance(String resourceDir) {
+		if (resourceDir==null)
+			try {
+				resourceDir = new File( "." ).getCanonicalPath()+"/src/test/resources";
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		pathToVerbnet = resourceDir + "/new_vn";
 		if (instance == null)
 			instance = new VerbNetProcessor();
@@ -37,7 +44,7 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 
 	IVerbIndex index = null;
 
-	public VerbNetProcessor() {
+	private VerbNetProcessor() {
 		
 		try {
 			URL url = new URL ("file", null , pathToVerbnet ) ;
