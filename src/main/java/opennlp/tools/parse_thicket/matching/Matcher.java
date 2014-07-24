@@ -23,7 +23,7 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 	//ParseTreeMatcherDeterministic md = new ParseTreeMatcherDeterministic();
 	PhraseGroupGeneralizer pgGen = new PhraseGroupGeneralizer();
 	
-	ParseCorefBuilderWithNER ptBuilder = ParseCorefBuilderWithNER.getInstance();
+	ParseCorefsBuilder ptBuilder = ParseCorefsBuilder.getInstance();
 	PT2ThicketPhraseBuilder phraseBuilder = new PT2ThicketPhraseBuilder();
 	Map<String, ParseThicket> parseThicketHash = new HashMap<String, ParseThicket>();
 	/**	   * The key function of similarity component which takes two portions of text
