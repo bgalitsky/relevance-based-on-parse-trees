@@ -30,17 +30,31 @@ public class TreeKernelRunner {
 
 	public void runLearner(String dir, String learning_file, String  model_file)
 	{
+			if (!dir.endsWith("/"))
+				dir+="/";
+		String[] runString = new String[]{dir+"svm_learn","-t", "5","-j","2","-W","A", dir+learning_file,  dir+model_file};
+		runEXE(runString, dir);
+	}
+	public void runLearnerWin(String dir, String learning_file, String  model_file)
+	{
 		dir = dir.replace('/', '\\');
 		
 		if (!dir.endsWith("\\"))
 				dir+="\\";
-		String[] runString = new String[]{dir+"svm_learn.exe","-t", "5", dir+learning_file,  dir+model_file};
+		String[] runString = new String[]{dir+"svm_learn.exe","-t", "5","-j","2","-W","A", dir+learning_file,  dir+model_file};
 		runEXE(runString, dir);
 	}
 	
 	
 	//svm_classify example_file model_file predictions_file
 	public void runClassifier(String dir, String example_file, String  model_file, String predictions_file)
+	{
+		if (!dir.endsWith("/"))
+				dir+="/";
+		String[] runString = new String[]{dir+"svm_classify", dir+example_file,  dir+model_file, dir+predictions_file};
+		runEXE(runString, dir);
+	}
+	public void runClassifierWin(String dir, String example_file, String  model_file, String predictions_file)
 	{
 		dir = dir.replace('/', '\\');
 		
