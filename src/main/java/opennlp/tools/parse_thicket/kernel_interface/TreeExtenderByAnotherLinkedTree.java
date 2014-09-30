@@ -6,6 +6,7 @@ import java.util.List;
 import opennlp.tools.jsmlearning.ProfileReaderWriter;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
+import opennlp.tools.parse_thicket.VerbNetProcessor;
 import opennlp.tools.parse_thicket.WordWordInterSentenceRelationArc;
 import opennlp.tools.parse_thicket.matching.Matcher;
 import opennlp.tools.parse_thicket.matching.PT2ThicketPhraseBuilder;
@@ -16,8 +17,8 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 	public List<String> buildForestForCorefArcs(ParseThicket pt){
 		List<String> results = new ArrayList<String>();
 		for(WordWordInterSentenceRelationArc arc: pt.getArcs()){
-			if (!arc.getArcType().getType().startsWith("coref"))
-				continue;
+			//if (!arc.getArcType().getType().startsWith("coref"))
+			//	continue;
 			int fromSent = arc.getCodeFrom().getFirst();
 			int toSent = arc.getCodeTo().getFirst();
 			String wordFrom = arc.getLemmaFrom();
@@ -32,13 +33,12 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 			System.out.println(sb.toString());
 			results.add(sb.toString());
 		}
-		/*
-		List<String[]> treeBankBuffer = new ArrayList<String[]>();
-		for(String t: results){
-			treeBankBuffer.add(new String[] {" 0 |BT|"+t.toString()+ "|ET|"});
+		// if no arcs then orig sentences
+		if (results.isEmpty()){
+			for(Tree t: pt.getSentences()){
+				results.add(t.toString());
+			}
 		}
-		ProfileReaderWriter.writeReport(treeBankBuffer, "C:\\stanford-corenlp\\tree_kernel\\unknownForest.txt", ' ');
-		*/
 		return results;
 	}
 
@@ -107,7 +107,7 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 
 					String phraseStr = kid.toString();
 					phraseStr=phraseStr.replace(")", "");
-					if (phraseStr.endsWith(word)){
+					if (phraseStr.endsWith(word)){ // found 
 						bInsert=true;
 						result = new ArrayList<Tree>();
 					}
@@ -263,22 +263,25 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 	}
 
 	public static void main(String[] args){
+		VerbNetProcessor p = VerbNetProcessor.
+				getInstance("/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/test/resources"); 
+				
 		Matcher matcher = new Matcher();
 		TreeExtenderByAnotherLinkedTree extender = new TreeExtenderByAnotherLinkedTree();
 		
 		ParseThicket pt = matcher.buildParseThicketFromTextWithRST(//"I went to the forest to look for a tree. I found out that it was thick and green");
-				"Iran refuses to accept the UN proposal to end its dispute over its work on nuclear weapons."+
+				"Iran refuses to accept the UN proposal to end its dispute over its work on nuclear weapons. "+
 				"UN nuclear watchdog passes a resolution condemning Iran for developing its second uranium enrichment site in secret. " +
 				"A recent IAEA report presented diagrams that suggested Iran was secretly working on nuclear weapons. " +
 				"Iran envoy says its nuclear development is for peaceful purpose, and the material evidence against it has been fabricated by the US. ");
 
 		List<String> results = extender.buildForestForCorefArcs(pt);
 		System.out.println(results);
-		System.exit(0);
+		//System.exit(0);
 
 		List<Tree> forest = pt.getSentences();
 		
-		List<Tree> trees = extender.getASubtreeWithRootAsNodeForWord1(forest.get(1), forest.get(1), new String[]{"it"});
+		List<Tree> trees = extender.getASubtreeWithRootAsNodeForWord1(forest.get(1), forest.get(1), new String[]{"its"});
 		System.out.println(trees);
 		StringBuilder sb = new StringBuilder(10000);	
 		extender.toStringBuilderExtenderByAnotherLinkedTree1(sb, forest.get(0), trees.get(0), new String[]{"the", "forest"});

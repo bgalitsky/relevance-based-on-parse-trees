@@ -32,6 +32,22 @@ public class PT2ExtendedTreeForestBuilder {
 		return treeBankBuffer;
 	}
 	
+	private String formTrainingSetFromTextOneLine(String para,  boolean positive){
+		String prefix = null;
+		if (positive)
+			prefix=" 1 ";
+		else
+			prefix=" -1 ";
+			
+		ParseThicket pt = matcher.buildParseThicketFromTextWithRST(para);
+		List<Tree> forest = pt.getSentences();
+		String line = prefix;
+		for(Tree t: forest){
+			line+= "|BT| "+t.toString()+ " |ET| ";
+		} 
+		return line;
+	}
+	
 	public void formPosNegTrainingSet(String pos, String neg, String path){
 		List<String[]> list = formTrainingSetFromText(pos,  true), 
 				negList= formTrainingSetFromText(neg, false);
@@ -50,8 +66,6 @@ public class PT2ExtendedTreeForestBuilder {
 		
 		ProfileReaderWriter.writeReport(treeBankBuffer, path+"unknown.txt", ' ');
 		tkRunner.runClassifier(path, "unknown.txt", modelFileName, "classifier_output.txt");
-		
-		
 	}
 	
 	
