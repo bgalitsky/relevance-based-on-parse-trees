@@ -33,8 +33,6 @@ public class PT2ThicketPhraseBuilder {
 		Map<Integer, List<List<ParseTreeNode>>> sentNumPhrases = new HashMap<Integer, List<List<ParseTreeNode>>>();
 		// build regular phrases
 		for(int nSent=0; nSent<pt.getSentences().size(); nSent++){
-
-
 			List<ParseTreeNode> sentence = pt.getNodesThicket().get(nSent);
 			Tree ptree = pt.getSentences().get(nSent);
 			//ptree.pennPrint();
@@ -48,6 +46,8 @@ public class PT2ThicketPhraseBuilder {
 		// discover and add RST arcs
 		List<WordWordInterSentenceRelationArc> arcsRST =
 				rstBuilder.buildRSTArcsFromMarkersAndCorefs(pt.getArcs(), sentNumPhrases, pt);
+		
+		
 
 		List<WordWordInterSentenceRelationArc> arcs = pt.getArcs();
 		arcs.addAll(arcsRST);
@@ -65,7 +65,7 @@ public class PT2ThicketPhraseBuilder {
 	 * arcs - arcs formed so far
 	 * pt - the built Parse Thicket
 	 */
-	private List<List<ParseTreeNode>> expandTowardsThicketPhrases(
+	protected List<List<ParseTreeNode>> expandTowardsThicketPhrases(
 			List<List<ParseTreeNode>> phrasesAllSent,
 			List<WordWordInterSentenceRelationArc> arcs,
 			Map<Integer, List<List<ParseTreeNode>>> sentNumPhrases, 
