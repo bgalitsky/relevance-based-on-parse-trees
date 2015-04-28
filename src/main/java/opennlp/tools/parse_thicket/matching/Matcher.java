@@ -1,9 +1,12 @@
 package opennlp.tools.parse_thicket.matching;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+
 
 
 
@@ -13,6 +16,7 @@ import opennlp.tools.parse_thicket.ParseCorefBuilderWithNER;
 import opennlp.tools.parse_thicket.ParseCorefsBuilder;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
+import opennlp.tools.parse_thicket.VerbNetProcessor;
 import opennlp.tools.textsimilarity.LemmaPair;
 import opennlp.tools.textsimilarity.ParseTreeChunk;
 import opennlp.tools.textsimilarity.ParseTreeMatcherDeterministic;
@@ -20,12 +24,16 @@ import opennlp.tools.textsimilarity.SentencePairMatchResult;
 import opennlp.tools.textsimilarity.chunker2matcher.ParserChunker2MatcherProcessor;
 
 public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
-	//ParseTreeMatcherDeterministic md = new ParseTreeMatcherDeterministic();
-	PhraseGroupGeneralizer pgGen = new PhraseGroupGeneralizer();
+	public static String resourceDir = new File(".").getAbsolutePath().replace("/.", "") + "/src/main/resources";
+	VerbNetProcessor proc = VerbNetProcessor.getInstance(resourceDir);
 	
-	ParseCorefsBuilder ptBuilder = ParseCorefsBuilder.getInstance();
+	protected PhraseGroupGeneralizer pgGen = new PhraseGroupGeneralizer();
+	
+	protected ParseCorefBuilderWithNER ptBuilder = ParseCorefBuilderWithNER.getInstance();
 	PT2ThicketPhraseBuilder phraseBuilder = new PT2ThicketPhraseBuilder();
-	Map<String, ParseThicket> parseThicketHash = new HashMap<String, ParseThicket>();
+	protected Map<String, ParseThicket> parseThicketHash = new HashMap<String, ParseThicket>();
+	
+	
 	/**	   * The key function of similarity component which takes two portions of text
 	 * and does similarity assessment by finding the set of all maximum common
 	 * subtrees of the set of parse trees for each portion of text
@@ -133,7 +141,7 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 				List<List<ParseTreeChunk>> res = pgGen.generalize(sent1GrpLst, sent2GrpLst);
 				return res;
 	}
-	private List<List<ParseTreeChunk>> formGroupedPhrasesFromChunksForPara(
+	protected List<List<ParseTreeChunk>> formGroupedPhrasesFromChunksForPara(
 			List<List<ParseTreeNode>> phrs) {
 		List<List<ParseTreeChunk>> results = new ArrayList<List<ParseTreeChunk>>();
 		List<ParseTreeChunk> nps = new ArrayList<ParseTreeChunk>(), vps = new ArrayList<ParseTreeChunk>(), 
