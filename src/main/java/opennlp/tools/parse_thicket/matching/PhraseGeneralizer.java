@@ -134,7 +134,7 @@ public class PhraseGeneralizer implements IGeneralizer<ParseTreeChunk> {
 		// starts from 1, not 0
 		List<int[]> accum = new ArrayList<int[]>();
 		accum.add(new int[] { occur1.get(0), occur2.get(0) });
-		for (int i = 1; i < occur1.size(); i++) {
+		for (int i = 1; i < occur1.size() && i< occur2.size(); i++) {
 
 			if (occur1.get(i) > occur1.get(i - 1)
 					&& occur2.get(i) > occur2.get(i - 1))
