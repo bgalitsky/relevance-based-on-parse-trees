@@ -24,7 +24,7 @@ import opennlp.tools.textsimilarity.SentencePairMatchResult;
 import opennlp.tools.textsimilarity.chunker2matcher.ParserChunker2MatcherProcessor;
 
 public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
-	public static String resourceDir = new File(".").getAbsolutePath().replace("/.", "") + "/src/main/resources";
+	public static String resourceDir = new File(".").getAbsolutePath().replace("/.", "") + "/src/test/resources";
 	VerbNetProcessor proc = VerbNetProcessor.getInstance(resourceDir);
 	
 	protected PhraseGroupGeneralizer pgGen = new PhraseGroupGeneralizer();
