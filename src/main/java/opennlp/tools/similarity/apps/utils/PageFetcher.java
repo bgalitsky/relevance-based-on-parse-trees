@@ -18,6 +18,7 @@
 package opennlp.tools.similarity.apps.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -27,16 +28,49 @@ import java.util.logging.Logger;
 
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
+
 
 public class PageFetcher {
   private static final Logger LOG = Logger
       .getLogger("opennlp.tools.similarity.apps.utils.PageFetcher");
+  Tika tika = new Tika();
 
-  private static int DEFAULT_TIMEOUT = 15000;
+  private static int DEFAULT_TIMEOUT = 1500;
 
   public String fetchPage(final String url) {
     return fetchPage(url, DEFAULT_TIMEOUT);
   }
+  
+  public String fetchPageAutoDetectParser(final String url ){
+	  String fetchURL = addHttp(url);
+	  String pageContent = null;
+	    URLConnection connection;
+	    try {
+	      LOG.info("fetch url  auto detect parser " + url);
+	      connection = new URL(fetchURL).openConnection();
+	      connection.setReadTimeout(DEFAULT_TIMEOUT);
+	      
+	    //parse method parameters
+	      Parser parser = new AutoDetectParser();
+	      BodyContentHandler handler = new BodyContentHandler();
+	      Metadata metadata = new Metadata();
+	      ParseContext context = new ParseContext();
+	      
+	      //parsing the file
+	      parser.parse(connection.getInputStream(), handler, metadata, context);
+	      
+	      pageContent = handler.toString();
+	    } catch (Exception e) {
+	      LOG.info(e.getMessage() + "\n" + e);
+	    }
+	    return  pageContent;
+  }
+  
 
   public String fetchPage(final String url, final int timeout) {
     String fetchURL = addHttp(url);
@@ -46,23 +80,23 @@ public class PageFetcher {
     String pageContent = null;
     URLConnection connection;
     try {
-      connection = new URL(url).openConnection();
+      connection = new URL(fetchURL).openConnection();
       connection.setReadTimeout(DEFAULT_TIMEOUT);
-      Tika tika = new Tika();
+      
       pageContent = tika.parseToString(connection.getInputStream())
           .replace('\n', ' ').replace('\t', ' ');
     } catch (MalformedURLException e) {
-      LOG.severe(e.getMessage() + "\n" + e);
+      LOG.info(e.getMessage() + "\n" + e);
     } catch (IOException e) {
-      LOG.severe(e.getMessage() + "\n" + e);
+      LOG.info(e.getMessage() + "\n" + e);
     } catch (TikaException e) {
-      LOG.severe(e.getMessage() + "\n" + e);
+      LOG.info(e.getMessage() + "\n" + e);
     }
     return pageContent;
   }
 
   private String addHttp(final String url) {
-    if (!url.startsWith("http://")) {
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
       return "http://" + url;
     }
     return url;
@@ -106,6 +140,20 @@ public class PageFetcher {
       e.printStackTrace();
     } */
     return buf.toString();
+  }
+  
+  public static void main(String[] args){
+	  PageFetcher fetcher = new PageFetcher();
+	  String content = fetcher.fetchPageAutoDetectParser("http://www.elastica.net/");
+	  System.out.println(content);
+	  content = fetcher.
+			  fetchPageAutoDetectParser("http://www.cnn.com");
+	  System.out.println(content);
+	  content = new PageFetcher().fetchPage("https://github.com");
+	  System.out.println(content);
+	  content = new PageFetcher().fetchOrigHTML("http://www.cnn.com");
+	  System.out.println(content);
+	  
   }
 
 }

@@ -54,6 +54,12 @@
 	</repositories>
 
 	<dependencies>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-log4j12</artifactId>
+	    <version>1.6.4</version>
+    </dependency>
+	
 		<dependency>
 		  <groupId>org.apache.opennlp</groupId>
 		  <artifactId>opennlp-tools</artifactId>
@@ -77,12 +83,11 @@
 			<artifactId>json</artifactId>
 			<version>20090211</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-core</artifactId>
-			<version>0.7</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-app</artifactId>
+            <version>1.6</version>
+        </dependency>
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
@@ -231,8 +236,9 @@
         <dependency>
 			<groupId>org.docx4j</groupId>
 			<artifactId>docx4j</artifactId>
-			<version>3.2.1</version>
+			<version>2.7.1</version>
 		</dependency>
+
  	</dependencies>
 	
 	<build>

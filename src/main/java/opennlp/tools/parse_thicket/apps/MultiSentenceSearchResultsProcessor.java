@@ -161,7 +161,7 @@ public class MultiSentenceSearchResultsProcessor  {
 			LOG.info("No search results for query '" + query);
 			return null;
 		}
-		ProfileReaderWriter.writeReport(reportData, "resultsForQuery_"+query.replace(' ', '_')+".csv");
+		//ProfileReaderWriter.writeReport(reportData, "resultsForQuery_"+query.replace(' ', '_')+".csv");
 		return hits;
 	}
 	

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.billylieurance.azuresearch.AzureSearchImageQuery;
 import net.billylieurance.azuresearch.AzureSearchImageResult;
 import net.billylieurance.azuresearch.AzureSearchResultSet;
@@ -39,11 +41,23 @@ public class BingQueryRunner {
 		BING_KEY = key;
 	}
 	
+	private int MAX_QUERY_LENGTH = 100;
+	
 	public void setLang(String language){
 		aq.setMarket(language);
 	}
   
 	public List<HitBase> runSearch(String query, int nRes) {
+		
+		if (query.length()>MAX_QUERY_LENGTH){
+			try {
+				query = query.substring(0, MAX_QUERY_LENGTH);
+				//should not cut words, need the last space to end the query
+				query = query.substring(0, StringUtils.lastIndexOf(query, " "));
+			} catch (Exception e) {
+				LOG.severe("Problem reducing the length of query :"+query);
+			}
+		}
 		aq.setAppid(BING_KEY);
 		aq.setQuery(query);		
 		aq.setPerPage(nRes);
