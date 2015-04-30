@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package opennlp.tools.parse_thicket.external_rst;
 
 import java.io.File;
@@ -23,6 +39,16 @@ import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
 
 public class ExternalRSTImporter extends PT2ThicketPhraseBuilder{
 	private StringDistanceMeasurer strDistProc = new StringDistanceMeasurer ();
+	private String resourceDir = null; 
+	
+	public ExternalRSTImporter(){
+		 try {
+			resourceDir = new File( "." ).getCanonicalPath()+"/src/test/resources";
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public List<RstNode>  buildArrayOfRSTnodes(ParseThicket pt, String jotyDumpFileName){
 		String dump=null;
@@ -203,13 +229,13 @@ public class ExternalRSTImporter extends PT2ThicketPhraseBuilder{
 		return index;
 	}
 
-	/* TEST
+	/* 
 	 * Building phrases takes a Parse Thicket and forms phrases for each sentence individually
 	 * Then based on built phrases and obtained arcs, it builds arcs for RST
 	 * Finally, based on all formed arcs, it extends phrases with thicket phrases
 	 */
 
-	public void buildPT2ptPhrasesTest(ParseThicket pt ) {
+	public List<WordWordInterSentenceRelationArc> buildPT2ptPhrases(ParseThicket pt, String externalRSTresultFilename ) {
 		List<List<ParseTreeNode>> phrasesAllSent = new ArrayList<List<ParseTreeNode>> ();
 		Map<Integer, List<List<ParseTreeNode>>> sentNumPhrases = new HashMap<Integer, List<List<ParseTreeNode>>>();
 		// build regular phrases
@@ -224,26 +250,15 @@ public class ExternalRSTImporter extends PT2ThicketPhraseBuilder{
 
 		}
 		// TODO: code to run joty suite
-		List<RstNode> rstNodes = new ExternalRSTImporter().buildArrayOfRSTnodes(null, "/Users/borisgalitsky/Documents/workspace/opennlp-similarity/resInput.txt" );
+		List<RstNode> rstNodes = new ExternalRSTImporter().buildArrayOfRSTnodes(null, resourceDir+externalRSTresultFilename );
 
 		// discover and add RST arcs
 		List<WordWordInterSentenceRelationArc> arcsRST = buildRSTArcsFromRSTparser(  rstNodes, null, sentNumPhrases, pt );
 		System.out.println(arcsRST);
+		return arcsRST;
 
 	}
 
-	public static void main(String[] args){
-		Matcher m = new Matcher();
 
-		ParseThicket pt = m.buildParseThicketFromTextWithRST("I explained that I made a deposit, and then wrote a check, which bounced due to a bank error. A customer service representative confirmed that it usually takes a day to process the deposit. "
-				+ "I reminded that I was unfairly charged an overdraft fee amonth ago in a similar situation. "+
-				"  They explained that the overdraft fee was due to insufficient funds as disclosed in my account information. I disagreed with their fee because I made a deposit well in "+
-				" advance and wanted this fee back. They denied responsibility saying that nothing an be done at this point. They also confirmed that I needed to look into the account rules closer.");
-		ExternalRSTImporter imp = new ExternalRSTImporter();
-
-		imp.buildPT2ptPhrasesTest( pt );
-
-
-	}
 
 }

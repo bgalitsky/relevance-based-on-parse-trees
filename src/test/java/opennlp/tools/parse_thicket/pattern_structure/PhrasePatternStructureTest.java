@@ -114,7 +114,7 @@ public class PhrasePatternStructureTest /*extends TestCase*/{
 
 		lat.AddIntent(intent, 0);
 		intent.clear();
-		intent.add(1);
+		intent.add(tes1);
 		intent.add(2);
 		intent.add(3);
 		lat.AddIntent(intent, 0);
