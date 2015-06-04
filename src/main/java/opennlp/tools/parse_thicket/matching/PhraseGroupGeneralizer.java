@@ -22,7 +22,7 @@ import java.util.List;
 
 import opennlp.tools.parse_thicket.IGeneralizer;
 import opennlp.tools.parse_thicket.ParseTreeNode;
-import opennlp.tools.stemmer.PorterStemmer;
+import opennlp.tools.stemmer.PStemmer;
 import opennlp.tools.textsimilarity.GeneralizationListReducer;
 import opennlp.tools.textsimilarity.LemmaFormManager;
 import opennlp.tools.textsimilarity.POSManager;

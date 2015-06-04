@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -57,6 +59,61 @@ public class TreeKernelBasedClassifier {
 
 	protected static final String classifierOutput = "classifier_output.txt";
 	protected static final Float MIN_SVM_SCORE_TOBE_IN = 0.2f;
+	
+	/* main entry point to SVM TK classifier
+     * gets a file, reads it outside of CI, extracts longer paragraphs and builds parse thickets for them.
+     * Then parse thicket dump is processed by svm_classify
+     */
+	public Boolean classifyText(File f){
+		FileUtils.deleteQuietly(new File(path+unknownToBeClassified)); 
+		if (!(new File(path+modelFileName).exists())){
+			LOG.severe("Model file '" +modelFileName + "'is absent: skip SVM classification");
+			return null;
+		}
+		Map<Integer, Integer> countObject = new HashMap<Integer, Integer>(); 
+		int itemCount=0, objectCount = 0;
+		List<String> treeBankBuffer = new ArrayList<String>();	
+		List<String> texts=DescriptiveParagraphFromDocExtractor.getLongParagraphsFromFile(f);
+		List<String> lines = formTreeKernelStructuresMultiplePara(texts, "0");
+		for(String l: lines){
+			countObject.put(itemCount, objectCount);
+			itemCount++;
+		}
+		objectCount++;
+		treeBankBuffer.addAll(lines);		
+
+		// write the lists of samples to a file
+		try {
+			FileUtils.writeLines(new File(path+unknownToBeClassified), null, treeBankBuffer);
+		} catch (IOException e) {
+			LOG.severe("Problem creating parse thicket files '"+ path+unknownToBeClassified + "' to be classified\n"+ e.getMessage() );
+		}
+
+		tkRunner.runClassifier(path, unknownToBeClassified, modelFileName, classifierOutput);
+		// read classification results
+		List<String[]> classifResults = ProfileReaderWriter.readProfiles(path+classifierOutput, ' ');
+
+
+		itemCount=0; objectCount = 0;
+		int currentItemCount=0;
+		float accum = 0;
+		LOG.info("\nsvm scores per paragraph: " );
+		for(String[] line: classifResults){
+			Float val = Float.parseFloat(line[0]);
+			System.out.print(val+" ");
+			accum+=val;
+			currentItemCount++;
+		}
+
+		float averaged = accum/(float)currentItemCount;
+		LOG.info("\n average = "+averaged);
+		currentItemCount=0;
+		Boolean in = false;
+		if (averaged> MIN_SVM_SCORE_TOBE_IN)
+			return true;
+		else
+			return false;
+	}
 
 	protected void addFilesPos(File file) {
 
@@ -155,15 +212,35 @@ public class TreeKernelBasedClassifier {
 
 	}
 
+	protected List<String> formTreeKernelStructuresMultiplePara(List<String> texts, String flag) {
+		List<String> extendedTreesDumpTotal = new ArrayList<String>();
+		try {
+
+			for(String text: texts){
+				// get the parses from original documents, and form the training dataset
+				LOG.info("About to build pt from "+text);
+				ParseThicket pt = matcher.buildParseThicketFromTextWithRST(text);
+				LOG.info("About to build extended forest ");
+				List<String> extendedTreesDump = treeExtender.buildForestForCorefArcs(pt);
+				for(String line: extendedTreesDump)
+					extendedTreesDumpTotal.add(flag + " |BT| "+line + " |ET| ");
+				LOG.info("DONE");
+			}
+
+		} catch (Exception e) {
+			LOG.severe("Problem forming  parse thicket flat file to be classified\n"+ e.getMessage() );
+		}
+		return extendedTreesDumpTotal;
+	}
 	protected String formTreeKernelStructure(String text, String flag) {
 		String treeBankBuffer = "";
 		try {
 			// get the parses from original documents, and form the training dataset
-			System.out.println("About to build pt from "+text);
+			LOG.info("About to build pt from "+text);
 			ParseThicket pt = matcher.buildParseThicketFromTextWithRST(text);
-			System.out.print("About to build extended forest ");
+			LOG.info("About to build extended forest ");
 			List<String> extendedTreesDump = treeExtender.buildForestForCorefArcs(pt);
-			System.out.println("DONE");
+			LOG.info("DONE");
 
 			treeBankBuffer+=flag;
 			// form the list of training samples

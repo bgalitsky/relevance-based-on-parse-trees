@@ -21,10 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.parse_thicket.IGeneralizer;
-import opennlp.tools.stemmer.PorterStemmer;
+import opennlp.tools.stemmer.PStemmer;
 
 public class LemmaGeneralizer implements IGeneralizer<String> {
-	PorterStemmer ps = new PorterStemmer();
+	PStemmer ps = new PStemmer();
 	String pos = null;
 
 	public LemmaGeneralizer() {

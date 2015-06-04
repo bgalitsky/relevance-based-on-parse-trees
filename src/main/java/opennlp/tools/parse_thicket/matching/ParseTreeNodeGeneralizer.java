@@ -2,6 +2,7 @@ package opennlp.tools.parse_thicket.matching;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,13 @@ public class ParseTreeNodeGeneralizer implements IGeneralizer<ParseTreeNode>{
 				Map<String, Object> attr = newNode.getAttributes();
 				if (attr == null)
 					attr = new HashMap<String, Object> ();
+				try {
+					List<String> phrDscr = (List<String>) attr.get("phrDescr");
+					if (phrDscr!=null) // && phrDscr.size()>1)
+						phrDscr = new ArrayList<String>(new HashSet<String>(phrDscr));
+				} catch (Exception e) {
+					System.err.println("Problem de-duplicating verbnet expr" + attr);
+				}
 				if (verbNetGen!=null){
 					attr.putAll(verbNetGen);
 					newNode.setAttributes(attr);

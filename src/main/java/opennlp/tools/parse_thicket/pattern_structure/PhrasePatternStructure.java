@@ -1,8 +1,10 @@
 package opennlp.tools.parse_thicket.pattern_structure;
 
+
 import java.util.*;
 import java.io.*;
 
+import opennlp.tools.fca.FormalConcept;
 import opennlp.tools.parse_thicket.ParseCorefsBuilder;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
@@ -53,7 +55,6 @@ public class PhrasePatternStructure {
 		if (conceptList.get(generator).intent.equals(intent)) {
 			System.out.println("at generator:" + conceptList.get(generator).intent);
 			System.out.println("to add:" + intent);
-
 			System.out.println("already generated");
 			return generator;
 		}
@@ -118,21 +119,26 @@ public class PhrasePatternStructure {
 		}
 		return newConcept.position;
 	}
+	
 	public void printLatticeStats() {
 		System.out.println("Lattice stats");
 		System.out.println("max_object_index = " + objectCount);
 		System.out.println("max_attribute_index = " + attributeCount);
 		System.out.println("Current concept count = " + conceptList.size());
+
 	}
+	
 	public void printLattice() {
 		for (int i = 0; i < conceptList.size(); ++i) {
 			printConceptByPosition(i);
 		}
 	}
+	
 	public void printConceptByPosition(int index) {
 		System.out.println("Concept at position " + index);
 		conceptList.get(index).printConcept();
 	}
+	
 	public List<List<ParseTreeChunk>> formGroupedPhrasesFromChunksForPara(
 			List<List<ParseTreeNode>> phrs) {
 		List<List<ParseTreeChunk>> results = new ArrayList<List<ParseTreeChunk>>();
@@ -141,26 +147,29 @@ public class PhrasePatternStructure {
 		for(List<ParseTreeNode> ps:phrs){
 			ParseTreeChunk ch = convertNodeListIntoChunk(ps);
 			String ptype = ps.get(0).getPhraseType();
+			System.out.println(ps);
 			if (ptype.equals("NP")){
 				nps.add(ch);
 			} else if (ptype.equals("VP")){
 				vps.add(ch);
 			} else if (ptype.equals("PP")){
-				pps.add(ch);
+					pps.add(ch);
+				}
+		}
+			results.add(nps); results.add(vps); results.add(pps);
+			return results;
+		}
+		private ParseTreeChunk convertNodeListIntoChunk(List<ParseTreeNode> ps) {
+			List<String> lemmas = new ArrayList<String>(),  poss = new ArrayList<String>();
+			for(ParseTreeNode n: ps){
+				lemmas.add(n.getWord());
+				poss.add(n.getPos());
 			}
+			ParseTreeChunk ch = new ParseTreeChunk(lemmas, poss, 0, 0);
+			ch.setMainPOS(ps.get(0).getPhraseType());
+			return ch;
 		}
-		results.add(nps); results.add(vps); results.add(pps);
-		return results;
-	}
-	private ParseTreeChunk convertNodeListIntoChunk(List<ParseTreeNode> ps) {
-		List<String> lemmas = new ArrayList<String>(),  poss = new ArrayList<String>();
-		for(ParseTreeNode n: ps){
-			lemmas.add(n.getWord());
-			poss.add(n.getPos());
-		}
-		ParseTreeChunk ch = new ParseTreeChunk(lemmas, poss, 0, 0);
-		ch.setMainPOS(ps.get(0).getPhraseType());
-		return ch;
-	}
+				
 	
 }
+
