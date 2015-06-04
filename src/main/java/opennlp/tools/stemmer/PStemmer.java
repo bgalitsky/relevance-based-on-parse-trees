@@ -34,7 +34,7 @@ package opennlp.tools.stemmer;
 	 * by calling one of the various stem(something) methods.
 	 */
 
-	public class PorterStemmer
+	public class PStemmer
 	{
 	  private char[] b;
 	  private int i,    /* offset into b */
@@ -42,7 +42,7 @@ package opennlp.tools.stemmer;
 	  private boolean dirty = false;
 	  private static final int INITIAL_SIZE = 50;
 
-	  public PorterStemmer() {
+	  public PStemmer() {
 	    b = new char[INITIAL_SIZE];
 	    i = 0;
 	  }
@@ -471,7 +471,7 @@ package opennlp.tools.stemmer;
 	   * Usage: Stemmer file-name
 	   */
 	  public static void main(String[] args) {
-	    PorterStemmer s = new PorterStemmer();
+	    PStemmer s = new PStemmer();
 
 	    for (int i = 0; i < args.length; i++) {
 	      try {
