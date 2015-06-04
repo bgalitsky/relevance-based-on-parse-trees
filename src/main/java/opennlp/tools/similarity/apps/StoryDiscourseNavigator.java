@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import opennlp.tools.similarity.apps.utils.PageFetcher;
 import opennlp.tools.similarity.apps.utils.StringCleaner;
-import opennlp.tools.stemmer.PorterStemmer;
+import opennlp.tools.stemmer.PStemmer;
 import opennlp.tools.textsimilarity.ParseTreeChunk;
 import opennlp.tools.textsimilarity.SentencePairMatchResult;
 import opennlp.tools.textsimilarity.TextProcessor;
@@ -37,7 +37,7 @@ public class StoryDiscourseNavigator {
 	protected BingQueryRunner yrunner = new BingQueryRunner();
 	ParserChunker2MatcherProcessor sm = ParserChunker2MatcherProcessor
 			.getInstance();
-	private PorterStemmer ps = new PorterStemmer();
+	private PStemmer ps = new PStemmer();
 	PageFetcher pFetcher = new PageFetcher();
 
 	public static final String[] frequentPerformingVerbs = {

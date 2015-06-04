@@ -177,9 +177,10 @@ public class TreeKernelBasedClassifierMultiplePara extends TreeKernelBasedClassi
 
 		TreeKernelBasedClassifierMultiplePara proc = new TreeKernelBasedClassifierMultiplePara();
 		proc.setKernelPath("/Users/borisgalitsky/Documents/tree_kernel/");
-//		proc.trainClassifier(args[0], args[1]);
-		List<String[]>res = proc.classifyFilesInDirectory(args[2]);
-		ProfileReaderWriter.writeReport(res, "svmDesignDocReport05plus.csv");
+		proc.trainClassifier("/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/main/resources/ferpa",
+				"/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/main/resources/non-ferpa");
+//		List<String[]>res = proc.classifyFilesInDirectory(args[2]);
+//		ProfileReaderWriter.writeReport(res, "svmDesignDocReport05plus.csv");
 	}
 
 }

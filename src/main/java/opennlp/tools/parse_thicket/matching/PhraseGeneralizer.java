@@ -27,7 +27,7 @@ import java.util.List;
 
 import opennlp.tools.parse_thicket.IGeneralizer;
 import opennlp.tools.parse_thicket.ParseTreeNode;
-import opennlp.tools.stemmer.PorterStemmer;
+import opennlp.tools.stemmer.PStemmer;
 import opennlp.tools.textsimilarity.GeneralizationListReducer;
 import opennlp.tools.textsimilarity.LemmaFormManager;
 import opennlp.tools.textsimilarity.POSManager;
@@ -39,7 +39,7 @@ public class PhraseGeneralizer implements IGeneralizer<ParseTreeChunk> {
 
 	protected LemmaFormManager lemmaFormManager = new LemmaFormManager();
 	protected POSManager posManager = new POSManager();
-	protected PorterStemmer ps = new PorterStemmer();
+	protected PStemmer ps = new PStemmer();
 	protected ParseTreeNodeGeneralizer nodeGen = new ParseTreeNodeGeneralizer();
 
 	/**

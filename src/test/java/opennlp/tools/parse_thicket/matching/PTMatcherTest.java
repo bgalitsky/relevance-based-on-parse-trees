@@ -1,14 +1,18 @@
 package opennlp.tools.parse_thicket.matching;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.tools.parse_thicket.ParseThicket;
+import opennlp.tools.parse_thicket.VerbNetProcessor;
 import opennlp.tools.parse_thicket.WordWordInterSentenceRelationArc;
 import opennlp.tools.textsimilarity.ParseTreeChunk;
 import junit.framework.TestCase;
 
 public class PTMatcherTest extends TestCase {
+	//public static String resourceDir = new File(".").getAbsolutePath().replace("/.", "") + "/src/test/resources";
+	//VerbNetProcessor proc = VerbNetProcessor.getInstance(resourceDir);
 	Matcher m = new Matcher();
 	
 	public void testMatchTwoParaTestReduced(){
@@ -86,6 +90,28 @@ public class PTMatcherTest extends TestCase {
 				"People are exempt from health insurance fine if they report they make too little money, or US citizens living abroad.";
 		List<List<ParseTreeChunk>> res = m.assessRelevance(text1, text2);
 		System.out.print(res);
+		assertTrue(res!=null);
+		assertTrue(res.size()>0);
+	}
+	
+	public void testMatchTwoParaTestREq1(){
+		String q = "I am buying a foreclosed house. "
+				+ "A bank offered me to waive inspection; however I am afraid I will not identify "
+				+ "some problems in this property unless I call a specialist.";
+
+		String a1 =	"I am a foreclosure specialist in a bank which is subject to an inspection. "
+				+ "FTC offered us to waive inspection "
+				+ "if we can identify our potential problems with customers we lent money to buy their properties.";
+		
+		String a2 =	"My wife and I are buying a foreclosure from a bank. "
+				+ "In return for accepting a lower offer, they want me to waive the inspection.  "
+				+ "I prefer to let the bank know that I would not waive the inspection.";
+		List<List<ParseTreeChunk>> res = m.assessRelevance(q, a1);
+		assertEquals(res.toString(), "[[NP [DT-a NN-bank ], NP [NNS-problems ], NP [NN*-property ], NP [PRP-i ]], [VP [VB-am {phrStr=[NP V ADVP-Middle PP, NP V ADVP-Middle], roles=[A, P, C], phrDescr=[Middle Construction, Middle Construction]} DT-a ], VP [VB-* TO-to NN-inspection ], VP [VB-offered PRP-* TO-to VB-waive NN-inspection ], VP [VB-* TO-to VB-* ], VP [VB-am {phrStr=[NP V ADVP-Middle PP, NP V ADVP-Middle], roles=[A, P, C], phrDescr=[Middle Construction, Middle Construction]} NN*-* IN-in DT-* NN-* ], VP [VB-* VB-identify NNS-problems IN-* NN*-property ], VP [VB-* DT-* NN*-* VB-* ], VP [VB-* {phrStr=[], roles=[A, *, *], phrDescr=[]} DT-a NN-* ]]]");
+		System.out.println(res);
+		res = m.assessRelevance(q, a2);
+		assertEquals(res.toString(), "[[NP [DT-a NN-bank ], NP [PRP-i ]], [VP [VB-* VB-buying DT-a ], VP [VB-* PRP-me TO-to VB-waive NN-inspection ], VP [TO-to VB-* VB-waive NN-inspection ], VP [VB-* {phrStr=[], roles=[], phrDescr=[]} PRP-i MD-* RB-not VB-* DT-* NN*-* ], VP [VB-* DT-* NN*-* VB-* DT-* NN-* ], VP [VB-* DT-a NN-* ]]]");
+		System.out.println(res);
 		assertTrue(res!=null);
 		assertTrue(res.size()>0);
 	}
