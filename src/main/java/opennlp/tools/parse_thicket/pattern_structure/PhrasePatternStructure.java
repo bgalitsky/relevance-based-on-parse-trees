@@ -32,7 +32,7 @@ import opennlp.tools.textsimilarity.ParseTreeMatcherDeterministic;
 public class PhrasePatternStructure {
 	int objectCount;
 	int attributeCount;
-	List<PhraseConcept> conceptList;
+	public List<PhraseConcept> conceptList;
 	ParseTreeMatcherDeterministic md; 
 	public PhrasePatternStructure(int objectCounts, int attributeCounts) {
 		objectCount = objectCounts;

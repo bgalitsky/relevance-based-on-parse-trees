@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.ListUtils;
+
 import opennlp.tools.parse_thicket.ParseTreeNode;
 
 public class ParseTreeChunk {
@@ -295,7 +297,7 @@ public class ParseTreeChunk {
 		return results;
 	}
 
-	public Boolean equals(ParseTreeChunk ch) {
+/*	public Boolean equals(ParseTreeChunk ch) {
 		List<String> lems = ch.getLemmas();
 		List<String> poss = ch.POSs;
 
@@ -309,7 +311,7 @@ public class ParseTreeChunk {
 		}
 		return true;
 	}
-
+*/
 	// 'this' is super - chunk of ch, ch is sub-chunk of 'this'
 	public Boolean isASubChunk_OLD(ParseTreeChunk ch) {
 		List<String> lems = ch.getLemmas();
@@ -391,6 +393,12 @@ public class ParseTreeChunk {
 		}
 
 		return true;
+	}
+	
+	public boolean equals(ParseTreeChunk ch) {
+		List<String> lems = ch.getLemmas();
+		List<String> poss = ch.POSs;
+		return ListUtils.isEqualList(ch.getLemmas(), this.lemmas) && ListUtils.isEqualList(ch.getPOSs(), this.POSs);
 	}
 
 	public String toString() {
