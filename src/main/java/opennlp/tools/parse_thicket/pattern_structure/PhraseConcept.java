@@ -25,7 +25,7 @@ import opennlp.tools.textsimilarity.ParseTreeChunk;
 
 public class PhraseConcept {
 	int position;
-	List<List<ParseTreeChunk>> intent;
+	public List<List<ParseTreeChunk>> intent;
 	Set<Integer> parents;
 	Set<Integer> childs;
 	Set<Integer> extent;
