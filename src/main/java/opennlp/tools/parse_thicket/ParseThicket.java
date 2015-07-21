@@ -13,6 +13,33 @@ public class ParseThicket {
 	// then list for all sentences
 	private List<List<ParseTreeNode>> sentenceNodes;
 	
+	private String origText;
+	
+	
+	public List<Tree> getSentenceTrees() {
+		return sentenceTrees;
+	}
+
+	public void setSentenceTrees(List<Tree> sentenceTrees) {
+		this.sentenceTrees = sentenceTrees;
+	}
+
+	public List<List<ParseTreeNode>> getSentenceNodes() {
+		return sentenceNodes;
+	}
+
+	public void setSentenceNodes(List<List<ParseTreeNode>> sentenceNodes) {
+		this.sentenceNodes = sentenceNodes;
+	}
+
+	public String getOrigText() {
+		return origText;
+	}
+
+	public void setOrigText(String origText) {
+		this.origText = origText;
+	}
+
 	public List<Tree> getSentences() {
 		return sentenceTrees;
 	}

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
-	String word;
+	String word; // word in normal form, lemma
     // this is the POS tag of the token
     String pos; 
     // this is the NER label of the token
@@ -14,10 +14,65 @@ public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
     //PhraseType 
     String phraseType;
     Map<String, Object> attributes;
+    String normalizedWord;
+    String syntacticDependence;
+    String originalWord; //what actually occurs in a sentence
+    
+    String head;
+    String label;
+    String modifier;
     
     
     
-    public Map<String, Object> getAttributes() {
+    public String getOriginalWord() {
+		return originalWord;
+	}
+
+	public void setOriginalWord(String originalWord) {
+		this.originalWord = originalWord;
+	}
+
+	public String getHead() {
+		return head;
+	}
+
+	public void setHead(String head) {
+		this.head = head;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getModifier() {
+		return modifier;
+	}
+
+	public void setModifier(String modifier) {
+		this.modifier = modifier;
+	}
+
+	public String getNormalizedWord() {
+		return normalizedWord;
+	}
+
+	public void setNormalizedWord(String normalizedWord) {
+		this.normalizedWord = normalizedWord;
+	}
+
+	public String getSyntacticDependence() {
+		return syntacticDependence;
+	}
+
+	public void setSyntacticDependence(String syntacticDependence) {
+		this.syntacticDependence = syntacticDependence;
+	}
+
+	public Map<String, Object> getAttributes() {
 		return attributes;
 	}
 

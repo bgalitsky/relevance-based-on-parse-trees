@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 public class FCATest extends TestCase{
 	ConceptLattice cl=null;
-
+/*
 	public void testConceptLattice() {
 
 
@@ -74,6 +74,6 @@ public class FCATest extends TestCase{
 		new_cl.printLatticeStats();
 		new_cl.printLattice();
 	}
-
+*/
 }
 
