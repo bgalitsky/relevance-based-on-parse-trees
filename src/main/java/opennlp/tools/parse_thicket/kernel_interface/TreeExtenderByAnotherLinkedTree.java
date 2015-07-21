@@ -38,10 +38,14 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 			//	continue;
 			int fromSent = arc.getCodeFrom().getFirst();
 			int toSent = arc.getCodeTo().getFirst();
+			if (fromSent <1 || toSent <1 ) // problem in sentence enumeration => skip building extended trees
+				return results;
+			
 			String wordFrom = arc.getLemmaFrom();
 			String wordTo = arc.getLemmaTo();
 
-			List<Tree> trees = getASubtreeWithRootAsNodeForWord1(pt.getSentences().get(fromSent-1), pt.getSentences().get(fromSent-1), new String[]{ wordFrom});
+			List<Tree> trees = getASubtreeWithRootAsNodeForWord1(pt.getSentences().get(fromSent-1), 
+					pt.getSentences().get(fromSent-1), new String[]{ wordFrom});
 			if (trees==null || trees.size()<1)
 				continue;
 			System.out.println(trees);

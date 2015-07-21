@@ -42,7 +42,7 @@ public class TreeKernelBasedClassifierMultiplePara extends TreeKernelBasedClassi
 
 
 
-	protected void trainClassifier(
+	public void trainClassifier(
 			String posDirectory, String negDirectory) {
 
 		queuePos.clear(); queueNeg.clear();
@@ -177,10 +177,38 @@ public class TreeKernelBasedClassifierMultiplePara extends TreeKernelBasedClassi
 
 		TreeKernelBasedClassifierMultiplePara proc = new TreeKernelBasedClassifierMultiplePara();
 		proc.setKernelPath("/Users/borisgalitsky/Documents/tree_kernel/");
-		proc.trainClassifier("/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/main/resources/ferpa",
+		proc.trainClassifier(
+				
+				"/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/main/resources/ferpa",
 				"/Users/borisgalitsky/Documents/workspace/deepContentInspection/src/main/resources/non-ferpa");
+				
 //		List<String[]>res = proc.classifyFilesInDirectory(args[2]);
 //		ProfileReaderWriter.writeReport(res, "svmDesignDocReport05plus.csv");
 	}
 
 }
+
+/*
+Number of examples: 8524, linear space size: 10
+
+estimating ...
+Setting default regularization parameter C=1.0000
+Optimizing...............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+ Checking optimality of inactive variables...done.
+ Number of inactive variables = 2356
+done. (2256 iterations)
+Optimization finished (195 misclassified, maxdiff=0.00098).
+Runtime in cpu-seconds: 195.19
+Number of SV: 2910 (including 932 at upper bound)
+L1 loss: loss=558.77971
+Norm of weight vector: |w|=41.99191
+Norm of longest example vector: |x|=1.00000
+Estimated VCdim of classifier: VCdim<=1764.32083
+Computing XiAlpha-estimates...done
+Runtime for XiAlpha-estimates in cpu-seconds: 0.14
+XiAlpha-estimate of the error: error<=14.62% (rho=1.00,depth=0)
+XiAlpha-estimate of the recall: recall=>92.55% (rho=1.00,depth=0)
+XiAlpha-estimate of the precision: precision=>87.42% (rho=1.00,depth=0)
+Number of kernel evaluations: 56506636
+Writing model file...done
+*/

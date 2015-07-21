@@ -21,17 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
 import opennlp.tools.parse_thicket.WordWordInterSentenceRelationArc;
 import opennlp.tools.parse_thicket.rhetoric_structure.RhetoricStructureArcsBuilder;
-
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
-
-
 
 import edu.stanford.nlp.trees.Tree;
 
@@ -63,13 +56,10 @@ public class PT2ThicketPhraseBuilder {
 		// discover and add RST arcs
 		List<WordWordInterSentenceRelationArc> arcsRST =
 				rstBuilder.buildRSTArcsFromMarkersAndCorefs(pt.getArcs(), sentNumPhrases, pt);
-		
-		
 
 		List<WordWordInterSentenceRelationArc> arcs = pt.getArcs();
 		arcs.addAll(arcsRST);
 		pt.setArcs(arcs);
-
 
 		List<List<ParseTreeNode>> expandedPhrases = expandTowardsThicketPhrases(phrasesAllSent, pt.getArcs(), sentNumPhrases, pt);
 		return expandedPhrases;
@@ -441,6 +431,18 @@ public class PT2ThicketPhraseBuilder {
 	}
 
 	public static void main(String[] args){
+		Matcher matcher = new Matcher();
+		String para = 
+				"Last Wednesday, world powers reached agreement with Iran on limiting Iranian nuclear activity in return for the lifting of sanctions. "
+		/*+
+						"The Israeli Prime Minister called the deal an historic mistake which would only make it easier for Iran to back its proxies in the Middle East. "+
+						"That position may have hardened after Iran's supreme leader Ayatollah Ali Khamenei said his country would continue its support for the people of Palestine after the deal. "+
+						"Saudi Arabia has officially said it supports the deal, although it is also thought to have similar concerns to Israel that the agreement legitimises Iran. "
+						*/
+						;
+		matcher.buildParseThicketFromTextWithRST(para);
+		
+		
 		PT2ThicketPhraseBuilder phraseBuilder = new PT2ThicketPhraseBuilder();
 		String line = "(NP (NNP Iran)) (VP (VBZ refuses) (S (VP (TO to) (VP (VB accept) (S (NP (DT the) " +
 				"(NNP UN) (NN proposal)) (VP (TO to) (VP (VB end) (NP (PRP$ its) (NN dispute))))))))";
@@ -459,3 +461,8 @@ public class PT2ThicketPhraseBuilder {
 	}
 
 }
+/*
+ * The Ukrainian government, Western leaders and Nato all say there is clear evidence that Russia is helping the rebels in the eastern Donetsk and Luhansk regions with heavy weapons and soldiers. Independent experts echo that accusation.
+Moscow denies it, insisting that any Russians serving with the rebels are volunteers.
+
+*/
