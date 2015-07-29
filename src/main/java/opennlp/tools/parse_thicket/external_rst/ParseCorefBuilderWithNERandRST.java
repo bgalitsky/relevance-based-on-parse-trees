@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package opennlp.tools.parse_thicket.external_rst;
 
 import java.util.ArrayList;
@@ -14,19 +31,10 @@ import edu.arizona.sista.processors.corenlp.CoreNLPProcessor;
 import edu.arizona.sista.struct.DirectedGraphEdgeIterator;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
-import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
-import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeCoreAnnotations;
-import edu.stanford.nlp.util.CoreMap;
 import opennlp.tools.parse_thicket.ArcType;
 import opennlp.tools.parse_thicket.Pair;
-import opennlp.tools.parse_thicket.ParseCorefsBuilder;
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
 import opennlp.tools.parse_thicket.WordWordInterSentenceRelationArc;
@@ -147,11 +155,12 @@ public class ParseCorefBuilderWithNERandRST {
 				List<WordWordInterSentenceRelationArc> rstArcs = new ArrayList<WordWordInterSentenceRelationArc>();
 				navigateDiscourseTree(dt, rstArcs);
 				arcs.addAll(rstArcs);
-				System.out.println(dt);
+				/*System.out.println(dt);
 				System.out.println("first EDU = "+dt.firstEDU() + "| dt.firstSentence() = "+ dt.firstSentence() + 
 						" \n| last EDU = "+dt.lastEDU() + "| dt.lastSentence() = "+ dt.lastSentence() + 
 						" \n| dt.tokenCount() = " + dt.tokenCount() + "| dt.firstToken " + dt.firstToken() + 
 						" | dt.lastToken() "+ dt.lastToken() + "\n kind =" + dt.kind() + " | text = "+ dt.rawText());
+						*/
 
 			}
 		}
