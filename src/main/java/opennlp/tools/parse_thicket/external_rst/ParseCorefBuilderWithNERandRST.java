@@ -50,7 +50,7 @@ public class ParseCorefBuilderWithNERandRST {
 	ParseCorefBuilderWithNERandRST() {
 		super();
 		classifier = CRFClassifier.getDefaultClassifier();
-		proc = new CoreNLPProcessor(true, true, true, 100);
+		proc = new CoreNLPProcessor(true, true, 100);
 	}
 
 	public ParseThicket buildParseThicket(String text){
