@@ -45,6 +45,11 @@
 			<url>http://www.billylieurance.net/maven2</url>
 		</repository>
 	</repositories>
+	
+	<properties>
+              <nd4j.version>0.4-rc3.4</nd4j.version> 
+              <dl4j.version>0.4-rc3.3</dl4j.version>
+   </properties>
 
 	<dependencies>
 		<dependency>
@@ -89,13 +94,13 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>4.0.0-BETA</version>
+			<version>4.10.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-core</artifactId>
-			<version>4.0.0-BETA</version>
+			<version>4.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -115,7 +120,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-			<version>3.0</version>
+			<version>3.5</version>
 		</dependency>
 
 		<dependency>
@@ -249,6 +254,21 @@
 			<version>5.7.1</version>
 			<classifier>models</classifier>
 		</dependency>
+		<dependency>
+                 <groupId>org.deeplearning4j</groupId>
+                 <artifactId>deeplearning4j-ui</artifactId>
+                 <version>${dl4j.version}</version>
+               </dependency>
+               <dependency>
+                 <groupId>org.deeplearning4j</groupId>
+                 <artifactId>deeplearning4j-nlp</artifactId>
+                 <version>${dl4j.version}</version>
+               </dependency>
+               <dependency>
+                 <groupId>org.nd4j</groupId>
+                 <artifactId>nd4j-jblas</artifactId> 
+                 <version>${nd4j.version}</version>
+               </dependency>
 
 	</dependencies>
 

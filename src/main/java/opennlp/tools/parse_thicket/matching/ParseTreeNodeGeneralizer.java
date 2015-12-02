@@ -35,7 +35,7 @@ public class ParseTreeNodeGeneralizer implements IGeneralizer<ParseTreeNode>{
 		//TODO separate NER generalizer
 		//TODO multiword generalizer
 		if (posGenStrList.get(0).startsWith("NN")){
-			if (ch1.getNe().equals(ch2.getNe()))
+			if (ch1.getNe()!=null && ch2.getNe()!=null && ch1.getNe().equals(ch2.getNe()))
 					newNode.setNe(ch1.getNe());
 		}
 		if (posGenStrList.get(0).startsWith("VB")){	

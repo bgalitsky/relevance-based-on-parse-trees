@@ -155,13 +155,13 @@ public class IterativeQueryComponent extends QueryComponent{
 			e.printStackTrace();
 		}
 		rb.setQparser(parser);
-		try {
+	/*	try {
 			rb.setScoreDoc(parser.getPaging());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+*/
 		String[] fqs = rb.req.getParams().getParams(CommonParams.FQ);
 		if (fqs!=null && fqs.length!=0) {
 			List<Query> filters = rb.getFilters();

@@ -28,6 +28,8 @@ import java.util.List;
 
 
 
+
+
 import opennlp.tools.parse_thicket.IGeneralizer;
 import opennlp.tools.parse_thicket.ParseTreeNode;
 import opennlp.tools.stemmer.PStemmer;
@@ -158,10 +160,23 @@ public class NERPhraseGeneralizer extends PhraseGeneralizer {
       }
       int k1max = pos1.size() - 1, k2max = pos2.size() - 1;
       while (k1 <= k1max && k2 <= k2max) {
-        // first check if the same POS
+/*        // first check if the same POS
         String sim = posManager.similarPOS(pos1.get(k1), pos2.get(k2));
         String lemmaMatch = lemmaFormManager.matchLemmas(ps, lem1.get(k1),
             lem2.get(k2), sim);
+  */      
+			String sim = null;
+			List<String> sims = posManager.//similarPOS(pos1.get(k1), pos2.get(k2));
+					generalize(pos1.get(k1), pos2.get(k2));
+			if (!sims.isEmpty())
+				sim = sims.get(0);
+			
+			String lemmaMatch = null;		
+			List<String> lemmaMatchs = lemmaFormManager.//matchLemmas(ps, 
+					generalize(lem1.get(k1),
+					lem2.get(k2));
+			if (!lemmaMatchs.isEmpty())
+				lemmaMatch = lemmaMatchs.get(0);
         
         
         

@@ -95,7 +95,7 @@ public class LemmaFormManager {
     // if (sim!=null && (lemmaMatch!=null && !lemmaMatch.equals("fail"))){
 
   }
-
+/*
   // all lemmas ending with # in ch1 and/or ch2 SHOULD occur in chunkToAdd
   public boolean mustOccurVerifier(ParseTreePath ch1, ParseTreePath ch2,
       ParseTreePath chunkToAdd) {
@@ -112,5 +112,5 @@ public class LemmaFormManager {
     }
     return true;
   }
-
+*/
 }

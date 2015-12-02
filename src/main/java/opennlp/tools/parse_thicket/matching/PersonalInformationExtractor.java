@@ -37,7 +37,7 @@ public class PersonalInformationExtractor {
 	public void runExtractor(String filename){
 		String content = null;
 		try {
-			content = FileUtils.readFileToString(new File(filename), null);
+			content = FileUtils.readFileToString(new File(filename));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -84,7 +84,7 @@ public class PersonalInformationExtractor {
 		String templateStr = null;
 		try {
 
-			templateStr =  FileUtils.readFileToString(new File(template), null);
+			templateStr =  FileUtils.readFileToString(new File(template));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,8 +122,8 @@ public class PersonalInformationExtractor {
 	public void runExtractor(String filename, String template){
 		String content = null, templateStr = null;
 		try {
-			content = FileUtils.readFileToString(new File(filename), null);
-			templateStr =  FileUtils.readFileToString(new File(template), null);
+			content = FileUtils.readFileToString(new File(filename));
+			templateStr =  FileUtils.readFileToString(new File(template));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
