@@ -215,7 +215,7 @@ public class DocClassifier {
 	 * Main entry point for classifying sentences
 	 */
 
-	public void runExpressionsOnContent(String content) {
+	public List<String> runExpressionsOnContent(String content) {
 
 		List<String> sentences = TextProcessor.splitToSentences(content);
 		List<String> classifResults;
@@ -242,9 +242,7 @@ public class DocClassifier {
 		} catch (Exception e) {
 			logger.error("Problem classifying sentence\n " + e);
 		}
-	}
-
-	public List<String> getClassificationResults() {
+		
 		List<String> aggrResults = new ArrayList<String>();
 		try {
 
@@ -254,24 +252,10 @@ public class DocClassifier {
 		} catch (Exception e) {
 			logger.error("Problem aggregating search results\n" + e);
 		}
-		// this section implement category annihilation
-		// one category may defeat others
-		// approach is inspired by DeLP
-		// http://dl.acm.org/citation.cfm?id=986847
-		// Defeasible logic programming: an argumentative approach
-
-		localCats = new CountItemsList<String>();
-		try {
-			if (!aggrResults.isEmpty()){
-				
-			}
-		} catch (Exception e) {
-			// skip categories annihilation rules section
-			logger.error("Problem with annihilation rules \n" + e);
-		}
 		return aggrResults;
 	}
 
+	
 	public static String formClassifQuery(String pageContentReader, int maxRes) {
 
 		// We want to control which delimiters we substitute. For example '_' &
@@ -314,8 +298,6 @@ public class DocClassifier {
 		} catch (IOException e) {
 			logger.error("Problem closing index \n" + e);
 		}
-	}
-
-	
+	}	
 
 }
