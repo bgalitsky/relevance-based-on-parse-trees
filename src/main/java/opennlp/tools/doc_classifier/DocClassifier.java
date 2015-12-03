@@ -211,49 +211,7 @@ public class DocClassifier {
 
 	}
 
-	/*
-	 * Main entry point for classifying sentences
-	 */
-
-	public List<String> runExpressionsOnContent(String content) {
-
-		List<String> sentences = TextProcessor.splitToSentences(content);
-		List<String> classifResults;
-
-		try {
-			for (String sentence : sentences) {
-				// If sentence is too short, there is a chance it is not form a
-				// main text area,
-				// but from somewhere else, so it is safer not to use this
-				// portion of text for classification
-
-				if (sentence.length() < MIN_SENTENCE_LENGTH_TO_CATEGORIZE)
-					continue;
-				String query = formClassifQuery(sentence, MAX_TOKENS_TO_FORM);
-				classifResults = classifySentence(query);
-				if (classifResults != null && classifResults.size() > 0) {
-					for (String c : classifResults) {
-						localCats.add(c);
-					}
-					logger.debug(sentence + " =>  " + classifResults);
-				}
-			}
-
-		} catch (Exception e) {
-			logger.error("Problem classifying sentence\n " + e);
-		}
-		
-		List<String> aggrResults = new ArrayList<String>();
-		try {
-
-			aggrResults = localCats.getFrequentTags();
-
-			logger.debug(localCats.getFrequentTags());
-		} catch (Exception e) {
-			logger.error("Problem aggregating search results\n" + e);
-		}
-		return aggrResults;
-	}
+	
 
 	
 	public static String formClassifQuery(String pageContentReader, int maxRes) {
@@ -299,5 +257,50 @@ public class DocClassifier {
 			logger.error("Problem closing index \n" + e);
 		}
 	}	
+	
+	
+	/*
+	 * Main entry point for classifying sentences
+	 */
+
+	public List<String> getEntityOrClassFromText(String content) {
+
+		List<String> sentences = TextProcessor.splitToSentences(content);
+		List<String> classifResults;
+
+		try {
+			for (String sentence : sentences) {
+				// If sentence is too short, there is a chance it is not form a
+				// main text area,
+				// but from somewhere else, so it is safer not to use this
+				// portion of text for classification
+
+				if (sentence.length() < MIN_SENTENCE_LENGTH_TO_CATEGORIZE)
+					continue;
+				String query = formClassifQuery(sentence, MAX_TOKENS_TO_FORM);
+				classifResults = classifySentence(query);
+				if (classifResults != null && classifResults.size() > 0) {
+					for (String c : classifResults) {
+						localCats.add(c);
+					}
+					logger.debug(sentence + " =>  " + classifResults);
+				}
+			}
+
+		} catch (Exception e) {
+			logger.error("Problem classifying sentence\n " + e);
+		}
+		
+		List<String> aggrResults = new ArrayList<String>();
+		try {
+
+			aggrResults = localCats.getFrequentTags();
+
+			logger.debug(localCats.getFrequentTags());
+		} catch (Exception e) {
+			logger.error("Problem aggregating search results\n" + e);
+		}
+		return aggrResults;
+	}
 
 }
