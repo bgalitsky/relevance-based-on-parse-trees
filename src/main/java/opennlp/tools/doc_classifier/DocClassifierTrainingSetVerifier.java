@@ -95,8 +95,8 @@ public class DocClassifierTrainingSetVerifier {
 
 				content = tika.parseToString(f);
 
-				classifier.runExpressionsOnContent(content);
-				List<String> resultsClassif = classifier.getClassificationResults();
+				//classifier.runExpressionsOnContent(content);
+				List<String> resultsClassif = classifier.getEntityOrClassFromText(content);
 				Boolean bRejected = true;
 				if (resultsClassif.size()==1 
 						&& resultsClassif.get(0).equals(

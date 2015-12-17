@@ -89,7 +89,6 @@ public class ParseTreeChunk {
 		this.mainPOS = mPOS;
 		this.lemmas = lemmas;
 		this.POSs = POSss;
-
 	}
 
 
@@ -418,6 +417,15 @@ public class ParseTreeChunk {
 			}
 		}
 		return buf + "]";
+	}
+	
+	public String toWordOnlyString(){
+		String buf = "";
+
+		for (int i = 0; i < lemmas.size()  ; i++) {
+			buf+=lemmas.get(i)+" ";
+		}
+		return buf.trim();
 	}
 
 	public int compareTo(ParseTreeChunk o) {
