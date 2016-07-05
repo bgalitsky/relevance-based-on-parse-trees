@@ -14,6 +14,7 @@ public class ParseThicket {
 	private List<List<ParseTreeNode>> sentenceNodes;
 	
 	private String origText;
+	private List<List<ParseTreeNode>> phrases;
 	
 	
 	public List<Tree> getSentenceTrees() {
@@ -79,6 +80,14 @@ public class ParseThicket {
 	
 	public String toString(){
 		return this.sentenceTrees+"\n"+this.arcs;
+	}
+
+	public void setPhrases(List<List<ParseTreeNode>> phrs) {
+		this.phrases = phrs;		
+	}
+
+	public List<List<ParseTreeNode>> getPhrases() {
+		return phrases;
 	}
 	
 	

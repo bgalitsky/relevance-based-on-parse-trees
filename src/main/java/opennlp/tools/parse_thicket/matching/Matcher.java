@@ -192,6 +192,7 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 	public ParseThicket buildParseThicketFromTextWithRST(String para){
 		ParseThicket pt = ptBuilder.buildParseThicket(para);
 		List<List<ParseTreeNode>> phrs = phraseBuilder.buildPT2ptPhrases(pt);
+		pt.setPhrases(phrs);
 		return pt;	
 	}
 

@@ -19,6 +19,7 @@ package opennlp.tools.parse_thicket.kernel_interface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import opennlp.tools.jsmlearning.ProfileReaderWriter;
 import opennlp.tools.parse_thicket.ParseThicket;
@@ -30,6 +31,8 @@ import opennlp.tools.parse_thicket.matching.PT2ThicketPhraseBuilder;
 import edu.stanford.nlp.trees.Tree;
 
 public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
+	private static Logger log = Logger
+		      .getLogger("opennlp.tools.parse_thicket.kernel_interface.TreeExtenderByAnotherLinkedTree");
 
 	public List<String> buildForestForCorefArcs(ParseThicket pt){
 		List<String> results = new ArrayList<String>();
@@ -38,7 +41,7 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 			//	continue;
 			int fromSent = arc.getCodeFrom().getFirst();
 			int toSent = arc.getCodeTo().getFirst();
-			if (fromSent <1 || toSent <1 ) // problem in sentence enumeration => skip building extended trees
+			if (fromSent <1 || toSent <1 ) // TODO problem in sentence enumeration => skip building extended trees
 				return results;
 			
 			String wordFrom = arc.getLemmaFrom();
@@ -51,6 +54,46 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 			System.out.println(trees);
 			StringBuilder sb = new StringBuilder(10000);	
 			toStringBuilderExtenderByAnotherLinkedTree1(sb, pt.getSentences().get(toSent-1), trees.get(0), new String[]{wordTo});
+			System.out.println(sb.toString());
+			results.add(sb.toString());
+		}
+		// if no arcs then orig sentences
+		if (results.isEmpty()){
+			for(Tree t: pt.getSentences()){
+				results.add(t.toString());
+			}
+		}
+		return results;
+	}
+	// sentences in pt are enumerarted starting from 0;
+	//this func works with Sista version of Stanford NLP and sentences are coded from 0
+	public List<String> buildForestForRSTArcs(ParseThicket pt){
+		List<String> results = new ArrayList<String>();
+		for(WordWordInterSentenceRelationArc arc: pt.getArcs()){
+			// TODO - uncomment
+			//if (!arc.getArcType().getType().startsWith("rst"))
+			//   continue;
+			int fromSent = arc.getCodeFrom().getFirst();
+			int toSent = arc.getCodeTo().getFirst();
+			
+			String wordFrom = arc.getLemmaFrom();
+			String wordTo = arc.getLemmaTo();
+			
+			if (wordFrom == null || wordFrom.length()<1 || wordTo == null || wordTo.length()<1) 
+				log.severe("Empty lemmas for RST arc "+ arc);
+
+			List<Tree> trees = getASubtreeWithRootAsNodeForWord1(pt.getSentences().get(fromSent), 
+					pt.getSentences().get(fromSent), new String[]{ wordFrom});
+			if (trees==null || trees.size()<1)
+				continue;
+			System.out.println(trees);
+			StringBuilder sb = new StringBuilder(10000);	
+			Tree tree = trees.get(0);
+			// instead of phrase type for the root of the tree, we want to put the RST relation name
+			if (arc.getArcType().getType().startsWith("rst"))
+				tree.setValue(arc.getArcType().getSubtype());
+			
+			toStringBuilderExtenderByAnotherLinkedTree1(sb, pt.getSentences().get(toSent), tree, new String[]{wordTo});
 			System.out.println(sb.toString());
 			results.add(sb.toString());
 		}
@@ -96,8 +139,6 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 					}
 					sb.append(' ');
 					toStringBuilderExtenderByAnotherLinkedTree1(sb, treeToInsert, null, null);
-					int z=0; z++;
-
 				} else {
 					for (Tree kid : kids) {
 						sb.append(' ');
@@ -111,6 +152,7 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 		}
 	}
 
+	// given a parse tree and a 
 	public List<Tree> getASubtreeWithRootAsNodeForWord1(Tree tree, Tree currentSubTree, String[] corefWords){
 		if (currentSubTree.isLeaf()){
 			return null;
@@ -118,26 +160,23 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 		List<Tree> result = null;
 		Tree[] kids = currentSubTree.children();
 		if (kids != null) {
-			boolean bInsert=false;
+			boolean bFound=false;
 			String word = corefWords[corefWords.length-1];
-
 			for (Tree kid : kids) {
-				if (bInsert){
+				if (bFound){
 					result.add(kid);
 				} else {
-
 					String phraseStr = kid.toString();
 					phraseStr=phraseStr.replace(")", "");
 					if (phraseStr.endsWith(word)){ // found 
-						bInsert=true;
+						bFound=true;
 						result = new ArrayList<Tree>();
 					}
 				}
 			}
-			if (bInsert){
+			if (bFound){
 				return result;
 			}
-
 			// if not a selected node, proceed with iteration
 			for (Tree kid : kids) {
 				List<Tree> ts = getASubtreeWithRootAsNodeForWord1(tree, kid, corefWords);
@@ -149,7 +188,7 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 		return null;
 	}
 
-
+	// now obsolete
 	public Tree[] getASubtreeWithRootAsNodeForWord(Tree tree, Tree currentSubTree, String[] corefWords){
 		if (currentSubTree.isLeaf()){
 			return null;
@@ -259,7 +298,7 @@ public class TreeExtenderByAnotherLinkedTree extends  PT2ThicketPhraseBuilder {
 		}
 	}
 
-	private StringBuilder toStringBuilder(StringBuilder sb, Tree t) {
+	public StringBuilder toStringBuilder(StringBuilder sb, Tree t) {
 		if (t.isLeaf()) {
 			if (t.label() != null) {
 				sb.append(t.label().value());

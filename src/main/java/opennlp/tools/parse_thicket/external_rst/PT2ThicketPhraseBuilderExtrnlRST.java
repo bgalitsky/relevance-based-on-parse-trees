@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
@@ -43,12 +44,16 @@ import org.jgrapht.graph.SimpleGraph;
 
 
 
+
 import edu.stanford.nlp.trees.Tree;
 
 public class PT2ThicketPhraseBuilderExtrnlRST extends PT2ThicketPhraseBuilder{
 
-	RhetoricStructureArcsBuilder rstBuilder = new RhetoricStructureArcsBuilder();
-	ExternalRSTImporter externalRstBuilder = new ExternalRSTImporter();
+	private RhetoricStructureArcsBuilder rstBuilder = new RhetoricStructureArcsBuilder();
+	private ExternalRSTImporter externalRstBuilder = new ExternalRSTImporter();
+	private static Logger log = Logger
+		      .getLogger("opennlp.tools.parse_thicket.external_rst.PT2ThicketPhraseBuilderExtrnlRST");
+
 
 	/*
 	 * Building phrases takes a Parse Thicket and forms phrases for each sentence individually
@@ -56,7 +61,7 @@ public class PT2ThicketPhraseBuilderExtrnlRST extends PT2ThicketPhraseBuilder{
 	 * Finally, based on all formed arcs, it extends phrases with thicket phrases
 	 */
 
-	public List<List<ParseTreeNode>> buildPT2ptPhrases(ParseThicket pt, String text , String externRSTpath) {
+	public List<List<ParseTreeNode>> buildPT2ptPhrases(ParseThicket pt, String text, String externRSTpath) {
 		List<List<ParseTreeNode>> phrasesAllSent = new ArrayList<List<ParseTreeNode>> ();
 		Map<Integer, List<List<ParseTreeNode>>> sentNumPhrases = new HashMap<Integer, List<List<ParseTreeNode>>>();
 		// build regular phrases

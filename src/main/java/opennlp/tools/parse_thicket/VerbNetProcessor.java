@@ -41,11 +41,10 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 		return instance;
 	}	
 
-
 	IVerbIndex index = null;
 
 	private VerbNetProcessor() {
-		
+
 		try {
 			URL url = new URL ("file", null , pathToVerbnet ) ;
 			index = new VerbIndex ( url ) ;
@@ -60,8 +59,8 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	public IVerbClass getVerbNetForAVerb_____New(String verb){
 		Iterator<IVerbClass> iter = index.iterator();
 		while(iter.hasNext()){
@@ -70,22 +69,21 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 			if (v.getID().startsWith(verb))
 				return v;
 		}
-		
 		iter = index.iterator();
 		while(iter.hasNext()){
 			IVerbClass v = iter.next();
-			if (!v.getMembers().isEmpty())
+			if (!v.getMembers().isEmpty()){
 				for(IMember m: v.getMembers()) {
 					if (m.getName().equals(verb)){
 						return v;
 					}
 				}
+			}
 		}
-
 		return null;
 	}
-	
-	
+
+
 
 	public IVerbClass getVerbNetForAVerb(String verb){
 		Iterator<IVerbClass> iter = index.iterator();
@@ -102,9 +100,6 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 		return null;
 	}
 
-
-
-	//@Override
 	public List<Map<String, List<String>>> generalize(Object o1, Object o2) {
 		IVerbClass v1, v2;
 		if ((o1 instanceof String) && (o2 instanceof String)){
@@ -116,17 +111,15 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 			v1 = (IVerbClass)o1;
 		v2 = (IVerbClass)o2;
 		List<Map<String, List<String>>> resList = new ArrayList<Map<String, List<String>>>();
-		
+
 		if (v1 ==null || v2==null) // not found
 			return  resList;
-			
+
 		// lists for results
-		List<String> roles = new ArrayList<String>(), phraseStructs = new ArrayList<String>();
+		List<String> roles = new ArrayList<String>();
 
 		List<IThematicRole> roles1 = v1.getThematicRoles(), roles2 = v2.getThematicRoles();
 		Map<String, List<String>> results = new HashMap<String, List<String>>();
-		
-
 
 		for(int i=0; i< roles1.size()&& i< roles2.size(); i++){
 			if (roles1.get(i).getType().equals(roles2.get(i).getType())){
@@ -145,13 +138,12 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 		}
 		patterns2.retainAll(patterns1);
 		results.put("phrStr", patterns2) ; 
-		
+
 		List<String> patternsWord1 = new ArrayList<String>(), patternsWord2 = new ArrayList<String>();
 		for(int i=0; i< frames1.size(); i++){
 			try {
 				patternsWord1.add(frames1.get(i).getSecondaryType().getID());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -173,11 +165,45 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 		return resList;
 	}
 
+	// takes a verb and forms its verbnet parameters 
+	// abandon  (leave-51.2 leave-51.2 ) (NP V NP.source ) (Transitivebasically, locative preposition drop of "from" ) (
+	public StringBuilder buildTreeRepresentationForTreeKernelLearning(String verb){
+		StringBuilder sb = new StringBuilder(1000);
+		IVerbClass v;
+		v = getVerbNetForAVerb(verb);
+		if (v==null) // for some reason this verb is not in the vocabulary
+			return null;
+		sb.append(verb + "  (" );
+		List<IThematicRole> roles = v.getThematicRoles();
+
+		for(int i=0; i< roles.size(); i++){
+			sb.append(roles.get(i).getVerbClass().getID().replace(".", "")+" ");
+		}
+		sb.append( ") (" );
+
+		List<IFrame> frames = v.getFrames();
+		for(int i=0; i< frames.size(); i++){
+			sb.append(//" ("+
+		frames.get(i).getPrimaryType().getID().replace(".", "-")+" ");
+		}
+		sb.append( ") (" );
+		for(int i=0; i< frames.size(); i++){
+			sb.append(frames.get(i).getSecondaryType().getID().
+					replace(".", "").replace(",", " ").replace("\"", "-").replace("/", "-").replace("(","").replace(")","")+" ");
+		}
+		sb.append( ") " );
+
+		if (v.getParent()!=null && v.getParent().getThematicRoles()!=null){
+			sb.append( "(" );
+			for(int i=0; i<v.getParent().getThematicRoles().size(); i++){
+				sb.append(v.getParent().getThematicRoles().get(i).getType()+" ");
+			}
+			sb.append( ")" );
+		}
+		return sb;
+	}
 
 	public void testIndex () throws Exception {
-
-
-
 		Iterator<IVerbClass> iter = index.iterator();
 		while(iter.hasNext()){
 			IVerbClass v = iter.next();
@@ -196,15 +222,7 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 					e.printStackTrace();
 				}
 			}
-
-
-
-
 		}
-
-
-
-
 		IVerbClass verb0 =  index.getVerb("hit-18.1");
 		// look up a verb class and print out some info
 		IVerbClass verb = index . getRootVerb ("hit-18.1") ;
@@ -217,11 +235,11 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 		System . out . println (" first wordnet keys : " + keys ) ;
 		System . out . println (" first frame type : " + type . getID () ) ;
 		System . out . println (" first example : " + example ) ;
-
 	}
 
 	public static void main(String[] args){
-		VerbNetProcessor proc = VerbNetProcessor.getInstance("/Users/borisgalitsky/Documents/workspace/opennlp-similarity/src/test/resources");
+		String resourceDir = new File(".").getAbsolutePath().replace("/.", "") + "/src/test/resources";
+		VerbNetProcessor proc = VerbNetProcessor.getInstance(resourceDir);
 		/*	try {
 				proc.testIndex();
 			} catch (Exception e) {
@@ -230,6 +248,9 @@ public class VerbNetProcessor implements IGeneralizer<Map<String, List<String>>>
 			}
 		 */	
 
+		System.out.println(proc.buildTreeRepresentationForTreeKernelLearning("abandon"));
+		System.out.println(proc.buildTreeRepresentationForTreeKernelLearning("earn"));
+		
 		List res = proc.generalize("marry", "engage");
 		System.out.println (res);
 

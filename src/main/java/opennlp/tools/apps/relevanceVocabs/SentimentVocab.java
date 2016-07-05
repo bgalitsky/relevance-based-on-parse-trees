@@ -76,7 +76,7 @@ public class SentimentVocab {
 	private static final String[] POSITIVE_NOUN_LIST = { "ability", "benefit",
 			"character", "charm", "comfort", "discount", "dream", "elegance",
 			"favourite", "feature", "improvement", "luck", "luxury", "offer",
-			"pro", "quality", "requirement", "usability" };
+			 "quality", "requirement", "usability" };
 
 	private static final String[] NEGATIVE_NOUN_LIST = { "blocker",
 			"challenge", "complain", "complaint", "compromise", "con",

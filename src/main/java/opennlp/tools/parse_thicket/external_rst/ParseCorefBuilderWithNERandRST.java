@@ -18,9 +18,8 @@
 package opennlp.tools.parse_thicket.external_rst;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Logger;
 
 import edu.arizona.sista.discourse.rstparser.DiscourseTree;
 import edu.arizona.sista.processors.CorefMention;
@@ -44,6 +43,9 @@ import scala.Option;
 public class ParseCorefBuilderWithNERandRST {	
 	public Processor proc = null;
 	CommunicativeActionsArcBuilder caFinder = new CommunicativeActionsArcBuilder();
+	private static Logger log = Logger
+		      .getLogger("opennlp.tools.parse_thicket.external_rst.ParseCorefBuilderWithNERandRST");
+
 
 	AbstractSequenceClassifier<CoreLabel> classifier = null;
 
@@ -53,43 +55,56 @@ public class ParseCorefBuilderWithNERandRST {
 		proc = new CoreNLPProcessor(true, true, 100);
 	}
 
-	public ParseThicket buildParseThicket(String text){
+	public ParseThicketWithDiscourseTree buildParseThicket(String text){
 		List<Tree> ptTrees = new ArrayList<Tree>();
-		// all numbering from 1, not 0
 		List<WordWordInterSentenceRelationArc> arcs = new ArrayList<WordWordInterSentenceRelationArc>();
 		List<List<ParseTreeNode>> nodesThicket = new ArrayList<List<ParseTreeNode>>();
 
-		Document doc = proc.annotate(text, false);
-		int sentenceCount = 0;
+		Document doc=null;
+        try {
+	        doc = proc.annotate(text, false);
+        } catch (IllegalArgumentException iae) {
+        	log.severe("failed to parse text: "+text);
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+        // failed to parse - skip this text
+		if (doc==null)
+			return null;
+		//java.lang.IllegalArgumentException
 		for (Sentence sentence: doc.sentences()) {
 			List<ParseTreeNode> sentenceNodes = new ArrayList<ParseTreeNode>();
 			String[] tokens= sentence.words();
 			for(int i=0; i< tokens.length; i++){
 				//sentence.startOffsets(), " "));
 				//sentence.endOffsets(), " "));
-				ParseTreeNode p = new ParseTreeNode(sentence.lemmas().get()[i], sentence.tags().get()[i]);
+				ParseTreeNode p = new ParseTreeNode(sentence.words()[i], sentence.tags().get()[i]);
 				p.setId(i+1);
 				if(sentence.entities().isDefined()){
 					p.setNe(sentence.entities().get()[i]);
 				}
 				if(sentence.norms().isDefined()){
-					p.setNormalizedWord(sentence.norms().get()[i]);
+					//p.setNormalizedWord(sentence.norms().get()[i]);
+					p.setNormalizedWord(sentence.lemmas().get()[i]);
 				}
 				sentenceNodes.add(p);
 			}
 
 			if(sentence.dependencies().isDefined()) {
-				int i=1;
+				int i=0;
 				DirectedGraphEdgeIterator<String> iterator = new
 						DirectedGraphEdgeIterator<String>(sentence.dependencies().get());
 				while(iterator.hasNext()) {
 					scala.Tuple3<Object, Object, String> dep = iterator.next();
 					//System.out.println(" head:" + dep._1() + " modifier:" + dep._2() + " label:" + dep._3());
-					ParseTreeNode p = sentenceNodes.get(i-1);
+					if (i>sentenceNodes.size()-1)
+						break;
+					ParseTreeNode p = sentenceNodes.get(i);
 					p.setHead(dep._1().toString());
 					p.setModifier(dep._2().toString());
 					p.setLabel(dep._3());
 					sentenceNodes.set(i, p);
+					i++;
 				}
 			}
 			if(sentence.syntacticTree().isDefined()) {
@@ -97,9 +112,6 @@ public class ParseCorefBuilderWithNERandRST {
 				ptTrees.add(tree);
 				//tree.pennPrint();
 			}
-
-			sentenceCount += 1;
-
 			nodesThicket.add(sentenceNodes);
 		}
 
@@ -133,8 +145,8 @@ public class ParseCorefBuilderWithNERandRST {
 						WordWordInterSentenceRelationArc arc = 
 								new WordWordInterSentenceRelationArc(new Pair<Integer, Integer>(niSentence[i],niWord[i]), 
 										new Pair<Integer, Integer>(niSentence[i+1],niWord[i+1]), 
-										nodesThicket.get(niSentence[i]).get(startOffset[i]).getWord()+"..."+nodesThicket.get(niSentence[i]).get(endOffset[i]).getWord(),
-										nodesThicket.get(niSentence[i+1]).get(startOffset[i+1]).getWord()+"..."+nodesThicket.get(niSentence[i+1]).get(endOffset[i+1]).getWord(),           	    					  arcType);
+									    startOffset[i]+"", startOffset[i+1]+"",
+	      	    					  arcType);
 						arcs.add(arc);
 					}
 				}
@@ -144,6 +156,7 @@ public class ParseCorefBuilderWithNERandRST {
 
 		List<WordWordInterSentenceRelationArc> arcsCA = buildCAarcs(nodesThicket);
 		arcs.addAll(arcsCA);
+		ParseThicketWithDiscourseTree result = new ParseThicketWithDiscourseTree(ptTrees, arcs);
 
 		if(doc.discourseTree().isDefined()) {
 			Option<DiscourseTree> discourseTree = doc.discourseTree();
@@ -152,21 +165,24 @@ public class ParseCorefBuilderWithNERandRST {
 			scala.collection.Iterator<DiscourseTree> iterator = discourseTree.iterator();
 			while(iterator.hasNext()) {
 				DiscourseTree dt = iterator.next();
+				result.setDt(dt);
 				List<WordWordInterSentenceRelationArc> rstArcs = new ArrayList<WordWordInterSentenceRelationArc>();
-				navigateDiscourseTree(dt, rstArcs);
+				navigateDiscourseTree(dt, rstArcs, nodesThicket );
 				arcs.addAll(rstArcs);
-				/*System.out.println(dt);
+				System.out.println(dt);
 				System.out.println("first EDU = "+dt.firstEDU() + "| dt.firstSentence() = "+ dt.firstSentence() + 
 						" \n| last EDU = "+dt.lastEDU() + "| dt.lastSentence() = "+ dt.lastSentence() + 
 						" \n| dt.tokenCount() = " + dt.tokenCount() + "| dt.firstToken " + dt.firstToken() + 
 						" | dt.lastToken() "+ dt.lastToken() + "\n kind =" + dt.kind() + " | text = "+ dt.rawText());
-						*/
-
+				StringBuilder sb = new StringBuilder(10000);
+				System.out.println(sb);
 			}
 		}
 
-		ParseThicket result = new ParseThicket(ptTrees, arcs);
+		result.setOrigText(text);
 		result.setNodesThicket(nodesThicket);
+		
+		result.setDtDump(); // sets the DT representation for TK learning
 		return result;
 	}
 
@@ -208,23 +224,28 @@ public class ParseCorefBuilderWithNERandRST {
 		return buf.toString();
 	}
 
-	private void navigateDiscourseTree(DiscourseTree dt, List<WordWordInterSentenceRelationArc> arcs ) {
+	// creates a list of Arcs objects 'arcs' from the descourse tree dt, using the list of sentences 'nodesThicket' to identify words 
+	// for nodes being connected with these arcs
+	private void navigateDiscourseTree(DiscourseTree dt, List<WordWordInterSentenceRelationArc> arcs,  List<List<ParseTreeNode>> nodesThicket  ) {
 		if (dt.isTerminal()) {
 			return;
 		} else {
 			ArcType arcType = new ArcType("rst", 
 					dt.relationLabel()+ "=>" + dt.kind(), Boolean.compare(dt.relationDirection().equals("LeftToRight"), true),0);
+			String lemmaFrom = nodesThicket.get(dt.firstSentence()).get(dt.firstToken().copy$default$2()).getWord();
+			String lemmaTo = nodesThicket.get(dt.lastSentence()).get(dt.lastToken().copy$default$2()-1).getWord();
+			
 			WordWordInterSentenceRelationArc arc = 
 					new WordWordInterSentenceRelationArc(new Pair<Integer, Integer>(dt.firstToken().copy$default$1(), dt.firstToken().copy$default$2()), 
 							new Pair<Integer, Integer>(dt.lastToken().copy$default$1(), dt.lastToken().copy$default$2()), 
-							"","", 
+							lemmaFrom,lemmaTo, 
 							arcType);
 			System.out.println(arc);
 			arcs.add(arc);
 			DiscourseTree[] kids = dt.children();
 			if (kids != null) {
 				for (DiscourseTree kid : kids) {
-					navigateDiscourseTree(kid, arcs);
+					navigateDiscourseTree(kid, arcs, nodesThicket);
 				}
 			}
 			return ;
@@ -232,14 +253,15 @@ public class ParseCorefBuilderWithNERandRST {
 	}
 
 	public static void main(String[] args){
-		new ParseCorefBuilderWithNERandRST ().buildParseThicket(
+		ParseCorefBuilderWithNERandRST builder = new ParseCorefBuilderWithNERandRST ();
+		String text = "I thought I d tell you a little about what I like to write. And I like to immerse myself in my topics. I just like to dive right in and become sort of a human guinea pig. And I see my life as a series of experiments. So , I work for Esquire magazine , and a couple of years ago I wrote an article called  My Outsourced Life ,  where I hired a team of people in Bangalore , India , to live my life for me. "
+		+ "So they answered my emails. They answered my phone. ";
+		
+		ParseThicket pt = builder.buildParseThicket(text);
+		pt = builder.buildParseThicket(
 				"Dutch accident investigators say that evidence points to pro-Russian rebels as being responsible for shooting down plane. The report indicates where the missile was fired from and identifies who was in control of the territory and pins the downing of the plane on the pro-Russian rebels. "+
-						 "However, the Investigative Committee of the Russian Federation believes that the plane was hit by a missile from the air which was not produced in Russia. "+
-						 "At the same time, rebels deny that they controlled the territory from which the missile was supposedly fired."
-			/*	
-				"No one knows yet what General Prayuth's real intentions are. He has good reason to worry about resistance. "
-				+ "The pro-government Red-Shirt movement is far better organised than eight years ago, and could still be financed by former Prime Minister Thaksin Shinawatra's deep pockets."
-				*/		
+						"However, the Investigative Committee of the Russian Federation believes that the plane was hit by a missile from the air which was not produced in Russia. "+
+						"At the same time, rebels deny that they controlled the territory from which the missile was supposedly fired."
 				);
 	}
 

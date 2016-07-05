@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import opennlp.tools.parse_thicket.ParseTreeNode;
 
@@ -57,6 +58,26 @@ public class ParseTreeChunk {
 	}
 
 	public ParseTreeChunk(){};
+	// "[<1>NP'Property':NN, <2>NP'has':VBZ, <3>NP'lots':NNS, <4>NP'of':IN, <5>NP'trash':NN, <6>NP'and':CC, <7>NP'debris':NN]";
+
+	public ParseTreeChunk(String phrStr){
+		String[] parts = phrStr.replace("]","").split(", <");
+		this.POSs = new ArrayList<String>();
+		this.lemmas = new ArrayList<String>();
+		this.mainPOS = StringUtils.substringBetween(phrStr, ">", "'");
+		for(String part: parts){
+			String lemma = StringUtils.substringBetween(part, "P'", "':");
+			String pos = part.substring(part.indexOf(":")+1, part.length());
+			
+			if (pos==null || lemma ==null){
+				continue;
+			}
+			this.POSs.add(pos.trim());
+			this.lemmas.add(lemma.trim());
+		}
+		
+	}
+	
 	public ParseTreeChunk(List<String> lemmas, List<String> POSs, int startPos,
 			int endPos) {
 		this.lemmas = lemmas;
@@ -149,9 +170,7 @@ public class ParseTreeChunk {
 			this.setMainPOS(ps.get(0).getPhraseType());
 			this.parseTreeNodes = ps;
 		}
-
 	}
-
 
 	public List<ParseTreeChunk> buildChunks(List<LemmaPair> parseResults) {
 		List<ParseTreeChunk> chunksResults = new ArrayList<ParseTreeChunk>();
@@ -541,4 +560,9 @@ public class ParseTreeChunk {
 		return parseTreeMatcher;
 	}
 
+	public static void main(String[] args){
+		String phrStr = "[<1>NP'Property':NN, <2>NP'has':VBZ, <3>NP'lots':NNS, <4>NP'of':IN, <5>NP'trash':NN, <6>NP'and':CC, <7>NP'debris':NN]";
+	    ParseTreeChunk ch = new ParseTreeChunk(phrStr);
+	    System.out.println(ch);
+	}
 }

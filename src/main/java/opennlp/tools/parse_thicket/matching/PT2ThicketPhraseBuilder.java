@@ -21,16 +21,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import opennlp.tools.parse_thicket.ParseThicket;
 import opennlp.tools.parse_thicket.ParseTreeNode;
 import opennlp.tools.parse_thicket.WordWordInterSentenceRelationArc;
 import opennlp.tools.parse_thicket.rhetoric_structure.RhetoricStructureArcsBuilder;
-
 import edu.stanford.nlp.trees.Tree;
 
 public class PT2ThicketPhraseBuilder {
 
 	RhetoricStructureArcsBuilder rstBuilder = new RhetoricStructureArcsBuilder();
+	private static Logger log = Logger
+		      .getLogger("opennlp.tools.parse_thicket.matching.PT2ThicketPhraseBuilder");
 
 	/*
 	 * Building phrases takes a Parse Thicket and forms phrases for each sentence individually
@@ -40,6 +43,8 @@ public class PT2ThicketPhraseBuilder {
 
 	public List<List<ParseTreeNode>> buildPT2ptPhrases(ParseThicket pt ) {
 		List<List<ParseTreeNode>> phrasesAllSent = new ArrayList<List<ParseTreeNode>> ();
+		if (pt ==null) // parsing failed, return empty
+			return phrasesAllSent;
 		Map<Integer, List<List<ParseTreeNode>>> sentNumPhrases = new HashMap<Integer, List<List<ParseTreeNode>>>();
 		// build regular phrases
 		for(int nSent=0; nSent<pt.getSentences().size(); nSent++){
@@ -47,7 +52,7 @@ public class PT2ThicketPhraseBuilder {
 			Tree ptree = pt.getSentences().get(nSent);
 			//ptree.pennPrint();
 			List<List<ParseTreeNode>> phrases = buildPT2ptPhrasesForASentence(ptree, sentence);
-			System.out.println(phrases);
+			log.info(phrases.toString());
 			phrasesAllSent.addAll(phrases);
 			sentNumPhrases.put(nSent, phrases);
 
@@ -60,6 +65,10 @@ public class PT2ThicketPhraseBuilder {
 		List<WordWordInterSentenceRelationArc> arcs = pt.getArcs();
 		arcs.addAll(arcsRST);
 		pt.setArcs(arcs);
+		
+		if (pt.getArcs().size()>20){
+			log.info(pt.toString());
+		}
 
 		List<List<ParseTreeNode>> expandedPhrases = expandTowardsThicketPhrases(phrasesAllSent, pt.getArcs(), sentNumPhrases, pt);
 		return expandedPhrases;
@@ -120,8 +129,8 @@ public class PT2ThicketPhraseBuilder {
 							List<ParseTreeNode> appended = append(lFromFound, lToFound);
 							if (thicketPhrasesAllSent.contains(appended))
 								continue;
-							System.out.println("rel: "+arc);
-							System.out.println("From "+lFromFound);
+							log.info("rel: "+arc);
+							log.info("From "+lFromFound);
 							System.out.println("TO "+lToFound);
 							thicketPhrasesAllSent.add(append(lFromFound, lToFound));	
 							//break;
@@ -217,7 +226,7 @@ public class PT2ThicketPhraseBuilder {
 								e.printStackTrace();
 							}
 						} else {
-							System.err.println("Failed alignment:"+nodes);
+							log.severe("Failed alignment:"+nodes);
 						}
 					}
 				}
