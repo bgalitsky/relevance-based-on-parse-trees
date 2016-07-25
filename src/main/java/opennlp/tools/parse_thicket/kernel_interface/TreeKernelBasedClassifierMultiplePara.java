@@ -62,7 +62,7 @@ public class TreeKernelBasedClassifierMultiplePara extends TreeKernelBasedClassi
 			List<String> texts=DescriptiveParagraphFromDocExtractor.getLongParagraphsFromFile(f);		
 			List<String> lines = formTreeKernelStructuresMultiplePara(texts, "1");
 			treeBankBuffer.addAll(lines);		
-			if (bShortRun && countPos>3)
+			if (bShortRun && countPos>3000)
 				break;
 
 			countPos++;
@@ -72,7 +72,7 @@ public class TreeKernelBasedClassifierMultiplePara extends TreeKernelBasedClassi
 			List<String> texts=DescriptiveParagraphFromDocExtractor.getLongParagraphsFromFile(f);	
 			List<String> lines = formTreeKernelStructuresMultiplePara(texts, "-1");
 			treeBankBuffer.addAll(lines);	
-			if (bShortRun && countNeg>3)
+			if (bShortRun && countNeg>3000)
 				break;
 
 			countNeg++;

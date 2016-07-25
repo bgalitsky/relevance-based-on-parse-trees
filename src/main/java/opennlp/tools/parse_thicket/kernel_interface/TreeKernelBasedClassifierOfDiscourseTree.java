@@ -36,7 +36,7 @@ public class TreeKernelBasedClassifierOfDiscourseTree extends TreeKernelBasedCla
 
 	protected List<String> formTreeKernelStructuresMultiplePara(List<String> texts, String flag) {
 		//TODO
-		this.setShortRun();	
+		//this.setShortRun();	
 		List<String> extendedTreesDumpTotal = new ArrayList<String>();
 		try {
 
@@ -77,69 +77,7 @@ public class TreeKernelBasedClassifierOfDiscourseTree extends TreeKernelBasedCla
 		}		
 		return extendedTreesDump;
 	}
-	/*
-	public void dt(){
-		1 |BT| (elaboration
-		  (joint
-		    (elaboration 
-		      (It that)
-		    (joint (Journalism readers)))
-		  (elaboration ( elaboration ( joint (elaboration (I who))) and)
-		      manner-means (by they))
-		    elaboration (rural become)))|ET|
-
-		    (elaboration (joint (elaboration (It that) (joint (Journalism readers))) 
-		    (elaboration ( elaboration ( joint ( elaboration (I who))) and) (manner-means (by they)) 
-		    elaboration (rural become))))
-
-		    1 |BT| (elaboration (joint (elaboration (It that) (joint (Journalism readers)))))|ET|
-
-	} 
-	 
 	
-	(elaboration (joint (attribution ((I PRP)(thought VBD)) 
-			((I PRP)(d NN)(tell VBP)(you PRP)(a DT)(little JJ)(about IN)(what WP)(I PRP)(like VBP)(to TO)(write VB)(. .))) 
-			(joint ((And CC)(I PRP)(like VBP)(to TO)(immerse VB)(myself PRP)(in IN)(my PRP$)(topics NNS)(. .)) 
-			(joint ((I PRP)(just RB)(like VBP)(to TO)(dive NN)(right NN)(in IN)) ((and CC)(become VB)(sort NN)(of IN)(a DT)(human JJ)(guinea NN)(pig NN)(. .))))) 
-			(elaboration (joint ((And CC)(I PRP)(see VBP)(my PRP$)(life NN)(as IN)(a DT)(series NN)(of IN)(experiments NNS)(. .)) (joint ((So RB)(, ,)(I PRP)(work VBP)(for IN)(Esquire NNP)
-					(magazine NN)(, ,)) (elaboration (elaboration ((and CC)(a DT)(couple NN)(of IN)(years NNS)(ago IN)(I PRP)(wrote VBD)(an DT)(article NN)) ((called VBN)(My PRP$)(Outsourced JJ)(Life NNP)(, ,))) 
-							(enablement ((where WRB)(I PRP)(hired VBD)(a DT)(team NN)(of IN)(people NNS)(in IN)(Bangalore NNP)(, ,)(India NNP)(, ,)) ((to TO)(live VB)(my PRP$)(life NN)(for IN)(me PRP)(. .)))))) 
-							(elaboration ((So IN)(they PRP)(answered VBD)(my PRP$)(emails NNS)(. .)) 
-			((They PRP)(answered VBD)(my PRP$)(phone NN)(. .))))) 
-
-	(elaboration (elaboration (joint (elaboration (joint (elaboration (And CC)(this DT) (be  (beg-582 beg-582 beg-582 ) 
-			(NP V for NP S_INF NP V NP PP-proposition NP V NP S_INF NP V PP-proposition NP V NP that S NP V S_INF ) 
-			(FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ) (
-					the DT)(United NNP)(States NNPS) (move  (slide-112 slide-112 slide-112 slide-112 ) 
-							(NP V NP V PP-source NP V PP-destination NP V PP-source PP-destination NP-agent V NP NP V NP PP-source NP V NP PP-destination NP V NP PP-source             PP-destination ) 
-							(Intransitive PPpath-PP PPpath-PP PPpath-PP Basic TransitiveCausative NP-PPpath-PP NP-PPpath-PP NP-PPpath-PP ) ) 
-							(away RB)(here RB) (earn  (get-1351-1 ) (NP V NP PP-source ) (NP-PPfor/on Source (abstract) ) 
-									(edu.mit.jverbnet.data.ThematicRole@43a267d2 edu.mit.jverbnet.data.ThematicRole@2db6b034 
-											edu.mit.jverbnet.data.ThematicRole@38f90b2d edu.mit.jverbnet.data.ThematicRole@67bd3d10 edu.mit.jverbnet.data.ThematicRole@37715ac2 ))
-											(more JJR)(money NN)) (And CC)(we PRP)(will MD)(soon RB) (see  (see-301 see-301 see-301 ) (NP V NP NP V that S NP V NP-ATTR-POS PP-oblique NP V how S NP V what S ) (Basic Transitive S Attribute Object Possessor-Attribute Factoring Alternation HOW-S WHAT-S ) ) (China NNP)(coming VBG)(up RB)(in IN)(the DT)(very RB)(far RB)(end VB)(corner NN)(here RB)) (elaboration (cause (And CC)(it PRP) (move  (slide-112 slide-112 slide-112 slide-112 ) (NP V NP V PP-source NP V PP-destination NP V PP-source PP-destination NP-agent V NP NP V NP PP-source NP V NP PP-destination NP V NP PP-source             PP-destination ) (Intransitive PPpath-PP PPpath-PP PPpath-PP Basic TransitiveCausative NP-PPpath-PP NP-PPpath-PP NP-PPpath-PP ) ) (up RP)(with IN)(Mao NNP)(TseTung NNP) (get  (get-1351 get-1351 get-1351 get-1351 get-1351 ) (NP V NP NP V NP PP-source NP V NP PP-beneficiary NP V NP-beneficiary NP NP V NP PP-asset NP-asset V NP NP V NP PP-source NP-asset ) (Basic Transitive NP-PPfrom-PP NP-PPBeneficiary Object Benefactive Alternationdouble object NP-PPAsset Subject NPAsset Subject NP-PP-PPSource-PP  Asset-PP ) ) (health NN) (not RB) (get  (get-1351 get-1351 get-1351 get-1351 get-1351 ) (NP V NP NP V NP PP-source NP V NP PP-beneficiary NP V NP-beneficiary NP NP V NP PP-asset NP-asset V NP NP V NP PP-source NP-asset ) (Basic Transitive NP-PPfrom-PP NP-PPBeneficiary Object Benefactive Alternationdouble object NP-PPAsset Subject NPAsset Subject NP-PP-PPSource-PP  Asset-PP ) ) (so RB)(rich JJ)) (temporal (There EX)(he PRP) (die  (disappearance-482 disappearance-482 ) (NP V There V PP NP ) (Basic Intransitive PP-NPExpletive-there Subject ) ) (attribution (then RB)(Deng NNP)(Xiaoping NNP) (bring  (bring-113 bring-113 bring-113 bring-113 ) (NP V NP NP V NP PP-destination NP V PP-destination NP NP V NP PP-source NP V NP PP-source PP-destination NP V NP ADVP ) (Basic Transitive NP-PPGoal-PP PP-NPGoal-PP NP-PPSource-PP NP-PP-PPSource-PP Goal-PP NP-ADVP-PREDhere/there ) ) (money NN) (it PRP) (move  (slide-112 slide-112 slide-112 slide-112 ) (NP V NP V PP-source NP V PP-destination NP V PP-source PP-destination NP-agent V NP NP V NP PP-source NP V NP PP-destination NP V NP PP-source             PP-destination ) (Intransitive PPpath-PP PPpath-PP PPpath-PP Basic TransitiveCausative NP-PPpath-PP NP-PPpath-PP NP-PPpath-PP ) ) (this DT)(way NN)(over IN)(here RB))))) (joint (And CC)(the DT)(bubbles NNS) (keep  (keep-152 keep-152 keep-152 ) (NP V NP PP-location NP V NP ) (NP-PPlocative-PP Basic Transitive ) )  (move  (slide-112 slide-112 slide-112 slide-112 ) (NP V NP V PP-source NP V PP-destination NP V PP-source PP-destination NP-agent V NP NP V NP PP-source NP V NP PP-destination NP V NP PP-source             PP-destination ) (Intransitive PPpath-PP PPpath-PP PPpath-PP Basic TransitiveCausative NP-PPpath-PP NP-PPpath-PP NP-PPpath-PP ) ) (up RB)(there RB) (and CC)(this DT) (be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP PP-proposition NP V NP S_INF NP V PP-proposition NP V NP that S NP V S_INF ) (FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ) (what WP)(the DT)(world NN)(looks VBZ)(like IN)(today NN))) (Applause NN)(Let VB)(us PRP) (have  (own-100 own-100 ) (NP V NP ) (NP ) ) (a DT)(look NN)(at IN)(the DT)(United NNP)(States NNPS)) (elaboration (We PRP) (have  (own-100 own-100 ) (NP V NP ) (NP ) ) (a DT)(function NN)(here RB)(I PRP)(can MD) (tell  (tell-372 tell-372 tell-372 ) (NP V NP NP V NP PP-topic NP V NP S ) (NP NP-PPof-PP NP-S ) ) (the DT)(world NN)(Stay NNP) (where WRB)(you PRP) (be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP PP-proposition NP V NP S_INF NP V PP-proposition NP V NP that S NP V S_INF ) (FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ))) 
-
-	
-	(elaboration (elaboration (attribution (And CC)(we PRP)(can MD) (see  (see-301 see-301 see-301 ) (NP V NP NP V that S NP V NP-ATTR-POS 
-			PP-oblique NP V how S NP V what S ) (Basic Transitive S Attribute Object Possessor-Attribute Factoring Alternation HOW-S WHAT-S ) 
-			) (that IN)(the DT)(United NNP)(States NNPS) (go  (gobble-393 ) () () ) (to TO)(the DT)(right NN)(of IN)(the DT)(mainstream NN))
-			(joint (They PRP) (be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP PP-proposition NP V NP S_INF NP V PP-proposition NP
-					V NP that S NP V S_INF ) (FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ) 
-					(on IN)(the DT)(money NN)(side NN)(all PDT)(the DT)(time NN) (joint (And CC)(down RB)(in IN)(1915 CD)(the DT)
-							(United NNP)(States NNPS) (be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP PP-proposition NP V NP 
-									S_INF NP V PP-proposition NP V NP that S NP V S_INF ) (FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP 
-											S-SUBJUNCT TO-INF-SCwith-PP ) ) (a DT)(neighbor NN)(of IN)(India NNP)(present JJ)(contemporary JJ)
-											(India NNP) (joint (contrast (And CC)(that DT) (mean  (meander-477 meander-477 ) (NP V PP-location PP-location V NP There V PP NP There V NP PP ) 
-													(PPpath-PP Locative Inversion PP-NPExpletive-there Subject NP-PPExpletive-there Subject ) ) (United NNP)(States NNPS) 
-													(be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP PP-proposition NP V NP S_INF NP V PP-proposition NP V NP that S NP 
-															V S_INF ) (FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ) (richer JJR) (elaboration 
-																	(but CC) (lose  (contribute-132 contribute-132 contribute-132 ) (NP V NP PP-recipient NP V NP-theme (PP) 
-																			NP V PP-recipient NP ) (NP-PPRecipient-PP TransitiveTheme Object PP-NPRecipient-PP ) ) 
-																			(more JJR)(kids NNS) (than IN)(India NNP) (be  (beg-582 beg-582 beg-582 ) (NP V for NP S_INF NP V NP 
-																					PP-proposition NP V NP S_INF NP V PP-proposition NP V NP that S NP V S_INF ) 
-																					(FOR-TO-INF NP-PPfor-PP NP-TO-INF-OC PPfor-PP S-SUBJUNCT TO-INF-SCwith-PP ) ) (doing VBG)(today NN)(proportionally RB))) 
-															(And CC)(look VB)(here RB)(compare VB)(to TO)(the DT)(Philippines NNPS)(of IN)(today NN))))) 
-															)
-															*/
 	public static void main(String[] args){
 		VerbNetProcessor p = VerbNetProcessor.
 				getInstance("/Users/bgalitsky/Documents/relevance-based-on-parse-trees/src/test/resources"); 
@@ -298,5 +236,30 @@ XiAlpha-estimate of the error: error<=12.32% (rho=1.00,depth=0)
 XiAlpha-estimate of the recall: recall=>97.15% (rho=1.00,depth=0)
 XiAlpha-estimate of the precision: precision=>88.53% (rho=1.00,depth=0)
 Number of kernel evaluations: 138447398
+Writing model file...done
+
+HYBRID FULL RUN
+
+Number of examples: 2880, linear space size: 10
+
+estimating ...
+Setting default regularization parameter C=1.0021
+Optimizing...........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+ Checking optimality of inactive variables...done.
+ Number of inactive variables = 1035
+done. (1820 iterations)
+Optimization finished (162 misclassified, maxdiff=0.00099).
+Runtime in cpu-seconds: 1.35
+Number of SV: 1552 (including 556 at upper bound)
+L1 loss: loss=426.90789
+Norm of weight vector: |w|=25.52139
+Norm of longest example vector: |x|=1.00000
+Estimated VCdim of classifier: VCdim<=652.34149
+Computing XiAlpha-estimates...done
+Runtime for XiAlpha-estimates in cpu-seconds: 0.01
+XiAlpha-estimate of the error: error<=23.92% (rho=1.00,depth=0)
+XiAlpha-estimate of the recall: recall=>92.67% (rho=1.00,depth=0)
+XiAlpha-estimate of the precision: precision=>80.55% (rho=1.00,depth=0)
+Number of kernel evaluations: 4075095
 Writing model file...done
  */

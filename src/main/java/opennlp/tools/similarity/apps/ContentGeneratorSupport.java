@@ -147,8 +147,6 @@ public class ContentGeneratorSupport {
 		//was 3 spaces => now back to 2
 		//TODO - verify regexp!!
 		pageContent = pageContent.trim().replaceAll("([a-z])(\\s{2,3})([A-Z])", "$1. $3")
-				//replaceAll("[a-z]  [A-Z]", ". $0")// .replace("  ",
-				// ". ")
 				.replace("..", ".").replace(". . .", " ").
 				replace(".    .",". ").trim(); // sometimes   html breaks are converted into ' ' (two spaces), so
 		// we need to put '.'

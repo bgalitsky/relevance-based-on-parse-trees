@@ -36,11 +36,14 @@ import org.apache.tika.sax.BodyContentHandler;
 
 
 public class PageFetcher {
-  private static final Logger LOG = Logger
+  private static final Logger log = Logger
       .getLogger("opennlp.tools.similarity.apps.utils.PageFetcher");
   Tika tika = new Tika();
 
   private static int DEFAULT_TIMEOUT = 1500;
+  private void setTimeout(int to){
+	  DEFAULT_TIMEOUT = to;
+  }
 
   public String fetchPage(final String url) {
     return fetchPage(url, DEFAULT_TIMEOUT);
@@ -51,7 +54,7 @@ public class PageFetcher {
 	  String pageContent = null;
 	    URLConnection connection;
 	    try {
-	      LOG.info("fetch url  auto detect parser " + url);
+	      log.info("fetch url  auto detect parser " + url);
 	      connection = new URL(fetchURL).openConnection();
 	      connection.setReadTimeout(DEFAULT_TIMEOUT);
 	      
@@ -66,7 +69,7 @@ public class PageFetcher {
 	      
 	      pageContent = handler.toString();
 	    } catch (Exception e) {
-	      LOG.info(e.getMessage() + "\n" + e);
+	      log.info(e.getMessage() + "\n" + e);
 	    }
 	    return  pageContent;
   }
@@ -75,7 +78,7 @@ public class PageFetcher {
   public String fetchPage(final String url, final int timeout) {
     String fetchURL = addHttp(url);
 
-    LOG.info("fetch url " + fetchURL);
+    log.info("fetch url " + fetchURL);
 
     String pageContent = null;
     URLConnection connection;
@@ -86,11 +89,11 @@ public class PageFetcher {
       pageContent = tika.parseToString(connection.getInputStream())
           .replace('\n', ' ').replace('\t', ' ');
     } catch (MalformedURLException e) {
-      LOG.info(e.getMessage() + "\n" + e);
+      log.severe(e.getMessage() + "\n" + e);
     } catch (IOException e) {
-      LOG.info(e.getMessage() + "\n" + e);
+      log.severe(e.getMessage() + "\n" + e);
     } catch (TikaException e) {
-      LOG.info(e.getMessage() + "\n" + e);
+      log.severe(e.getMessage() + "\n" + e);
     }
     return pageContent;
   }
@@ -101,14 +104,18 @@ public class PageFetcher {
     }
     return url;
   }
+  
+  public String fetchOrigHTML(String url, int timeout) {
+	  setTimeout(timeout);
+	  return fetchOrigHTML(url);
+  }
 
   public String fetchOrigHTML(String url) {
-    System.out.println("fetch url " + url);
-    String pageContent = null;
+    log.info("fetch url " + url);
     StringBuffer buf = new StringBuffer();
     try {
       URLConnection connection = new URL(url).openConnection();
-      connection.setReadTimeout(10000);
+      connection.setReadTimeout(DEFAULT_TIMEOUT);
       connection
           .setRequestProperty(
               "User-Agent",
@@ -119,8 +126,8 @@ public class PageFetcher {
         reader = new BufferedReader(new InputStreamReader(
             connection.getInputStream()));
       } catch (Exception e) {
-        // we dont need to log trial web pages if access fails
-        // LOG.error(e.getMessage(), e);
+        // we dont always need to log trial web pages if access fails
+        log.severe(e.toString());
       }
 
       while ((line = reader.readLine()) != null) {

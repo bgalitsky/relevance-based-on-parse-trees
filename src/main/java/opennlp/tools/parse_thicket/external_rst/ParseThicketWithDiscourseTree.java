@@ -35,8 +35,6 @@ public class ParseThicketWithDiscourseTree extends ParseThicket {
 			this.dt = dt;
 	}
 
-
-
 	public ParseThicketWithDiscourseTree(List<Tree> ptTrees, List<WordWordInterSentenceRelationArc> barcs) {
 		super(ptTrees, barcs);
 	}
@@ -90,7 +88,7 @@ public class ParseThicketWithDiscourseTree extends ParseThicket {
 
 	private StringBuilder toStringBuilderDTWithPOSSeq(StringBuilder sb, DiscourseTree dt) {
 		if (dt.isTerminal()) {
-			if (dt.relationLabel() != null) {
+			if (dt.relationLabel() != null && dt.relationLabel().length()>2) {
 				sb.append(dt.relationLabel());
 				// different StrBuilder for trees from scala
 				scala.collection.mutable.StringBuilder sbs = new scala.collection.mutable.StringBuilder(100);
@@ -143,7 +141,7 @@ public class ParseThicketWithDiscourseTree extends ParseThicket {
 
 	private StringBuilder toStringBuilderDTWithEmbeddedTrees(StringBuilder sb, DiscourseTree dt) {
 		if (dt.isTerminal()) {
-			if (dt.relationLabel() != null) {
+			if (dt.relationLabel() != null && dt.relationLabel().length()>2) {
 				sb.append(dt.relationLabel());
 				//sb.append("("+dt.rawText()+")");
 				scala.collection.mutable.StringBuilder sbs = new scala.collection.mutable.StringBuilder(100);
@@ -191,15 +189,20 @@ public class ParseThicketWithDiscourseTree extends ParseThicket {
 
 	private StringBuilder toStringBuilderDTWithVerbNet(StringBuilder sb, DiscourseTree dt) {
 		if (dt.isTerminal()) {
-			if (dt.relationLabel() != null) {
+			if (dt.relationLabel() != null && dt.relationLabel().length()>2) {
 				sb.append(dt.relationLabel());
 				//sb.append("("+dt.rawText()+")");
 				scala.collection.mutable.StringBuilder sbs = new scala.collection.mutable.StringBuilder(100);
 
 				dt.print(sbs, 0, false, true);
 				String text  =  sbs.replaceAllLiterally("Nucleus TEXT:", "");
-				//text = text.substring(0, text.length()-1)+"";
-				String textDump = substituteTextWithPOStextVerbNet(text, this.getNodesThicket().get(dt.firstToken().copy$default$1()));
+				String textDump = null;
+				if (text.split(" ").length<100) // if not TOO long, more informative substitution, including VerbNets
+					textDump = substituteTextWithPOStextVerbNet(text, this.getNodesThicket().get(dt.firstToken().copy$default$1()));
+				else // otherwise just lemma-POS chains
+					textDump = substituteTextWithPOStext(text, this.getNodesThicket().get(dt.firstToken().copy$default$1()));
+				
+					
 				sb.append(textDump);
 			}
 			return sb;
@@ -237,6 +240,7 @@ public class ParseThicketWithDiscourseTree extends ParseThicket {
 				if (count>3) // three tokens is enough for alignment
 					break;
 			}
+			// alignment found; now 
 			if (bMatch){
 				StringBuilder buf = new StringBuilder();
 				for(ParseTreeNode ch: subList){
