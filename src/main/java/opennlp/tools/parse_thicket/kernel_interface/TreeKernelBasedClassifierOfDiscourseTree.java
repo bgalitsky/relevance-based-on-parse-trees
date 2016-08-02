@@ -78,16 +78,33 @@ public class TreeKernelBasedClassifierOfDiscourseTree extends TreeKernelBasedCla
 		return extendedTreesDump;
 	}
 	
+	/*
+	 * dtDump
+	 * 1 |BT| (elaboration (joint (attribution (I though) (I d tell you a little about what I like to write )) (joint (And I like to immerse myself in my topics ) (joint (I just like to dive right i) (and become sort of a human guinea pig )))) (elaboration (joint (And I see my life as a series of experiments ) (joint (So , I work for Esquire magazine ) (elaboration (elaboration (and a couple of years ago I wrote an articl) (called My Outsourced Life )) (enablement (where I hired a team of people in Bangalore , India ) (to live my life for me ))))) (elaboration (So they answered my emails ) (They answered my phone )))) |ET|
+	 * 
+	 * getDtDumpWithPOS
+	 * 
+	 *  1 |BT| (elaboration (joint (attribution (I PRP)(thought VBD) (I PRP)(d NN)(tell VBP)(you PRP)(a DT)(little JJ)(about IN)(what WP)(I PRP)(like VBP)(to TO)(write VB)) (joint (And CC)(I PRP)(like VBP)(to TO)(immerse VB)(myself PRP)(in IN)(my PRP$)(topics NNS) (joint (I PRP)(just RB)(like VBP)(to TO)(dive NN)(right NN)(in IN) (and CC)(become VB)(sort NN)(of IN)(a DT)(human JJ)(guinea NN)(pig NN)))) (elaboration (joint (And CC)(I PRP)(see VBP)(my PRP$)(life NN)(as IN)(a DT)(series NN)(of IN)(experiments NNS) (joint (So RB)(I PRP)(work VBP)(for IN)(Esquire NNP)(magazine NN) (elaboration (elaboration (and CC)(a DT)(couple NN)(of IN)(years NNS)(ago IN)(I PRP)(wrote VBD)(an DT)(article NN) (called VBN)(My PRP$)(Outsourced JJ)(Life NNP)) (enablement (where WRB)(I PRP)(hired VBD)(a DT)(team NN)(of IN)(people NNS)(in IN)(Bangalore NNP)(India NNP) (to TO)(live VB)(my PRP$)(life NN)(for IN)(me PRP))))) (elaboration (So IN)(they PRP)(answered VBD)(my PRP$)(emails NNS) (They PRP)(answered VBD)(my PRP$)(phone NN)))) |ET| 
+	 * 
+	 * getDtDumpWithEmbeddedTrees()
+	 * 1 |BT| (elaboration (joint (attribution (SBAR (S (NP (PRP I)) (VP (ADVP (NN d)) (VBP tell) (NP (PRP you)) (PP (NP (DT a) (JJ little)) (IN about) (SBAR (WHNP (WP what)) (S (NP (PRP I)) (VP (VBP like) (S (VP (TO to) (VP (VB write))))))))))) (VBP tell)) (joint (VP (VBP like) (S (VP (TO to) (VP (VB immerse) (NP (PRP myself)) (PP (IN in) (NP (PRP$ my) (NNS topics))))))) (joint (VP (VP (VBP like) (PP (TO to) (NP (NN dive) (NN right))) (PP (IN in))) (CC and) (VP (VB become) (NP (NP (NN sort)) (PP (IN of) (NP (DT a) (JJ human) (NN guinea) (NN pig)))))) (NP (NP (NN sort)) (PP (IN of) (NP (DT a) (JJ human) (NN guinea) (NN pig))))))) (elaboration (joint (VP (VBP see) (NP (PRP$ my) (NN life)) (PP (IN as) (NP (NP (DT a) (NN series)) (PP (IN of) (NP (NNS experiments)))))) (joint (S (NP (PRP I)) (VP (VBP work) (PP (IN for) (NP (NNP Esquire) (NN magazine))))) (elaboration (elaboration (NN couple) (JJ Outsourced)) (enablement (VP (VBP work) (PP (IN for) (NP (NNP Esquire) (NN magazine)))) (NP (PRP$ my) (NN life)))))) (elaboration (VP (VBD answered) (NP (PRP$ my) (NNS emails))) (NP (PRP$ my) (NN phone))))) |ET|
+	 
+	 pt.getDtDumpWithVerbNet()
+	 1 |BT| (elaboration (joint (attribution (I PRP)(thought VBD) (I PRP)(d NN) (tell  (tell-372 tell-372 tell-372 ) (NP V NP NP V NP PP-topic NP V NP S ) (NP NP-PPof-PP NP-S ) ) (you PRP)(a DT)(little JJ)(about IN)(what WP)(I PRP)(like VBP)(to TO)(write VB)) (joint (And CC)(I PRP)(like VBP)(to TO)(immerse VB)(myself PRP)(in IN)(my PRP$)(topics NNS) (joint (I PRP)(just RB)(like VBP)(to TO)(dive NN)(right NN)(in IN) (and CC)(become VB)(sort NN)(of IN)(a DT)(human JJ)(guinea NN)(pig NN)))) (elaboration (joint (And CC)(I PRP) (see  (see-301 see-301 see-301 ) (NP V NP NP V that S NP V NP-ATTR-POS PP-oblique NP V how S NP V what S ) (Basic Transitive S Attribute Object Possessor-Attribute Factoring Alternation HOW-S WHAT-S ) ) (my PRP$)(life NN)(as IN)(a DT)(series NN)(of IN)(experiments NNS) (joint (So RB)(I PRP)(work VBP)(for IN)(Esquire NNP)(magazine NN) (elaboration (elaboration (and CC)(a DT)(couple NN)(of IN)(years NNS)(ago IN)(I PRP)(wrote VBD)(an DT)(article NN) (call  (dub-293 dub-293 dub-293 ) (NP V NP NP NP V NP ) (NP-NP Basic Transitive ) ) (My PRP$)(Outsourced JJ)(Life NNP)) (enablement (where WRB)(I PRP) (hire  (hire-1353 hire-1353 hire-1353 ) (NP V NP NP V NP PP-predicate ) (NP NP-PPas-PP ) ) (a DT)(team NN)(of IN)(people NNS)(in IN)(Bangalore NNP)(India NNP) (to TO)(live VB)(my PRP$)(life NN)(for IN)(me PRP))))) (elaboration (So IN)(they PRP)(answered VBD)(my PRP$)(emails NNS) (They PRP)(answered VBD)(my PRP$)(phone NN)))) |ET|
+	 *
+	 */
+	
+	
+	
 	public static void main(String[] args){
 		VerbNetProcessor p = VerbNetProcessor.
-				getInstance("/Users/bgalitsky/Documents/relevance-based-on-parse-trees/src/test/resources"); 
+				getInstance("/Users/borisgalitsky/Documents/workspace/relevance-based-on-parse-trees/src/test/resources"); 
 
 		TreeKernelBasedClassifierOfDiscourseTree proc = new TreeKernelBasedClassifierOfDiscourseTree();
-		proc.setKernelPath("/Users/bgalitsky/Documents/relevance-based-on-parse-trees/src/test/resources/tree_kernel/");
+		proc.setKernelPath("/Users/borisgalitsky/Documents/workspace/relevance-based-on-parse-trees/src/test/resources/tree_kernel/");
 		proc.trainClassifier(
-
-				"/Users/bgalitsky/Documents/relevance-based-on-parse-trees/src/test/resources/style_recognizer/txt/ted",
-				"/Users/bgalitsky/Documents/relevance-based-on-parse-trees/src/test/resources/style_recognizer/txt/Tedi");
+				"/Users/borisgalitsky/Documents/workspace/relevance-based-on-parse-trees/src/test/resources/style_recognizer/txt/ted",
+				"/Users/borisgalitsky/Documents/workspace/relevance-based-on-parse-trees/src/test/resources/style_recognizer/txt/Tedi");
 	}
 
 }
