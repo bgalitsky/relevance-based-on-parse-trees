@@ -13,6 +13,8 @@ public class ParseThicket {
 	// then list for all sentences
 	private List<List<ParseTreeNode>> sentenceNodes;
 	
+	private List<Float> sentimentProfile;
+	
 	private String origText;
 	private List<List<ParseTreeNode>> phrases;
 	
@@ -88,6 +90,14 @@ public class ParseThicket {
 
 	public List<List<ParseTreeNode>> getPhrases() {
 		return phrases;
+	}
+
+	public List<Float> getSentimentProfile() {
+		return sentimentProfile;
+	}
+
+	public void setSentimentProfile(List<Float> sentimentProfile) {
+		this.sentimentProfile = sentimentProfile;
 	}
 	
 	

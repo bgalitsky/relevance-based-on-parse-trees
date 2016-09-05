@@ -16,7 +16,9 @@ import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.sentiment.SentimentCoreAnnotations.SentimentAnnotatedTree;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
@@ -51,12 +53,14 @@ public class ParseCorefBuilderWithNER extends ParseCorefsBuilder {
 		// all numbering from 1, not 0
 		List<WordWordInterSentenceRelationArc> arcs = new ArrayList<WordWordInterSentenceRelationArc>();
 		List<List<ParseTreeNode>> nodesThicket = new ArrayList<List<ParseTreeNode>>();
+		List<Float> sentimentProfile = new ArrayList<Float>();
 
 		annotation = new Annotation(text);
 		try {
 			pipeline.annotate(annotation);
 			List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
 			List<List<CoreLabel>> nerClassesText = classifier.classify(text);
+			
 
 			int nSent = 0;
 			if (sentences != null && sentences.size() > 0) 
@@ -96,6 +100,10 @@ public class ParseCorefBuilderWithNER extends ParseCorefsBuilder {
 					nSent++;
 					nodesThicket.add(nodes);
 					Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+					// now sentiment for given sentence
+					Tree sentimentTree = sentence.get(SentimentAnnotatedTree.class);
+					float sentiment = RNNCoreAnnotations.getPredictedClass(sentimentTree);
+					sentimentProfile.add(sentiment);
 					ptTrees.add(tree);
 				}
 		} catch (Exception e) {
@@ -135,6 +143,7 @@ public class ParseCorefBuilderWithNER extends ParseCorefsBuilder {
 		arcs.addAll(arcsCA);
 
 		ParseThicket result = new ParseThicket(ptTrees, arcs);
+		result.setSentimentProfile(sentimentProfile);
 		result.setNodesThicket(nodesThicket);
 		return result;
 	}

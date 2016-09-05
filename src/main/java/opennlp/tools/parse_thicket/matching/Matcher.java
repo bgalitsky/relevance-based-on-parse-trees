@@ -260,3 +260,4 @@ public class Matcher implements IGeneralizer<List<List<ParseTreeNode>>>{
 				m.isCoveredByTemplate(template, res));
 	}
 }
+
