@@ -33,7 +33,7 @@ public class AbstractEngineRunner {
 		for(String text: texts){
 			EntityExtractionResult result = neExtractor.extractEntities(text);
 			report.add(new String[]{text});
-			report.add((String[])result.extractedNERWords.toArray(new String[0]));
+			//report.add((String[])result.extractedNERWords.toArray(new String[0]));
 			//report.add((String[])result.extractedSentimentPhrases.toArray(new String[0]));
 			List<String> stringPhrases = new ArrayList<String>(),
 					nodePhrases = new ArrayList<String>();
@@ -48,16 +48,17 @@ public class AbstractEngineRunner {
 			}
 			report.add((String[])stringPhrases.toArray(new String[0]));
 			report.add((String[])nodePhrases.toArray(new String[0]));
-			
+			report.add(new String[]{"-----------------------------"});
 			ProfileReaderWriter.writeReport(report, "nameEntitiesTopicsOfInterestExtracted.csv");
 		}
 	}
 
-	private void addFiles(File file) {
+	// this func collects files 
+		private void addFiles(File file) {
 
-		if (!file.exists()) {
-			System.out.println(file + " does not exist.");
-
+			if (!file.exists()) {
+				System.out.println(file + " does not exist.");
+			}
 			if (file.isDirectory()) {
 				for (File f : file.listFiles()) {
 					if (f.getName().startsWith("."))
@@ -70,7 +71,6 @@ public class AbstractEngineRunner {
 
 			}
 		}
-	}
 	
 	public static void main(String[] args){
 		AbstractEngineRunner runner = new AbstractEngineRunner();
