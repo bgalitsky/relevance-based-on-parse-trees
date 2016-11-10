@@ -23,7 +23,13 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
 ## Engines and Systems of OpenNLP.Similarity
 
 ### Main relevance assessment function
-It takes two texts and returns the cardinality of a maximum common subgraph representations of these texts. This measure is supposed to be much more accurate than keyword statistics, compositional semantic models word2vec because linguistic structure is taken into account, not just co-occurrences of keywords
+It takes two texts and returns the cardinality of a maximum common subgraph representations of these texts. This measure is supposed to be much more accurate than keyword statistics, compositional semantic models word2vec because linguistic structure is taken into account, not just co-occurrences of keywords. 
+  [Matching class](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/parse_thicket/matching) has 
+List<List<ParseTreeChunk>> assessRelevance(String para1, String para2)
+function which returns the list of common phrases between these paragraphs.
+
+It operates on the level of sentences (giving maximal common subtree) and paragraphs (giving maximal common [parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket)).
+
 <li>Search results re-ranker based on linguistic similarity</li>
 <li>Request Handler for SOLR which used parse tree similarity</li>
 
