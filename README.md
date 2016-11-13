@@ -41,16 +41,16 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
   <li>/maps (some lookup files)</li>
   <li>/external_rst (examples of import of rhetoric parses from other systems)</li>
   <li>/fca (Formal Concept Analysis learning)</li>
-  <li>/taxonomies (for search support, taxonomies are auto-mined from the web)
+  <li>/taxonomies (for search support, taxonomies are auto-mined from the web)</li>
+  
+    Manual downloading is also required for:
+  <li>/new_vn</li>
+  <li>/w2v (where word2vector model needs to be downloaded)</li>
   
   4) Try running tests which will give you a hint on how to integrate OpenNLP.Similarity functionality into your application. You can start with [Matcher test](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/949bac8c2a41c21a1e54fec075f2966d693114a4/src/test/java/opennlp/tools/parse_thicket/matching/PTMatcherTest.java) and observe how long paragraphs can be linguistically matched (you can compare this with just an intersection of keywords)
   
   5) Look at [example POMs](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples) for how to better integrate into your existing project
   
-  Manual downloading is required:
-  /new_vn
-  /w2v (where word2vector model needs to be downloaded)
-
 ## Creating a simple project
 
   Create a project from [MyMatcher.java](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/MyMatcher.java)  
@@ -60,11 +60,11 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
 ### Main relevance assessment function
 It takes two texts and returns the cardinality of a maximum common subgraph representations of these texts. This measure is supposed to be much more accurate than keyword statistics, compositional semantic models word2vec because linguistic structure is taken into account, not just co-occurrences of keywords. 
   [Matching class](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/parse_thicket/matching/Matcher.java) in [matching package] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/parse_thicket/matching) has 
-List<List<ParseTreeChunk>> assessRelevance(String para1, String para2)
+####List<List<ParseTreeChunk>> assessRelevance(String para1, String para2)
 function which returns the list of common phrases between these paragraphs.
 
 To avoid re-parsing the same strings and improve the speed, use
-List<List<ParseTreeChunk>> assessRelevanceCache(String para1, String para2)
+####List<List<ParseTreeChunk>> assessRelevanceCache(String para1, String para2)
 
 It operates on the level of sentences (giving maximal common subtree) and paragraphs (giving maximal common [parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket)).
 
@@ -106,3 +106,8 @@ Here's the link to the book on [question-answering](https://www.amazon.com/Natur
 and [research papers](https://scholar.google.com/citations?hl=ru&user=kR_M3HIAAAAJ).
 
 Also the recent [book related to reasoning and linguistics in humans & machines](https://www.amazon.com/Computational-Autism-Human-Computer-Interaction-Galitsky/dp/3319399713)
+
+## Configuring OpenNLP.Similarity
+
+VerbNet model is included by default
+To include word2vector model
