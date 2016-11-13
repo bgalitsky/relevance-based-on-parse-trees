@@ -19,8 +19,10 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
 
 ## Installation
  0) Do ['git clone'](https://github.com/bgalitsky/relevance-based-on-parse-trees.git) to setup the environment including resources. Besides git, /resources directory requires some additional work
+ 
  1) Download the main [jar](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/opennlp-similarity.11.jar).
- 2) Set all necessary jars in /lib folder. Larger size jars are not on git so please download them from [Stanford NLP site]http://nlp.stanford.edu/)
+ 
+ 2) Set all necessary jars in /lib folder. Larger size jars are not on git so please download them from [Stanford NLP site](http://nlp.stanford.edu/)
  <li>edu.mit.jverbnet-1.2.0.jar</li>
  <li>ejml-0.23.jar</li>
  <li>joda-time.jar</li>
@@ -28,6 +30,7 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
  <li>stanford-corenlp-3.5.2-models.jar</li>
  <li>xom.jar</li>
  The rest of jars are available via maven.
+ 
  3) Set up src/test/resources directory
   - new_vn.zip needs to be unzipped
   - OpenNLP models need to be downloaded into the directory 'models' from [here](http://opennlp.sourceforge.net/models-1.5/)
@@ -69,7 +72,7 @@ It operates on the level of sentences (giving maximal common subtree) and paragr
 <li>apply tree kernel learning to search relevance</li>
 
 ### Content generator
- It takes a topic, build a taxonomy for it, forms a table of content. It then  mines the web for documents for each table of content item, finds relevant sentences and paragraphs and [merges them into a document](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps). We attempt to reproduce how humans cut-and-paste content from the web while writing on a topic.
+ It takes a topic, build a taxonomy for it, forms a table of content. It then  mines the web for documents for each table of content item, finds relevant sentences and paragraphs and merges them into a document [package](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps). We attempt to reproduce how humans cut-and-paste content from the web while writing on a topic.
   Content generation has a [demo](http://37.46.135.20/)  and to run it from IDE start [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/similarity/apps/ContentGeneratorRunner.java). Examples of written documents are [here](http://37.46.135.20/wrt_latest/).
  
 <li>Document builder with TOC, Sections, Figures& Captions and reference section</li>
