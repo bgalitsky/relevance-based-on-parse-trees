@@ -39,17 +39,17 @@ public class W2VDistanceMeasurer {
 				vec = null;
 				return;
 			}
-/*	
+	
 		String pathToW2V = resourceDir + "/w2v/GoogleNews-vectors-negative300.bin.gz";
 		File gModel = new File(pathToW2V);
 		try {
 			vec = WordVectorSerializer.loadGoogleModel(gModel, true);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Word2vec model is not loaded")
 			vec = null;
 			return;
 		} 
-		*/
+		
 	} 
 
 	public static void main(String[] args){

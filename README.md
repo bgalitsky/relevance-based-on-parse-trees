@@ -17,8 +17,9 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
 <li>general-purpose deterministic inductive learner</li>
 </ul>
 
+OpenNLP similarity provides a series of techniques to support the overall content pipeline. Technology and implementation of content pipeline developed at eBay is described [here] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/ContentPipeline.pdf). 
 ## Installation
- 0) Do ['git clone'](https://github.com/bgalitsky/relevance-based-on-parse-trees.git) to setup the environment including resources. Besides git, /resources directory requires some additional work
+ 0) Do [`git clone`](https://github.com/bgalitsky/relevance-based-on-parse-trees.git) to setup the environment including resources. Besides git, /resources directory requires some additional work
  
  1) Download the main [jar](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/opennlp-similarity.11.jar).
  
@@ -45,7 +46,7 @@ OpenNLP.Similarity is an NLP engine which solves a number of text processing and
   
   Manual downloading is also required for:
   <li>/new_vn</li>
-  <li>/w2v (where word2vector model needs to be downloaded)</li>
+  <li>/w2v (where word2vector model needs to be downloaded, if desired)</li>
   
   4) Try running tests which will give you a hint on how to integrate OpenNLP.Similarity functionality into your application. You can start with [Matcher test](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/949bac8c2a41c21a1e54fec075f2966d693114a4/src/test/java/opennlp/tools/parse_thicket/matching/PTMatcherTest.java) and observe how long paragraphs can be linguistically matched (you can compare this with just an intersection of keywords)
   
@@ -75,20 +76,28 @@ It operates on the level of sentences (giving maximal common subtree) and paragr
 <li>Request Handler for SOLR which used parse tree similarity</li>
 
 ### Search engine
+The following set of functionalities is available to enable search with linguistic features. It is desirable when query is long (more than 4 keywords), logically complex, ambiguous or 
 <li>Search results re-ranker based on linguistic similarity</li>
 <li>Request Handler for SOLR which used parse tree similarity</li>
 <li>Taxonomy builder via learning from the web</li>
-<li>appropriate rhetoric map of an answer</li>
-<li>apply tree kernel learning to search relevance</li>
+<li>Appropriate rhetoric map of an answer verifier. If parts of the answer are located in distinct discourse units, this answer might be irrelevant even if all keywords are mapped</li>
+<li>Tree kernel learning re-ranker to improve search relevance within a given domain with pre-trained model</li>
+
+SOLR request handlers are available [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/solr)
+
+Taxonomy builder is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder).
+ Examples of pre-built taxonomy are available in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/taxonomies). Please pay attention at taxonomies built for languages other than English. A [music taxonomy](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/musicTaxonomyRoot.csv is an example of the seed data for taxonomy building, and [this taxonomy hashmap dump](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/taxonomy.txt) is a good example of what can be automatically constructed.
 
 ### Content generator
  It takes a topic, build a taxonomy for it, forms a table of content. It then  mines the web for documents for each table of content item, finds relevant sentences and paragraphs and merges them into a document [package](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps). We attempt to reproduce how humans cut-and-paste content from the web while writing on a topic.
-  Content generation has a [demo](http://37.46.135.20/)  and to run it from IDE start [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/similarity/apps/ContentGeneratorRunner.java). Examples of written documents are [here](http://37.46.135.20/wrt_latest/).
+  Content generation has a [demo](http://37.46.135.20/)  and to run it from IDE start [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/similarity/apps/ContentGeneratorRunner.java). Examples of written documents are [here](http://37.46.135.20/wrt_latest/)
  
 <li>Document builder with TOC, Sections, Figures& Captions and reference section</li>
 <li>Review builder via taking a number of existing reviews and cross-breeding them, to write them so that they look "original"</li>
 
-### Text detector / classifier
+  Another content generation option is about opinion data. Reviews are mined for, cross-bred and made original. This and general content generation is done for SEO purposes. [Review builder](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/apps/review_builder/ReviewBuilderRunner.java) composes fake reviews which are in turn should be recognized by a Fake Review detector
+
+### Text classifier / feature detector in text
 The [classifier code](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/parse_thicket/kernel_interface/TreeKernelBasedClassifierMultiplePara.java) is the same but the [model files](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/tree_kernel/TRAINING) vary for the applications below:
 <li>detect security leaks
 <li>detect argumentation
@@ -96,11 +105,22 @@ The [classifier code](https://github.com/bgalitsky/relevance-based-on-parse-tree
 <li>detect authors’ doubt and low confidence
 <li>detect fake review
 
+Document classification to six major classes {finance, business, legal, computing, engineering, health} is available via [nearest neighbor model](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/DocClassifier). A 1G Lucene training model is obtained from Wikipedia corpus. This classifier can be trained for an arbitrary classes once respective Wiki pages are selected and respective [Lucene index is built](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/ClassifierTrainingSetIndexer). Once proper training documents are selected from Wikipedia with adequate coverage, the accuracy is usually higher than can be achieved by word2vec classification models.
+
 ### General-purpose [deterministic inductive learner](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/jsmlearning) implements JS Mills method of induction and abduction (deduction is also partially implemented).
 
- Inductive learning implemented as a base for syntactic tree-based learning is similar to the family of approaches such as Explanation-based learning and Inductive Logic Programming
+ Inductive learning implemented as a base for syntactic tree-based learning is similar to the family of approaches such as Explanation-based learning and Inductive Logic Programming.
+ 
+ #### Tree-kernel learning 
+ is integrated to allow application of SVM learning to sentence-level and paragraph-level linguistic data including discourse. Unlike learning in numerical space, each dimension in tree kernel learning is an occurrence of a particular subtree. Similarity is not a numerical distance but a count of common subtrees. A set of parse trees for individual sentences to represent a paragraph is called
+ [parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket). Its representation as a graph is coded in a tree representation via parenthesis such as [model.txt] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master//src/test/resources/tree_kernel/model.txt).
+ To do model building and predictions, C modules are run in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/tree_kernel), so proper choice need to be made: {svm_classify.linux, svm_classify.max, svm_classify.exe, svm_learn.*}. Proper run permission needs to be set as well for these files.
+ 
+ #### Concept learning 
+  is a branch of deterministic learning which is applied to attribute-value pairs and possesses useful explainability feature, unlike statistical and deep learning. It is fairly useful for data exploration and visualization since all interesting relations can be visualized. 
+    Concept learning covers inductive and abductive learning and also some cases of deduction. Explore [this package](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/fca) for the concept learning-related features.
 
-### Filtering results for Speech Recognition based on semantic meaningfulness.
+### Filtering results for Speech Recognition based on semantic meaningfulness
 It takes results from a speech-to-text system and subjects them to [filtering]
 (https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/main/java/opennlp/tools/similarity/apps/SpeechRecognitionResultsProcessor.java)
 ## Related Research
@@ -112,5 +132,6 @@ Also the recent [book related to reasoning and linguistics in humans & machines]
 
 ## Configuring OpenNLP.Similarity component
 
-VerbNet model is included by default
-To include word2vector model
+VerbNet model is included by default.
+To include word2vector model, download it and make sure the following path is valid:
+`resourceDir + "/w2v/GoogleNews-vectors-negative300.bin.gz"`
