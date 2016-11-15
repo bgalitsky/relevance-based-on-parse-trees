@@ -89,7 +89,8 @@ Taxonomy builder is [here](https://github.com/bgalitsky/relevance-based-on-parse
  Examples of pre-built taxonomy are available in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/taxonomies). Please pay attention at taxonomies built for languages other than English. A [music taxonomy](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/test/resources/taxonomies/musicTaxonomyRoot.csv) is an example of the seed data for taxonomy building, and [this taxonomy hashmap dump](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/taxonomy.txt) is a good example of what can be automatically constructed. A paper on taxonomy learning is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/examples/taxonomyBuilder.pdf). 
  
 #### Search results re-ranker
-Re-ranking scores similarity between a given 
+Re-ranking scores similarity between a given `orderedListOfAnswers` and  `question`
+
   `List<Pair<String,Double>> pairList = new ArrayList<Pair<String,Double>>();`
   
   `for (String ans: orderedListOfAnswers) {`
