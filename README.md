@@ -70,7 +70,7 @@ To avoid re-parsing the same strings and improve the speed, use
 
 `List<List<ParseTreeChunk>> assessRelevanceCache(String para1, String para2)`
 
-It operates on the level of sentences (giving [maximal common subtree](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/Inferring_sem_prop_of_sentences.pdf)) and paragraphs (giving maximal common [sub-parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket)). Maximal common sub-parse thicket is also represented as a [list of common phrases](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examplesMachineLearningSyntParseTreesGalitsky.pdf).
+It operates on the level of sentences (giving [maximal common subtree](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/Inferring_sem_prop_of_sentences.pdf)) and paragraphs (giving maximal common [sub-parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket)). Maximal common sub-parse thicket is also represented as a [list of common phrases](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/MachineLearningSyntParseTreesGalitsky.pdf).
 
 <li>Search results re-ranker based on linguistic similarity</li>
 <li>Request Handler for SOLR which used parse tree similarity</li>
@@ -86,17 +86,24 @@ The following set of functionalities is available to enable search with linguist
 SOLR request handlers are available [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/solr)
 
 Taxonomy builder is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder).
- Examples of pre-built taxonomy are available in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/taxonomies). Please pay attention at taxonomies built for languages other than English. A [music taxonomy](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/musicTaxonomyRoot.csv) is an example of the seed data for taxonomy building, and [this taxonomy hashmap dump](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/taxonomy.txt) is a good example of what can be automatically constructed.
+ Examples of pre-built taxonomy are available in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/taxonomies). Please pay attention at taxonomies built for languages other than English. A [music taxonomy](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/test/resources/taxonomies/musicTaxonomyRoot.csv) is an example of the seed data for taxonomy building, and [this taxonomy hashmap dump](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/taxonomy.txt) is a good example of what can be automatically constructed. A paper on taxonomy learning is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/examples/taxonomyBuilder.pdf). 
  
 #### Search results re-ranker
 Re-ranking scores similarity between a given 
   `List<Pair<String,Double>> pairList = new ArrayList<Pair<String,Double>>();`
+  
   `for (String ans: orderedListOfAnswers) {`
+  
             `List<List<ParseTreeChunk>> similarityResult = m.assessRelevanceCache(question, ans);`
+            
             `double score = parseTreeChunkListScorer.getParseTreeChunkListScoreAggregPhraseType(similarityResult);`
+            
             `Pair<String,Double> p = new Pair<String, Double>(ans, score);`
+            
             `pairList.add(p);`
+            
         `}`
+        
    `Collections.sort(pairList, Comparator.comparing(p -> p.getSecond()));`
    
    Then `pairList` is then ranked according to the linguistic relevance score. This score can be combined with other sources such as popularity, geo-proximity and others.
@@ -114,7 +121,7 @@ The [classifier code](https://github.com/bgalitsky/relevance-based-on-parse-tree
 <li>detect authors’ doubt and low confidence
 <li>detect fake review
 
-Document classification to six major classes {finance, business, legal, computing, engineering, health} is available via [nearest neighbor model](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/DocClassifier). A Lucene training model (1G file) is obtained from Wikipedia corpus. This classifier can be trained for an arbitrary classes once respective Wiki pages are selected and respective [Lucene index is built](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/ClassifierTrainingSetIndexer). Once proper training documents are selected from Wikipedia with adequate coverage, the accuracy is usually higher than can be achieved by word2vec classification models.
+Document classification to six major classes {finance, business, legal, computing, engineering, health} is available via [nearest neighbor model](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/DocClassifier.java). A Lucene training model (1G file) is obtained from Wikipedia corpus. This classifier can be trained for an arbitrary classes once respective Wiki pages are selected and respective [Lucene index is built](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/ClassifierTrainingSetIndexer.java). Once proper training documents are selected from Wikipedia with adequate coverage, the accuracy is usually higher than can be achieved by word2vec classification models.
 
 ### General-purpose [deterministic inductive learner](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/jsmlearning) implements JS Mills method of induction and abduction (deduction is also partially implemented).
 
@@ -123,10 +130,10 @@ Document classification to six major classes {finance, business, legal, computin
 #### Tree-kernel learning 
  
  is integrated to allow application of SVM learning to sentence-level and paragraph-level linguistic data including discourse. Unlike learning in numerical space, each dimension in tree kernel learning is an occurrence of a particular subtree. Similarity is not a numerical distance but a count of common subtrees. A set of parse trees for individual sentences to represent a paragraph is called
- [parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket). Its representation as a graph is coded in a tree representation via parenthesis such as [model.txt] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master//src/test/resources/tree_kernel/model.txt).
+ [parse thicket](https://en.wikipedia.org/wiki/Parse_Thicket). Its representation as a graph is coded in a tree representation via parenthesis such as [model*.txt] (https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/test/resources/tree_kernel/model_pos_neg_sentiment.txt).
  To do model building and predictions, C modules are run in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/tree_kernel), so proper choice need to be made: {svm_classify.linux, svm_classify.max, svm_classify.exe, svm_learn.*}. Also, proper run permissions needs to be set for these files.
  
- #### Concept learning 
+#### Concept learning 
  
   is a branch of deterministic learning which is applied to attribute-value pairs and possesses useful explainability feature, unlike statistical and deep learning. It is fairly useful for data exploration and visualization since all interesting relations can be visualized. 
     Concept learning covers inductive and abductive learning and also some cases of deduction. Explore [this package](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/fca) for the concept learning-related features.
@@ -145,5 +152,5 @@ Also the recent [book related to reasoning and linguistics in humans & machines]
 
 VerbNet model is included by default, so that the hand-coded meanings of the verb are used when simularity between verb phrases are computed.
 
-To include word2vector model, download it and make sure the following path is valid:
+To include word2vector model, [download it](https://deeplearning4j.org/) and make sure the following path is valid:
 `resourceDir + "/w2v/GoogleNews-vectors-negative300.bin.gz"`
