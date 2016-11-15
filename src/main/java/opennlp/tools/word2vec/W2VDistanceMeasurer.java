@@ -45,7 +45,7 @@ public class W2VDistanceMeasurer {
 		try {
 			vec = WordVectorSerializer.loadGoogleModel(gModel, true);
 		} catch (IOException e) {
-			System.out.println("Word2vec model is not loaded")
+			System.out.println("Word2vec model is not loaded");
 			vec = null;
 			return;
 		} 

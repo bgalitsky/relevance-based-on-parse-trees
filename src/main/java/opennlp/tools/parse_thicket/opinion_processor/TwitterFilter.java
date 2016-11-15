@@ -123,7 +123,7 @@ public class TwitterFilter {
 
 			Set<String> foundSentimentWords = new HashSet<String>();
 			// now we extract phrases
-			List<List<ParseTreeNode>> phrases = phraseBuilder.buildPT2ptPhrases(pt);
+			List<List<ParseTreeNode>> phrases = pt.getPhrases();
 			for(List<ParseTreeNode> phrase: phrases){
 				// find a noun phrase under sentiment
 				try {

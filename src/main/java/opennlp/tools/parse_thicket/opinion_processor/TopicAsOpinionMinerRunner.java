@@ -62,7 +62,7 @@ public class TopicAsOpinionMinerRunner {
 			report.add((String[])nodePhrases.toArray(new String[0]));
 			*/
 			
-			ProfileReaderWriter.writeReport(report, "phrasesExtracted2.csv");
+			ProfileReaderWriter.writeReport(report, "phrasesExtracted3.csv");
 		}
 	}
 
