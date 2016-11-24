@@ -76,20 +76,21 @@ It operates on the level of sentences (giving [maximal common subtree](https://g
 <li>Request Handler for SOLR which used parse tree similarity</li>
 
 ### Search engine
-The following set of functionalities is available to enable search with linguistic features. It is desirable when query is long (more than 4 keywords), logically complex, ambiguous or 
+The following set of functionalities is available to enable search with linguistic features. It is desirable when query is long (more than 4 keywords), logically complex, or ambiguous.
 <li>Search results re-ranker based on linguistic similarity</li>
 <li>Request Handler for SOLR which used parse tree similarity</li>
 <li>Taxonomy builder via learning from the web</li>
 <li>Appropriate rhetoric map of an answer verifier. If parts of the answer are located in distinct discourse units, this answer might be irrelevant even if all keywords are mapped</li>
 <li>Tree kernel learning re-ranker to improve search relevance within a given domain with pre-trained model</li>
 
-SOLR request handlers are available [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/solr)
+SOLR request handlers are available [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/solr).
 
 Taxonomy builder is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder).
  Examples of pre-built taxonomy are available in [this directory](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/test/resources/taxonomies). Please pay attention at taxonomies built for languages other than English. A [music taxonomy](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/src/test/resources/taxonomies/musicTaxonomyRoot.csv) is an example of the seed data for taxonomy building, and [this taxonomy hashmap dump](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/similarity/apps/taxo_builder/taxonomy.txt) is a good example of what can be automatically constructed. A paper on taxonomy learning is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/blob/master/examples/taxonomyBuilder.pdf). 
  
 #### Search results re-ranker
 Re-ranking scores similarity between a given `orderedListOfAnswers` and  `question`
+  `Matcher m = new Mather();`
 
   `List<Pair<String,Double>> pairList = new ArrayList<Pair<String,Double>>();`
   
@@ -122,7 +123,7 @@ The [classifier code](https://github.com/bgalitsky/relevance-based-on-parse-tree
 <li>detect authors’ doubt and low confidence
 <li>detect fake review
 
-Document classification to six major classes {finance, business, legal, computing, engineering, health} is available via [nearest neighbor model](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/DocClassifier.java). A Lucene training model (1G file) is obtained from Wikipedia corpus. This classifier can be trained for an arbitrary classes once respective Wiki pages are selected and respective [Lucene index is built](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/ClassifierTrainingSetIndexer.java). Once proper training documents are selected from Wikipedia with adequate coverage, the accuracy is usually higher than can be achieved by word2vec classification models.
+Document classification to six major classes {finance, business, legal, computing, engineering, health} is available via [nearest neighbor model](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/DocClassifier.java). A Lucene training model (1G file) is obtained from Wikipedia corpus. This classifier can be trained for an arbitrary classes once respective Wiki pages are selected and respective [Lucene index is built](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/doc_classifier/ClassifierTrainingSetIndexer.java). Once proper training documents are selected from Wikipedia with adequate coverage, the accuracy is usually higher than what can be achieved by word2vec classification models.
 
 ### General-purpose [deterministic inductive learner](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/src/main/java/opennlp/tools/jsmlearning) implements JS Mills method of induction and abduction (deduction is also partially implemented).
 
