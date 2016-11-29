@@ -20,11 +20,10 @@ package opennlp.tools.similarity.apps.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import opennlp.tools.stemmer.PStemmer;
 
 public class StringDistanceMeasurer {
   // external tools
-  private PStemmer ps; // stemmer
+
 
   private static final int MIN_STRING_LENGTH_FOR_WORD = 4;
 
@@ -36,7 +35,7 @@ public class StringDistanceMeasurer {
 
   public StringDistanceMeasurer() {
     // first get stemmer
-    ps = new PStemmer();
+
     if (MIN_SCORE_FOR_LING > 1.0)
       return;
 
@@ -58,7 +57,7 @@ public class StringDistanceMeasurer {
         // string like preposition is uninteresting
         continue;
       try {
-        w = ps.stem(w.toLowerCase()).toString();
+        w = w.toLowerCase();
       } catch (Exception e) {
         // do nothing, just have original term
       }
