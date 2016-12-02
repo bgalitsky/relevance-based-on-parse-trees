@@ -19,11 +19,13 @@ package opennlp.tools.stemmer;
 
 
 	import java.io.IOException;
-	import java.io.InputStream;
-	import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.FileInputStream;
 
-	import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_CHAR;
-	import org.apache.lucene.util.ArrayUtil;
+import opennlp.tools.similarity.apps.utils.ArrayUtil;
+
+	//import static org.apache.lucene.util.RamUsageEstimator.NUM_BYTES_CHAR;
+	//import org.apache.lucene.util.ArrayUtil;
 
 	/**
 	 *
@@ -427,7 +429,7 @@ package opennlp.tools.stemmer;
 	  public boolean stem(char[] wordBuffer, int offset, int wordLen) {
 	    reset();
 	    if (b.length < wordLen) {
-	      b = new char[ArrayUtil.oversize(wordLen, NUM_BYTES_CHAR)];
+	      b = new char[ArrayUtil.oversize(wordLen, 4)]; //  NUM_BYTES_CHAR)];
 	    }
 	    System.arraycopy(wordBuffer, offset, b, 0, wordLen);
 	    i = wordLen;

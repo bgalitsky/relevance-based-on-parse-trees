@@ -63,16 +63,6 @@
 			<version>2.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-			<version>4.10.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tika</groupId>
-			<artifactId>tika-app</artifactId>
-			<version>1.6</version>
-		</dependency>
-		<dependency>
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>2.0</version>
@@ -174,6 +164,11 @@
 			<version>0.23</version>
 			<systemPath>${project.basedir}/lib/xom.jar</systemPath>
 			<scope>system</scope>
+		</dependency>
+		<dependency> 
+			<groupId>org.jgrapht</groupId> 
+			<artifactId>jgrapht-jdk1.5</artifactId> 
+			<version>0.7.3</version>
 		</dependency>
 
 	</dependencies>
