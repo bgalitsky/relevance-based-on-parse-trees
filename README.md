@@ -90,6 +90,7 @@ Taxonomy builder is [here](https://github.com/bgalitsky/relevance-based-on-parse
  
 #### Search results re-ranker
 Re-ranking scores similarity between a given `orderedListOfAnswers` and  `question`
+
   `Matcher m = new Mather();`
 
   `List<Pair<String,Double>> pairList = new ArrayList<Pair<String,Double>>();`

@@ -148,14 +148,12 @@ public class WordDocBuilderSingleImageSearchCall extends WordDocBuilder{
 
 	protected List<String>  getAllImageSearchResults(String title) {
 		List<String> imageURLs = new ArrayList<String>();
-		AzureSearchResultSet<AzureSearchImageResult> res = imageSearcher.runImageSearch(title);
-		for(AzureSearchImageResult imResult: res){
-			imageURLs.add(imResult.getMediaUrl());
+		List<HitBase> res = imageSearcher.runImageSearch(title);
+		for(HitBase imResult: res){
+			imageURLs.add(imResult.getUrl());
 		}
 		return imageURLs;
-		
 	}
-
     
     public static void main(String[] args){
     	WordDocBuilderSingleImageSearchCall b = new WordDocBuilderSingleImageSearchCall();

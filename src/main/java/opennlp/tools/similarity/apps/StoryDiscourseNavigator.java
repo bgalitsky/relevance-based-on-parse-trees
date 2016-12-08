@@ -59,8 +59,8 @@ public class StoryDiscourseNavigator {
 	};
 	
 	private String[] obtainKeywordsForAnEntityFromWikipedia(String entity){
-		yrunner.setKey("xdnRVcVf9m4vDvW1SkTAz5kS5DFYa19CrPYGelGJxnc");
-		List<HitBase> resultList = yrunner.runSearch(entity, 20);
+		yrunner.setKey("???");
+		List<HitBase> resultList = yrunner.runSearch(entity);
 		HitBase h = null;
 		for (int i = 0; i < resultList.size(); i++) {
 			h = resultList.get(i);
@@ -104,7 +104,7 @@ public class StoryDiscourseNavigator {
 			String domain, String lang, int numbOfHits) {
 		List<List<ParseTreeChunk>> genResult = new ArrayList<List<ParseTreeChunk>>();
 		try {
-			List<HitBase> resultList = yrunner.runSearch(query, numbOfHits);
+			List<HitBase> resultList = yrunner.runSearch(query);
 
 			for (int i = 0; i < resultList.size(); i++) {
 				{

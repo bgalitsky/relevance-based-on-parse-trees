@@ -90,7 +90,7 @@ public class ContentGenerator /*extends RelatedSentenceFinder*/ {
 		int stepCount=0;
 		for (String verbAddition : StoryDiscourseNavigator.frequentPerformingVerbs) {
 			List<HitBase> searchResult = yrunner.runSearch(sentence + " "
-					+ verbAddition, MAX_SEARCH_RESULTS); //100);
+					+ verbAddition);
 			if (MAX_SEARCH_RESULTS<searchResult.size())
 				searchResult = searchResult.subList(0, MAX_SEARCH_RESULTS);
 			//TODO for shorter run
@@ -107,7 +107,6 @@ public class ContentGenerator /*extends RelatedSentenceFinder*/ {
 			if (stepCount>MAX_STEPS)
 				break;
 		}
-
 		opinionSentencesToAdd = ContentGeneratorSupport.removeDuplicatesFromResultantHits(opinionSentencesToAdd);
 		return opinionSentencesToAdd;
 	}

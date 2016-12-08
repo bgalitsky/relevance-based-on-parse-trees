@@ -1,199 +1,186 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package opennlp.tools.similarity.apps;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
+import opennlp.tools.similarity.apps.HitBase;
 
-import net.billylieurance.azuresearch.AzureSearchImageQuery;
-import net.billylieurance.azuresearch.AzureSearchImageResult;
-import net.billylieurance.azuresearch.AzureSearchResultSet;
-import net.billylieurance.azuresearch.AzureSearchWebQuery;
-import net.billylieurance.azuresearch.AzureSearchWebResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class BingQueryRunner {
+	// This is Boris' personal account key. Should be replaced by Ligadata's
+	private String accountKey = "623bf56c8cc9403290abb2aa1b5b8ced";
 	
-	protected static String BING_KEY = 
-			"WFoNMM706MMJ5JYfcHaSEDP+faHj3xAxt28CPljUAHA";
-			//"pjtCgujmf9TtfjCVBdcQ2rBUQwGLmtLtgCG4Ex7kekw";		
-			//"e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=";
-			//"Cec1TlE67kPGDA/1MbeqPfHzP0I1eJypf3o0pYxRsuU=";
-	private static final Logger LOG = Logger
-		      .getLogger("opennlp.tools.similarity.apps.BingQueryRunner");
-	protected AzureSearchWebQuery aq = new AzureSearchWebQuery();
-	private AzureSearchImageQuery iq = new AzureSearchImageQuery();
+	// request string
+	final String bingUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/search?q=", 
+			bingImageUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/images/search?q=";
+
+	// Main entry point. The same function from ver 3 but now new authentication and new reqiest string
+	public List<HitBase> runSearch(String queryOrig){
+		List<HitBase> sresults = new ArrayList<HitBase>();
+		String query = "";
+        try {
+	        query = URLEncoder.encode(queryOrig, Charset.defaultCharset().name());
+        } catch (UnsupportedEncodingException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		String bingUrl = String.format(bingUrlPattern, query);
+		URL url;
+		URLConnection connection = null;
+        try {
+	        url = new URL(bingUrl+query);
+            connection = url.openConnection();
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+	      connection.setRequestProperty("Ocp-Apim-Subscription-Key", accountKey);
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			try {
+	            JSONObject json = new JSONObject(response.toString());
+	            JSONObject d = json.getJSONObject("webPages");
+	            JSONArray results = d.getJSONArray("value");
+	            int resultsLength = results.length();
+	            for (int i = 0; i < resultsLength; i++) {
+	            	final JSONObject aResult = results.getJSONObject(i);
+	            	HitBase sr = new HitBase();
+	            	 sr.setUrl(aResult.getString("displayUrl"));
+	            	 sr.setAbstractText(aResult.getString("snippet"));
+	            	 sr.setTitle(aResult.getString("name"));
+	            	 sresults.add(sr);
+	            }
+            } catch (JSONException e) {
+	            e.printStackTrace();
+            }
+		} catch (IOException e) {
+	        e.printStackTrace();
+        }
+		return sresults;
+	}
+	
+	public List<HitBase> runSearch(String queryOrig, int count){
+		List<HitBase> sresults = new ArrayList<HitBase>();
+		String query = "";
+        try {
+	        query = URLEncoder.encode(queryOrig, Charset.defaultCharset().name());
+        } catch (UnsupportedEncodingException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		String bingUrl = String.format(bingUrlPattern, query);
+		URL url;
+		URLConnection connection = null;
+        try {
+	        url = new URL(bingUrl+query);
+            connection = url.openConnection();
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+	      connection.setRequestProperty("Ocp-Apim-Subscription-Key", accountKey);
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			try {
+	            JSONObject json = new JSONObject(response.toString());
+	            JSONObject d = json.getJSONObject("webPages");
+	            JSONArray results = d.getJSONArray("value");
+	            int resultsLength = results.length();
+	            for (int i = 0; i < resultsLength && i< count ; i++) {
+	            	final JSONObject aResult = results.getJSONObject(i);
+	            	HitBase sr = new HitBase();
+	            	 sr.setUrl(aResult.getString("displayUrl"));
+	            	 sr.setAbstractText(aResult.getString("snippet"));
+	            	 sr.setTitle(aResult.getString("name"));
+	            	 sresults.add(sr);
+	            }
+            } catch (JSONException e) {
+	            e.printStackTrace();
+            }
+		} catch (IOException e) {
+	        e.printStackTrace();
+        }
+		return sresults;
+	}
+	
+	public List<HitBase> runImageSearch(String queryOrig){
+		List<HitBase> sresults = new ArrayList<HitBase>();
+		String query = "";
+        try {
+	        query = URLEncoder.encode(queryOrig, Charset.defaultCharset().name());
+        } catch (UnsupportedEncodingException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
+		String bingUrl = String.format(bingImageUrlPattern, query);
+		URL url;
+		URLConnection connection = null;
+        try {
+	        url = new URL(bingUrl+query);
+            connection = url.openConnection();
+        } catch (Exception e) {
+	        e.printStackTrace();
+        }
+	      connection.setRequestProperty("Ocp-Apim-Subscription-Key", accountKey);
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			try {
+	            JSONObject json = new JSONObject(response.toString());
+	            //JSONObject d = json.getJSONObject("instrumentation");
+	            JSONArray results = json.getJSONArray("value");
+	            int resultsLength = results.length();
+	            for (int i = 0; i < resultsLength; i++) {
+	            	final JSONObject aResult = results.getJSONObject(i);
+	            	HitBase sr = new HitBase();
+	            	 sr.setUrl(aResult.getString("contentUrl"));
+	            	 sr.setAbstractText(aResult.getString("hostPageUrl"));
+	            	 sr.setTitle(aResult.getString("name"));
+	            	 sresults.add(sr);
+	            }
+            } catch (JSONException e) {
+	            e.printStackTrace();
+            }
+		} catch (IOException e) {
+	        e.printStackTrace();
+        }
+		return sresults;
+	}
 	
 	public void setKey(String key){
-		BING_KEY = key;
+		accountKey=key;
 	}
-	
-	private int MAX_QUERY_LENGTH = 100;
-	
-	public void setLang(String language){
-		aq.setMarket(language);
-	}
-  
-	public List<HitBase> runSearchMultiplePages(String query, int nPages) {
-		List<HitBase> results = new ArrayList<HitBase>();
-		for(int i=0; i< nPages; i++){
-			aq.setPage(i);
-		    results.addAll( runSearch(query, 50));
-		}
-		return results;
-	}
-	
-	public List<HitBase> runSearch(String query, int nRes) {
-		
-		if (query.length()>MAX_QUERY_LENGTH){
-			try {
-				query = query.substring(0, MAX_QUERY_LENGTH);
-				//should not cut words, need the last space to end the query
-				query = query.substring(0, StringUtils.lastIndexOf(query, " "));
-			} catch (Exception e) {
-				LOG.severe("Problem reducing the length of query :"+query);
-			}
-		}
-		aq.setAppid(BING_KEY);
-		aq.setQuery(query);		
-		aq.setPerPage(nRes);
-		try {
-			aq.doQuery();
-		} catch (Exception e) { // most likely exception is due to limit on bing key
-			aq.setAppid("pjtCgujmf9TtfjCVBdcQ2rBUQwGLmtLtgCG4Ex7kekw");
-			try {
-				aq.doQuery();
-			} catch (Exception e1) {
-				aq.setAppid("Cec1TlE67kPGDA/1MbeqPfHzP0I1eJypf3o0pYxRsuU=");
-				try {
-					aq.doQuery();
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
-			}
-			e.printStackTrace();
-		}
-		
-		//org.xml.sax.SAXParseException
-		
-		List<HitBase> results = new ArrayList<HitBase> ();
-		AzureSearchResultSet<AzureSearchWebResult> ars = aq.getQueryResult();
-		
-		for (AzureSearchWebResult anr : ars){
-		    HitBase h = new HitBase();
-		    h.setAbstractText(anr.getDescription());
-		    h.setTitle(anr.getTitle());
-		    h.setUrl(anr.getUrl());
-		    results.add(h);
-		}
-		return results;
-	}
-	
-	
-	public AzureSearchResultSet<AzureSearchImageResult> runImageSearch(String query) {
-		iq.setAppid(BING_KEY);
-		iq.setQuery(query);		
-		iq.doQuery();
-		
-		AzureSearchResultSet<AzureSearchImageResult> ars = iq.getQueryResult();
-
-		return ars;
-	}
-	public int getTotalPagesAtASite(String site)
-	{
-		return runSearch("site:"+site, 1000000).size();
-	}
-	
-
-	public List<HitBase> runSearch(String query) {
-		return runSearch(query, 100);
-	}	
-	
-	
-	
-
-  private float snapshotSimilarityThreshold = 0.4f;
-
-  
-
-  public void setSnapshotSimilarityThreshold(float thr) {
-    snapshotSimilarityThreshold = thr;
-  }
-
-  public float getSnapshotSimilarityThreshold() {
-    return snapshotSimilarityThreshold;
-  }
-
-  public BingQueryRunner() {
-
-  }
-
- 
-
-  public static void main(String[] args) {
-    BingQueryRunner self = new BingQueryRunner();
-    List<HitBase> resp1 = self.runSearch("albert einstein", 15);
-    System.out.println(resp1);
-    
-    AzureSearchResultSet<AzureSearchImageResult> res = self.runImageSearch("albert einstein");
-    System.out.println(res);
-    try {
-    	self.setLang("es-MX");
-    	self.setKey(
-    			"e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=");
-      List<HitBase> resp = self
-          .runSearch(//"art scene");
-        		  "biomecanica las palancas");
-      System.out.print(resp.get(0));
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+	public void setLang(String lang) {
+	    // TODO Auto-generated method stub   
     }
+	
+	public static void main(String[] args){
+		// run search and print all results in a  line
+//		System.out.println(new BingQueryRunner().runSearch("latest iphone"));
+		System.out.println(new BingQueryRunner().runImageSearch("latest iphone"));
+	}
 
-    /*
-     * 
-     * de-DE
-     * es-MX
-     * es-SP
-     */
-    /*
-     * String[] submittedNews = new String[]{
-     * "Asian airports had already increased security following the Christmas Day attack, but South Korea and Pakistan are thinking about additional measures."
-     * ,
-     * "Europe remains the key origin for air travelers heading to the United States, with about 1000 trans-Atlantic flights a day in 2009."
-     * ,
-     * "DeLaughter became an instant hero of the civil rights movement. Alec Baldwin portrayed him in the 1996 movie, Ghosts of Mississippi and his closing statement was once dubbed one of the greatest closing arguments in modern law."
-     * ,
-     * "After US president made the statement, Cuba protested extra screening for Cubans coming to the US"
-     * ,
-     * 
-     * }; for(String query: submittedNews){ System.out.println(query);
-     * List<CopyrightViolations> genResult =
-     * self.runCopyRightViolExtenralSearch(query, query); if
-     * (genResult.size()>0){
-     * 
-     * System.out.println(genResult.toString()); System.out.println("\n\n");
-     * 
-     * } }
-     */
-
-  }
 
 }

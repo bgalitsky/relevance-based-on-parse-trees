@@ -94,9 +94,9 @@ public class WordDocBuilder{
 	
 	private void addImageByImageTitleToPackage(
 			WordprocessingMLPackage wordMLPackage, String title) {
-		AzureSearchResultSet<AzureSearchImageResult> res = imageSearcher.runImageSearch(title);
-		for (AzureSearchImageResult anr : res){
-			String url = anr.getMediaUrl();
+		List<HitBase> res = imageSearcher.runImageSearch(title);
+		for (HitBase anr : res){
+			String url = anr.getUrl();
 			addImageByURLToPackage( wordMLPackage, url);
 			return;
 		}

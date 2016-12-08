@@ -50,7 +50,7 @@ public class RelatedSentenceFinderML extends RelatedSentenceFinder{
 		System.out.println(" \n=== Entity to write about = " + sentence);
 		List<String> nounPhraseQueries = new ArrayList<String>();
 
-		List<HitBase> searchResult = yrunner.runSearch(sentence, 100);
+		List<HitBase> searchResult = yrunner.runSearch(sentence);
 		if (MAX_SEARCH_RESULTS<searchResult.size())
 			searchResult = searchResult.subList(0, MAX_SEARCH_RESULTS);
 		//TODO for shorter run

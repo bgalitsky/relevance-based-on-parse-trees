@@ -42,13 +42,13 @@ import net.billylieurance.azuresearch.AzureSearchSpellingSuggestionResult;
 import net.billylieurance.azuresearch.AzureSearchWebQuery;
 import net.billylieurance.azuresearch.AzureSearchWebResult;
 
-public class BingRelatedSpellingQueryRunner extends BingQueryRunner{
+public class BingRelatedSpellingQueryRunner {
 	private AzureSearchRelatedSearchQuery aq = new AzureSearchRelatedSearchQuery ();
 	private AzureSearchSpellingSuggestionQuery  ssq = new AzureSearchSpellingSuggestionQuery ();
 	
 	
 	public List<HitBase> runSearch(String query, int nRes) {
-		aq.setAppid(BING_KEY);
+		//aq.setAppid(BING_KEY);
 		aq.setQuery(query);		
 		aq.setPerPage(nRes);
 		aq.doQuery();
@@ -66,7 +66,7 @@ public class BingRelatedSpellingQueryRunner extends BingQueryRunner{
 	}
 	
 	public List<HitBase> runSSSearch(String query, int nRes) {
-		ssq.setAppid(BING_KEY);
+		//ssq.setAppid(BING_KEY);
 		ssq.setQuery(query);		
 		ssq.setPerPage(nRes);
 		ssq.doQuery();
@@ -87,9 +87,9 @@ public class BingRelatedSpellingQueryRunner extends BingQueryRunner{
 	public static void main(String[] args) {
 		BingRelatedSpellingQueryRunner self = new BingRelatedSpellingQueryRunner();
 	    try {
-	    	self.setLang("es-MX");
-	    	self.setKey(
-	    			"e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=");
+	    	//self.setLang("es-MX");
+	    	//self.setKey(
+	    	//		"e8ADxIjn9YyHx36EihdjH/tMqJJItUrrbPTUpKahiU0=");
 	      List<HitBase> resp = self
 	          .runSearch("clear Sess", 10);
 	      System.out.print(resp.get(0));

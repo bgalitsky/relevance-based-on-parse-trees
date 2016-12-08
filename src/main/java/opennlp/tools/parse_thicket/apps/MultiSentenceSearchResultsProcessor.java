@@ -150,7 +150,7 @@ public class MultiSentenceSearchResultsProcessor  {
 		reportData.add(new String[]{query});
 		List<HitBase> hits = null;
 		try {
-			List<HitBase> resultList = bingSearcher.runSearch(query, NUM_OF_SEARCH_RESULTS);
+			List<HitBase> resultList = bingSearcher.runSearch(query);
 			reportData.add(convertListHitBaseIntoStringAr(resultList));
 			
 			// now we apply our own relevance filter

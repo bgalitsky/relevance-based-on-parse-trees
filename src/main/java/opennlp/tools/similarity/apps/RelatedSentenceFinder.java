@@ -95,7 +95,7 @@ public class RelatedSentenceFinder {
 	public List<HitBase> findRelatedOpinionsForSentenceFastAndDummy(String word,
 			List<String> sents) throws Exception {
 
-		List<HitBase> searchResult = yrunner.runSearch(word, 100);
+		List<HitBase> searchResult = yrunner.runSearch(word);
 		return searchResult;
 	}
 
@@ -109,7 +109,7 @@ public class RelatedSentenceFinder {
 		for (String query : nounPhraseQueries) {
 			System.out.println("\nquery = " + query);
 			// query += " "+join(MENTAL_VERBS, " OR ") ;
-			List<HitBase> searchResult = yrunner.runSearch(query, 100);
+			List<HitBase> searchResult = yrunner.runSearch(query);
 			if (searchResult != null) {
 				for (HitBase item : searchResult) { // got some text from .html
 					if (item.getAbstractText() != null
@@ -153,7 +153,7 @@ public class RelatedSentenceFinder {
 		int stepCount=0;
 		for (String verbAddition : extraKeywords) {
 			List<HitBase> searchResult = yrunner.runSearch(sentence + " "
-					+ verbAddition, MAX_SEARCH_RESULTS); //100);
+					+ verbAddition); 
 			if (MAX_SEARCH_RESULTS<searchResult.size())
 				searchResult = searchResult.subList(0, MAX_SEARCH_RESULTS);
 			//TODO for shorter run
@@ -177,7 +177,7 @@ public class RelatedSentenceFinder {
 		// if nothing is written, then get first search result and try again
 		try {
 			if (generateContentAboutIter<4 && ContentGeneratorSupport.problematicHitList(opinionSentencesToAdd)){
-				List<HitBase> resultList = yrunner.runSearch(sentence, 10);
+				List<HitBase> resultList = yrunner.runSearch(sentence);
 				String discoveredSimilarTopic = resultList.get(generateContentAboutIter).getTitle();
 				discoveredSimilarTopic = ContentGeneratorSupport.getPortionOfTitleWithoutDelimiters(discoveredSimilarTopic);
 				generateContentAboutIter++;

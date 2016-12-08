@@ -37,28 +37,7 @@ public class YahooAnswersMiner extends BingQueryRunner{
 	private int page = 0;
 	private static final int hitsPerPage = 50;
 
-	public List<HitBase> runSearch(String query) {
-		aq.setAppid(BING_KEY);
-		aq.setQuery("site:answers.yahoo.com "+
-				query);		
-		aq.setPerPage(hitsPerPage);
-		aq.setPage(page);
-
-		aq.doQuery();
-		List<HitBase> results = new ArrayList<HitBase> ();
-		AzureSearchResultSet<AzureSearchWebResult> ars = aq.getQueryResult();
-
-		for (AzureSearchWebResult anr : ars){
-			HitBase h = new HitBase();
-			h.setAbstractText(anr.getDescription());
-			h.setTitle(anr.getTitle());
-			h.setUrl(anr.getUrl());
-			results.add(h);
-		}
-		page++;
-
-		return results;
-	}
+	
 
 
 	public List<HitBase> runSearch(String query, int totalPages) {
