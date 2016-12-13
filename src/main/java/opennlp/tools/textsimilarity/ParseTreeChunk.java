@@ -41,13 +41,13 @@ public class ParseTreeChunk implements Serializable{
 
 	private int size;
 
-	private ParseTreeMatcher parseTreeMatcher;
+	private transient ParseTreeMatcher parseTreeMatcher;
 
-	private LemmaFormManager lemmaFormManager;
+	private transient LemmaFormManager lemmaFormManager;
 
-	private GeneralizationListReducer generalizationListReducer;
+	private transient GeneralizationListReducer generalizationListReducer;
 
-	private List<ParseTreeNode> parseTreeNodes;
+	private transient List<ParseTreeNode> parseTreeNodes;
 
 
 	public List<ParseTreeNode> getParseTreeNodes() {
