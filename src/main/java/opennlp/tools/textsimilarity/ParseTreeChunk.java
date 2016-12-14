@@ -17,6 +17,7 @@
 
 package opennlp.tools.textsimilarity;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -559,6 +560,23 @@ public class ParseTreeChunk implements Serializable{
 
 	public ParseTreeMatcher getParseTreeMatcher() {
 		return parseTreeMatcher;
+	}
+	
+	
+	// to get this object from a source such as a database
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        parseTreeMatcher = new ParseTreeMatcher();
+        lemmaFormManager = new LemmaFormManager();
+        generalizationListReducer = new GeneralizationListReducer();
+        
+        parseTreeNodes = new ArrayList<ParseTreeNode>();
+        int count = 0;
+        for(String lemma: this.lemmas){
+        	ParseTreeNode node = new ParseTreeNode(lemma, this.POSs.get(count));
+        	parseTreeNodes.add(node);
+        	count++;
+        }
 	}
 
 	public static void main(String[] args){
