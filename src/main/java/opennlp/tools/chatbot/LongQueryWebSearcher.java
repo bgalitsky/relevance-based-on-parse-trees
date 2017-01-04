@@ -1,23 +1,12 @@
 package opennlp.tools.chatbot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
-
-import opennlp.tools.parse_thicket.apps.SnippetToParagraph;
 import opennlp.tools.parse_thicket.kernel_interface.SnippetToParagraphFull;
 import opennlp.tools.parse_thicket.opinion_processor.EntityExtractionResult;
 import opennlp.tools.similarity.apps.BingQueryRunner;
-import opennlp.tools.similarity.apps.ContentGeneratorSupport;
-import opennlp.tools.similarity.apps.Fragment;
-import opennlp.tools.similarity.apps.GeneratedSentenceProcessor;
 import opennlp.tools.similarity.apps.HitBase;
 import opennlp.tools.similarity.apps.utils.PageFetcher;
-import opennlp.tools.similarity.apps.utils.Utils;
-import opennlp.tools.textsimilarity.ParseTreeChunk;
-import opennlp.tools.textsimilarity.SentencePairMatchResult;
-import opennlp.tools.textsimilarity.TextProcessor;
 
 public class LongQueryWebSearcher {
 	private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();

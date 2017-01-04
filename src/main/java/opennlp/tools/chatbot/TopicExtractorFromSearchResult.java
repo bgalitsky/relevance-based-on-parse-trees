@@ -157,7 +157,7 @@ public class TopicExtractorFromSearchResult {
 				new ArrayList<String>(), extractedNerPhraseTags = new ArrayList<String>();
 		
 		// Simple approach  - just subtract as keywords
-		List<String> queryKeywords = TextProcessor.fastTokenize(query, false);
+		List<String> queryKeywords = TextProcessor.fastTokenize(query.toLowerCase(), false);
 		
 		// no need to change to extract more/less phrases
 		ParseThicket pt = matcher.buildParseThicketFromTextWithRST(para);
@@ -275,9 +275,11 @@ public class TopicExtractorFromSearchResult {
 	private boolean isCoveredByQueryPhrase(List<ParseTreeNode> phrase, List<String> queryKeywords) {
 		List<ParseTreeNode> phraseRemaining = new ArrayList<ParseTreeNode>();
 		for(ParseTreeNode p: phrase){
-			if (!queryKeywords.contains(p.getNormalizedWord())){
+			if (!queryKeywords.contains(p.getWord().toLowerCase())){
 				phraseRemaining.add(p);
-			}
+			} /*else {
+				System.out.println("found match: "+ queryKeywords + " => " + p.getWord().toLowerCase());
+			}*/
 		}
 		if (phraseRemaining.size()>1)
 			return false;

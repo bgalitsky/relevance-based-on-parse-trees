@@ -275,7 +275,21 @@ public class ContentGeneratorSupport {
 						if (f2!=null){
 							followSent += " "+f2;
 						}
+						
 					}
+					if (i < sents.length - 3 && sents[i + 3].length() > 60) {
+						String f3 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+3]);
+						if (f3!=null){
+							followSent += " "+f3;
+						}
+					}
+					if (i < sents.length - 4 && sents[i + 4].length() > 60) {
+						String f4 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+4]);
+						if (f4!=null){
+							followSent += " "+f4;
+						}
+					}
+					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

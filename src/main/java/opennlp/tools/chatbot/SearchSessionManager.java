@@ -20,11 +20,14 @@ public class SearchSessionManager {
 		queryTypes.put("reformulated query", 10);
 		queryTypes.put("further clarification", 11);
 		queryTypes.put("further system response", 22);
+		
+		queryTypes.put("done with this session", 3);
+		
 
 
 	}
 	public void	runSession(){
-		System.out.print("Welcome to Ask Boris chatbot! Ask me something about personal finance");
+		System.out.print("Welcome to 'Ask Boris' chatbot! Ask me something about personal finance");
 		int queryType = 0;
 
 		while(true){
@@ -39,30 +42,47 @@ public class SearchSessionManager {
 					System.exit(0);
 
 				if (queryType == 0) {
+					clarificationExpressionGenerator.reset();
+					clarificationExpressionGenerator.originalQuestion = query;
+					
 					List<ChatIterationResult> searchRes0 = searcher.searchLongQuery(query);
 					String clarificationStr = clarificationExpressionGenerator.generateClarification(query, searchRes0);
 					// no clarification needed, so just give response as a first paragraph text
 					if (clarificationStr==null){ 
 						System.out.println("I think you will find this information useful:");
 						System.out.println(searchRes0.get(0).getParagraph());
+						queryType = 0;
 					} else {
 						System.out.println("I believe these are the main topics of your query: is that what you meant? Please select");
 						System.out.println(clarificationStr);
 						queryType = 1;
 					}
-				}
-
-				if (queryType == 1){
+				} else 
+					if (queryType == 1){
 					String selectedAnswer = clarificationExpressionGenerator.matchUserResponseWithGeneratedOptions(query);
 					if (selectedAnswer!=null){
 						System.out.println(selectedAnswer);
+						System.out.println("Are you OK with this answer? yes/no");
+						queryType = 3;
 					} else {
 						System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
 					}
+				} else if (queryType == 3 && query.toLowerCase().indexOf("yes")>-1){
+					queryType = 0;
+					System.out.println("Now you can ask a NEW question");
+				} else if (queryType == 3 && query.toLowerCase().indexOf("no")>-1){
+					queryType = 0;
+					System.out.println("We are now trying to use the constrainst from your previous replies...");
+					List<ChatIterationResult> searchRes0 = searcher.searchLongQuery("" //TODO query_1 + " " + query_0
+							);
+					System.out.println("I think you will find this information useful:");
+					System.out.println(searchRes0.get(0).getParagraph());
+					queryType = 0;
+					System.out.println("Now you can ask a NEW question");
 				}
 
 			} catch (IOException ioe) {
-				System.err.println("IO error trying to read your name!");
+				System.err.println("IO error");
 				System.exit(1);
 			}
 		}

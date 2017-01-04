@@ -15,6 +15,7 @@ import java.util.List;
 
 import opennlp.tools.similarity.apps.HitBase;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,13 +106,22 @@ public class BingQueryRunner {
 	            JSONObject d = json.getJSONObject("webPages");
 	            JSONArray results = d.getJSONArray("value");
 	            int resultsLength = results.length();
+	            int cnt = 0;
 	            for (int i = 0; i < resultsLength && i< count ; i++) {
 	            	final JSONObject aResult = results.getJSONObject(i);
 	            	HitBase sr = new HitBase();
-	            	 sr.setUrl(aResult.getString("displayUrl"));
+	            	 sr.setDisplayUrl(aResult.getString("displayUrl"));
+	            	 
+	            	 String encUrlFull = aResult.getString("url");
+	            	 String encUrl = StringUtils.substringBetween(encUrlFull, "r=", "&");
+	            	 String decodedURL = java.net.URLDecoder.decode(encUrl, "UTF-8");
+	            	 sr.setUrl(decodedURL);
 	            	 sr.setAbstractText(aResult.getString("snippet"));
 	            	 sr.setTitle(aResult.getString("name"));
 	            	 sresults.add(sr);
+	            	 if (cnt>=count)
+	            		 break;
+	            	 cnt++;
 	            }
             } catch (JSONException e) {
 	            e.printStackTrace();
@@ -121,6 +131,12 @@ public class BingQueryRunner {
         }
 		return sresults;
 	}
+	
+	/*
+	 * "url": "https:\/\/www.bing.com\/cr?IG=68108732D8B34F73BA8717948A600CA8&CID=30FA793A2D26674C1E5F70C52C1766BD&rd=1&h=hC5Q6GkMgH2EyLdypYCuB1wVKEFjpSZF8haOW1hhq_U&v=1&
+	 * r=https%3a%2f%2fwww.quora.com%2fHow-do-I-pay-my-credit-card-bill-with-another-credit-card
+	 * &p=DevEx,5146.1"
+	 */
 	
 	public List<HitBase> runImageSearch(String queryOrig){
 		List<HitBase> sresults = new ArrayList<HitBase>();
@@ -178,7 +194,7 @@ public class BingQueryRunner {
 	
 	public static void main(String[] args){
 		// run search and print all results in a  line
-//		System.out.println(new BingQueryRunner().runSearch("latest iphone"));
+		System.out.println(new BingQueryRunner().runSearch("can I pay with one credit card for another"));
 		System.out.println(new BingQueryRunner().runImageSearch("latest iphone"));
 	}
 

@@ -252,13 +252,13 @@ public class SnippetToParagraph extends ContentGeneratorSupport /*RelatedSentenc
 		int maxSentsFromPage= 100;
 		List<String[]> results = new ArrayList<String[]>();
 
-		String downloadedPage = pFetcher.fetchPage(url, 20000);
+		String downloadedPage = pFetcher.fetchPage(url, 10000);
 		if (downloadedPage == null || downloadedPage.length() < 100)
 		{
 			return null;
 		}
 
-		String pageOrigHTML = pFetcher.fetchOrigHTML(url);
+		//String pageOrigHTML = pFetcher.fetchOrigHTML(url);
 
 		downloadedPage= downloadedPage.replace("     ", "&");
 		downloadedPage = downloadedPage.replaceAll("(?:&)+", "#");

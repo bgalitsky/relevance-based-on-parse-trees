@@ -480,7 +480,7 @@ public class RelatedSentenceFinder {
 			if (pageSentence != null)
 				pageSentence.replace("_should_find_orig_", "");
 
-			// resultant sentence SHOULD NOT be longer than for times the size of
+			// resultant sentence SHOULD NOT be longer than four times the size of
 			// snippet fragment
 			if (pageSentence != null && pageSentence.length()>50 )
 			//		&& (float) pageSentence.length() / (float) fragment.length() < 4.0)
