@@ -20,9 +20,9 @@ public class SearchSessionManager {
 		queryTypes.put("reformulated query", 10);
 		queryTypes.put("further clarification", 11);
 		queryTypes.put("further system response", 22);
-		
+
 		queryTypes.put("done with this session", 3);
-		
+
 
 
 	}
@@ -43,8 +43,7 @@ public class SearchSessionManager {
 
 				if (queryType == 0) {
 					clarificationExpressionGenerator.reset();
-					clarificationExpressionGenerator.originalQuestion = query;
-					
+
 					List<ChatIterationResult> searchRes0 = searcher.searchLongQuery(query);
 					String clarificationStr = clarificationExpressionGenerator.generateClarification(query, searchRes0);
 					// no clarification needed, so just give response as a first paragraph text
@@ -59,27 +58,51 @@ public class SearchSessionManager {
 					}
 				} else 
 					if (queryType == 1){
-					String selectedAnswer = clarificationExpressionGenerator.matchUserResponseWithGeneratedOptions(query);
-					if (selectedAnswer!=null){
-						System.out.println(selectedAnswer);
-						System.out.println("Are you OK with this answer? yes/no");
-						queryType = 3;
-					} else {
-						System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
+						String selectedAnswer = clarificationExpressionGenerator.matchUserResponseWithGeneratedOptions(query);
+						if (selectedAnswer!=null){
+							System.out.println(selectedAnswer);
+							clarificationExpressionGenerator.latestAnswer = selectedAnswer;
+							System.out.println("Are you OK with this answer? yes/more/no/specify [different topic]");
+							queryType = 3;
+						} else {
+							System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
+						}
+					} 
+					else if (queryType == 3 && query.toLowerCase().indexOf("yes")>-1){
+						queryType = 0;
+						System.out.println("Now you can ask a NEW question");
 					}
-				} else if (queryType == 3 && query.toLowerCase().indexOf("yes")>-1){
-					queryType = 0;
-					System.out.println("Now you can ask a NEW question");
-				} else if (queryType == 3 && query.toLowerCase().indexOf("no")>-1){
-					queryType = 0;
-					System.out.println("We are now trying to use the constrainst from your previous replies...");
-					List<ChatIterationResult> searchRes0 = searcher.searchLongQuery("" //TODO query_1 + " " + query_0
-							);
-					System.out.println("I think you will find this information useful:");
-					System.out.println(searchRes0.get(0).getParagraph());
-					queryType = 0;
-					System.out.println("Now you can ask a NEW question");
-				}
+					else if (queryType == 3 && query.toLowerCase().indexOf("more")>-1){
+						System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
+						queryType = 0;
+						System.out.println("Now you can ask a NEW question");
+					}
+					else if (queryType == 3 && query.toLowerCase().indexOf("no")>-1){
+						queryType = 0;
+						System.out.println("We are now trying to use the constrainst from your previous replies...");
+						List<ChatIterationResult> searchRes0 = searcher.searchLongQuery(clarificationExpressionGenerator.originalQuestion+  " " +
+									clarificationExpressionGenerator.clarificationQuery);
+						System.out.println("I think you will find this information useful:");
+						for(int i=0; i< searchRes0.size(); i++){
+							if (!clarificationExpressionGenerator.isEqualToAlreadyGivenAnswer(searchRes0.get(0).getParagraph())){
+								System.out.println(searchRes0.get(0).getParagraph());
+								break;
+							}
+						}
+						queryType = 0;
+						System.out.println("\nNow you can ask a NEW question");
+						// another topic, no 'no, yes, more'
+					} else if (queryType == 3){
+						String selectedAnswer = clarificationExpressionGenerator.matchUserResponseWithGeneratedOptions(query);
+						if (selectedAnswer!=null){
+							System.out.println(selectedAnswer);
+							clarificationExpressionGenerator.latestAnswer = selectedAnswer;
+							System.out.println("Are you OK with this answer? yes/more/no/specify [different topic]");
+							queryType = 3;
+						} else {
+							System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
+						}
+					}
 
 			} catch (IOException ioe) {
 				System.err.println("IO error");
@@ -89,6 +112,7 @@ public class SearchSessionManager {
 	}
 
 	public static void main(String[] args){
+		System.setProperty("log4j.debug", "");
 		new SearchSessionManager() .runSession();
 	}
 }

@@ -132,12 +132,11 @@ public class SnippetToParagraph extends ContentGeneratorSupport /*RelatedSentenc
 				f.setSourceURL(item.getUrl());
 				f.fragment = fragment;
 				result.add(f);
-				System.out.println("Accepted sentence: " + pageSentenceProc
+				LOG.info("Accepted sentence: " + pageSentenceProc
 						+ "| with title= " + title);
-				System.out.println("For fragment = " + fragment);
+				LOG.info("For fragment = " + fragment);
 			} else
-				System.out
-				.println("Rejected sentence due to wrong area at webpage: "
+				LOG.info("Rejected sentence due to wrong area at webpage: "
 						+ pageSentence);
 		} 
 
@@ -299,7 +298,7 @@ public class SnippetToParagraph extends ContentGeneratorSupport /*RelatedSentenc
 		if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
 			continue;
 		if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
-			System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
+			//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 			continue;
 		}
 		// aaa. hhh hhh.  kkk . kkk ll hhh. lll kkk n.

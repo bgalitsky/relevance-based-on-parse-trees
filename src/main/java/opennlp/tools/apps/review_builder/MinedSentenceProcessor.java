@@ -19,48 +19,51 @@ package opennlp.tools.apps.review_builder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import opennlp.tools.similarity.apps.utils.Utils;
 
 import org.apache.commons.lang.StringUtils;
 
 public class MinedSentenceProcessor {
+	  private static final Logger log = Logger
+		      .getLogger("opennlp.tools.apps.review_builder.MinedSentenceProcessor");
   public static String acceptableMinedSentence(String sent) {
     // if too many commas => seo text
 
     String[] commas = StringUtils.split(sent, ',');
     String[] spaces = StringUtils.split(sent, ' ');
     if ((float) commas.length / (float) spaces.length > 0.7) {
-      System.out.println("Rejection: too many commas");
+      //log.info("Rejection: too many commas");
       return null;
     }
     
     String[] otherDelimiters = StringUtils.split(sent, '/');
     if ((float) otherDelimiters.length / (float) spaces.length > 0.7) {
-        System.out.println("Rejection: too many delimiters");
+    	 log.info("Rejection: too many delimiters");
         return null;
     }
     
     otherDelimiters = StringUtils.split(sent, '.');
     if ((float) otherDelimiters.length / (float) spaces.length > 0.7) {
-        System.out.println("Rejection: too many delimiters");
+    	 log.info("Rejection: too many delimiters");
         return null;
     }
     otherDelimiters = StringUtils.split(sent, '!');
     if ((float) otherDelimiters.length / (float) spaces.length > 0.7) {
-        System.out.println("Rejection: too many delimiters");
+    	 log.info("Rejection: too many delimiters");
         return null;
     }
     otherDelimiters = StringUtils.split(sent, '=');
     if ((float) otherDelimiters.length / (float) spaces.length > 0.7) {
-        System.out.println("Rejection: too many delimiters");
+    	 log.info("Rejection: too many delimiters");
         return null;
     }
     
-    String[] pipes = StringUtils.split(sent, '|');
+    //String[] pipes = StringUtils.split(sent, '|');
     if (StringUtils.split(sent, '|').length > 2
         || StringUtils.split(sent, '>').length > 2) {
-      System.out.println("Rejection: too many |s or >s ");
+    	log.info("Rejection: too many |s or >s ");
       return null;
     }
     String sentTry = sent.toLowerCase();

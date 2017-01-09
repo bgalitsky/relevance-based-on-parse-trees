@@ -131,7 +131,7 @@ public class PT2ThicketPhraseBuilder {
 								continue;
 							log.info("rel: "+arc);
 							log.info("From "+lFromFound);
-							System.out.println("TO "+lToFound);
+							log.info("TO "+lToFound);
 							thicketPhrasesAllSent.add(append(lFromFound, lToFound));	
 							//break;
 						}

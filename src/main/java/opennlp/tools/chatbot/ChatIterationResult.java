@@ -5,9 +5,9 @@ import opennlp.tools.similarity.apps.HitBase;
 
 public class ChatIterationResult extends HitBase {
 	public EntityExtractionResult eeResult;
-	public HitBase hit;
 	public String paragraph;
 	public String selectedClarificationPhrase;
+	public String firstClarificationPhrase;
 
 	public EntityExtractionResult getEeResult() {
 		return eeResult;
@@ -16,10 +16,7 @@ public class ChatIterationResult extends HitBase {
 		this.eeResult = eeResult;
 	}
 	public HitBase getHit() {
-		return hit;
-	}
-	public void setHit(HitBase hit) {
-		this.hit = hit;
+		return this.getHit();
 	}
 	public String getSelectedClarificationPhrase() {
 		return selectedClarificationPhrase;
@@ -31,12 +28,19 @@ public class ChatIterationResult extends HitBase {
 		this.paragraph = paragraph;
 	}
 	public ChatIterationResult(HitBase currHit, EntityExtractionResult eeRes, String text){
-		this.hit = currHit;
+		this.setAbstractText(currHit.getAbstractText());
+		this.setTitle(currHit.getTitle());
+		this.setUrl(currHit.getUrl());
+		
+		
 		this.eeResult = eeRes;
 		this.paragraph = text;
 	}
-	public ChatIterationResult(HitBase currSearchRes, EntityExtractionResult eeRes) {
-		this.hit = currSearchRes;
+	public ChatIterationResult(HitBase currHit, EntityExtractionResult eeRes) {
+		this.setAbstractText(currHit.getAbstractText());
+		this.setTitle(currHit.getTitle());
+		this.setUrl(currHit.getUrl());
+		
 		this.eeResult = eeRes;
 	}
 	public String getParagraph() {
@@ -44,7 +48,7 @@ public class ChatIterationResult extends HitBase {
 	}
 	
 	public String toString(){
-		return this.hit.getTitle() + " => " + this.eeResult.getExtractedNerExactStr() + "\n" +
+		return this.getTitle() + " => " + this.eeResult.getExtractedNerExactStr() + "\n" +
 				this.eeResult.getExtractedNONSentimentPhrasesStr()+"\n";
 	}
 }

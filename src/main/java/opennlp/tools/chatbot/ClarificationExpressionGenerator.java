@@ -10,46 +10,128 @@ public class ClarificationExpressionGenerator {
 	// session data
 	private List<ChatIterationResult> answerAndClarificationOptions;
 	public String originalQuestion;
-	
+	private int currBestIndex;
+	public String clarificationQuery;
+	public String latestAnswer;
+
 	// processors for use
 	private StringDistanceMeasurer meas = new StringDistanceMeasurer();
-	
-	private static String[] clarifPrefixes = new String[] {
-		"Did you mean: '", "Or is it about :'", "It might be connected with: '", "It can be related to :'",
+
+	public boolean isEqualToAlreadyGivenAnswer(String answer){
+		return meas.measureStringDistance(this.latestAnswer, answer)>0.8;
+	}
+
+	private static String[] clarifPrefixes = new String[] { "Possibly associated with :'", "Possible related to :'",
+		"Did you mean: '", "Or is it about :'", "Could be connected with: '", "It can be related to :'",
 		"Purhaps it is concerning: '"
 	};
-	
+
 	public void reset(){
 		answerAndClarificationOptions = null;
 		originalQuestion = null;
+		currBestIndex = -1;
+		clarificationQuery = null;;
 	}
 	public String generateClarification(String query, List<ChatIterationResult> searchRes0) {
+
 		int count =0;
-	    for(ChatIterationResult extrPhrases: searchRes0){
-	    	List<String> candidates = extrPhrases.getEeResult().getExtractedNONSentimentPhrasesStr();
-	    	// now find the longest
-	    	String bestPhrase = ""; int maxLen = -1;
-	    	for(String c: candidates){
-	    		if (c.length()>maxLen){
-	    			bestPhrase = c;
-	    			maxLen = c.length();
-	    		}
-	    	}
-	    	extrPhrases.selectedClarificationPhrase=bestPhrase;
-	    	searchRes0.set(count, extrPhrases);
-	    	count++;
-	    }
-	    String clarificationStr = "";
-	    for(ChatIterationResult extrPhrases: searchRes0){
-	    	if (! acceptableClarifPhrase(extrPhrases.selectedClarificationPhrase))
-	    		continue;
-	    	int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
-	    	clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.selectedClarificationPhrase + "'. ";
-	    }
-	    answerAndClarificationOptions = searchRes0;
-	    return clarificationStr;
-    }
-	
+		for(ChatIterationResult extrPhrases: searchRes0){
+			try {
+	            List<String> candidates = extrPhrases.getEeResult().getExtractedNONSentimentPhrasesStr();
+	            if (candidates.isEmpty()) 
+	            	continue;
+
+	            // now find the longest and the first one
+	            String bestPhrase = ""; int maxLen = -1; int bestIndex = -1;
+	            for(int i=0; i< candidates.size(); i++){
+	            	if (candidates.get(i).length()>5 && meas.measureStringDistance(query, candidates.get(i))<0.7
+	            			&& acceptableClarifPhrase(candidates.get(i)))
+	            	{
+	            		extrPhrases.firstClarificationPhrase=candidates.get(i);
+	            		candidates.remove(extrPhrases.firstClarificationPhrase);
+	            		break;
+	            	}
+	            }
+
+	            for(String c: candidates){
+	            	if (c.length()>maxLen && 
+	            			(extrPhrases.firstClarificationPhrase==null || 
+	            			meas.measureStringDistance(c, extrPhrases.firstClarificationPhrase)<0.7)
+	            			&& acceptableClarifPhrase(c)
+	            			&& meas.measureStringDistance(c, query)<0.7){
+	            		bestPhrase = c;
+	            		maxLen = c.length();
+	            	}
+	            }
+
+	            extrPhrases.selectedClarificationPhrase=bestPhrase;
+	            searchRes0.set(count, extrPhrases);
+	            count++;
+            } catch (Exception e) {
+	            e.printStackTrace();
+            }
+		}
+
+
+		String clarificationStr = "";
+		count = 0;
+		if (this.originalQuestion==null) // very first session
+			for(ChatIterationResult extrPhrases: searchRes0){
+				
+				try {
+	                if (extrPhrases.selectedClarificationPhrase!=null && extrPhrases.selectedClarificationPhrase.length()>2){
+	                	int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
+	                	clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.selectedClarificationPhrase + "'["+count + "]. ";
+	                }
+	                // adding first clarification phrase
+	                if (extrPhrases.firstClarificationPhrase!=null && extrPhrases.firstClarificationPhrase.length()>2){
+	                	int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
+	                	clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.firstClarificationPhrase + "'["+count + "]. ";
+	                	if (count % 3== 0)
+	                		clarificationStr +="\n";
+	                }
+                } catch (Exception e) {
+	                e.printStackTrace();
+                }
+				count++;
+			} else {
+				for(ChatIterationResult extrPhrases: searchRes0){
+					try {
+	                    if (extrPhrases.selectedClarificationPhrase.length()>2)
+	                    	clarificationStr +=  " ["+count + "] "+ extrPhrases.selectedClarificationPhrase + " | ";
+	                    if (extrPhrases.firstClarificationPhrase.length()>2)
+	                    	clarificationStr +=  " ["+count + "] "+ extrPhrases.firstClarificationPhrase + " | ";
+	                    count++;
+                    } catch (Exception e) {
+	                    e.printStackTrace();
+                    }
+				}
+			}
+		this.originalQuestion = query;
+		answerAndClarificationOptions = searchRes0;
+		return clarificationStr;
+	}
+	/*
+	private List<String> selectBestPhrases(List<String> candidates){
+	// now find the longest and the first one
+				String bestPhrase = ""; int maxLen = -1; int bestIndex = -1;
+				if (candidates.get(0).length()>5)
+					extrPhrases.firstClarificationPhrase=candidates.get(0);
+				candidates.remove(extrPhrases.firstClarificationPhrase);
+
+				for(String c: candidates){
+					try {
+		                if (c.length()>maxLen && 
+		                		meas.measureStringDistance(c, extrPhrases.firstClarificationPhrase)<0.8){
+		                	bestPhrase = c;
+		                	maxLen = c.length();
+		                }
+	                } catch (Exception e) {
+		                e.printStackTrace();
+	                }
+				}
+	 */
+
 	/*
 	 * , How to pay my credit card bill with another credit card ... => []
 [my credit card bill]
@@ -68,41 +150,55 @@ public class ClarificationExpressionGenerator {
 , Can You Pay a Credit Card With a Credit Card? | Fox Business => []
 [any of these scenarios, these scenarios, apply to you, your credit cards, to pay another credit card bill]
 	 */
+	//'s
+	boolean acceptableClarifPhrase(String ph) {
+		if (ph==null)
+			return false;
 
-	private boolean acceptableClarifPhrase(String ph) {
-	   if (ph.length()<30)
-		   return false;
-	   if  (ph.indexOf(",")>0 || ph.indexOf("...")>0)
-		   return false;
-	   return true;
-    }
-	public char[] getBestAvailableCurrentAnswer() {
-	    // TODO Auto-generated method stub
-	    return null;
-    }
+		ph = ph.toLowerCase();
+
+		if (ph.startsWith("our") || ph.startsWith("my") || ph.startsWith("no ") || ph.startsWith("could ")
+				|| ph.startsWith("no "))
+			return false;
+
+		if (ph.length()<20)
+			return false;
+		if  (ph.indexOf(",")>0 || ph.indexOf("...")>0)
+			return false;
+		return true;
+	}
+	public String getBestAvailableCurrentAnswer() {
+		if (this.currBestIndex==0 && answerAndClarificationOptions.size()>0)
+			return answerAndClarificationOptions.get(1).paragraph;
+		else
+			return answerAndClarificationOptions.get(0).paragraph;	
+
+	}
 
 	public String matchUserResponseWithGeneratedOptions(String query) {
-	    if (StringUtils.isNumeric(query)){
-	    	int bestIndex = Integer.parseInt(query);
-	    	if (bestIndex < answerAndClarificationOptions.size())
-	    		return answerAndClarificationOptions.get(bestIndex).paragraph;
-	    }
-	    
-	 // no number is indicated but instead the choice via a phrase
-	    double bestSim = -1.0; int bestIndex = -1;
-	    int count = 0;
-	    for(ChatIterationResult extrPhrases:answerAndClarificationOptions){
-	    	double sim = meas.measureStringDistance(query, extrPhrases.selectedClarificationPhrase);
-	    	if (sim>bestSim){
-	    		bestSim=sim;
-	    		bestIndex = count;
-	    	}
-	    	count++;
-	    		
-	    }
-	    
-	    return answerAndClarificationOptions.get(bestIndex).paragraph;
-    }
+		this.clarificationQuery = query;
+
+		if (StringUtils.isNumeric(query)){
+			int bestIndex = Integer.parseInt(query);
+			if (bestIndex < answerAndClarificationOptions.size())
+				return answerAndClarificationOptions.get(bestIndex).paragraph;
+		}
+
+		// no number is indicated but instead the choice via a phrase
+		double bestSim = -1.0; int bestIndex = -1;
+		int count = 0;
+		for(ChatIterationResult extrPhrases:answerAndClarificationOptions){
+			double sim = meas.measureStringDistance(query, extrPhrases.selectedClarificationPhrase);
+			if (sim>bestSim){
+				bestSim=sim;
+				bestIndex = count;
+			}
+			count++;
+
+		}
+		this.currBestIndex = bestIndex;
+		return answerAndClarificationOptions.get(bestIndex).paragraph;
+	}
 
 }
 
@@ -113,4 +209,4 @@ Or is it about :'your credit card company'. Did you mean: 'will begin charging a
 Did you mean: 'all the ways you can waste money'. Did you mean: 'to avoid credit card late'. 
 Or is it about :'claim interest and debt recovery costs if'. It can be related to :'can drop your credit'. 
 
-*/
+ */

@@ -310,6 +310,7 @@ public class TopicExtractorFromSearchResult {
 		String buf = "";
 		for(ParseTreeNode p: phrase)
 			buf+=p.getWord()+" ";
+		buf = buf.replace("-rrb-", "");
 		return buf.trim();
 	}
 

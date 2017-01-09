@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -40,7 +41,7 @@ public class PageFetcher {
       .getLogger("opennlp.tools.similarity.apps.utils.PageFetcher");
   Tika tika = new Tika();
 
-  private static int DEFAULT_TIMEOUT = 1500;
+  private static int DEFAULT_TIMEOUT = 3500; //1500
   private void setTimeout(int to){
 	  DEFAULT_TIMEOUT = to;
   }
@@ -81,9 +82,15 @@ public class PageFetcher {
     log.info("fetch url " + fetchURL);
 
     String pageContent = null;
-    URLConnection connection;
+    HttpURLConnection connection;
     try {
-      connection = new URL(fetchURL).openConnection();
+      connection = (HttpURLConnection)new URL(fetchURL).openConnection();
+      connection
+      .setRequestProperty(
+          "User-Agent",
+          "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3");
+      connection
+      	.setRequestProperty("Cookie", "foo=bar"); 
       connection.setReadTimeout(DEFAULT_TIMEOUT);
       
       pageContent = tika.parseToString(connection.getInputStream())

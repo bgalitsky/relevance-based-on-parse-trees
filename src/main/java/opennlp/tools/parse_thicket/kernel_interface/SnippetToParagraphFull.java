@@ -50,8 +50,8 @@ public class SnippetToParagraphFull extends SnippetToParagraph {
 
 		String[] sents = extractSentencesFromPage(item.getUrl());
 
-		String title = item.getTitle().replace("<b>", " ").replace("</b>", " ")
-				.replace("  ", " ").replace("  ", " ");
+		//String title = item.getTitle().replace("<b>", " ").replace("</b>", " ")
+		//		.replace("  ", " ").replace("  ", " ");
 		// generation results for this sentence
 		List<String> result = new ArrayList<String>();
 		// form plain text from snippet
@@ -78,14 +78,16 @@ public class SnippetToParagraphFull extends SnippetToParagraph {
 						f, sents);
 				pageSentence = mainAndFollowSent[0];
 				followSent = mainAndFollowSent[1];
-				if (pageSentence!=null)
+				if (pageSentence!=null && followSent!=null)
+					result.add(pageSentence + "\n" + followSent);
+				else if (pageSentence!=null){
 					result.add(pageSentence);
+				}
 				else {
 					result.add(f);
 					LOG.info("Could not find the original sentence \n"+f +"\n in the page " );
 				}
-				//if (followSent !=null)
-				//	result.add(followSent);
+
 			} catch (Exception e) {
 
 				e.printStackTrace();

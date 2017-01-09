@@ -17,7 +17,7 @@ public class LongQueryWebSearcher {
 	public List<ChatIterationResult> searchLongQuery(String queryOrig){
 		List<ChatIterationResult> chatIterationResults= new ArrayList<ChatIterationResult>();
 		
-		List<HitBase> results = bSearcher.runSearch(queryOrig, 20), augmResults = new ArrayList<HitBase>() ;
+		List<HitBase> results = bSearcher.runSearch(queryOrig, 6), augmResults = new ArrayList<HitBase>() ;
 		// populate with orig text
 		for(HitBase currSearchRes: results){
 			HitBase augmRes = paraFormer.formTextFromOriginalPageGivenSnippet(currSearchRes);
