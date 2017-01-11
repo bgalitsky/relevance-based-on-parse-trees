@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 
 
+
 import opennlp.tools.similarity.apps.ContentGeneratorSupport;
 import opennlp.tools.similarity.apps.Fragment;
 import opennlp.tools.similarity.apps.GeneratedSentenceProcessor;
@@ -41,6 +42,15 @@ public class SnippetToParagraph extends ContentGeneratorSupport /*RelatedSentenc
 	private PageFetcher pFetcher = new PageFetcher();
 	private static Logger LOG = Logger
 			.getLogger("com.become.parse_thicket.apps.SnippetToParagraph");
+	
+	public class TextChunk {
+		public TextChunk(String s, int length) {
+			this.text = s;
+			this.len = length;
+		}
+		public String text;
+		public int len;
+	}
 
 	public HitBase formTextFromOriginalPageGivenSnippetDirect(HitBase item) {
 
@@ -351,14 +361,7 @@ public class SnippetToParagraph extends ContentGeneratorSupport /*RelatedSentenc
 		}
 		return results;
 	}
-	public class TextChunk {
-		public TextChunk(String s, int length) {
-			this.text = s;
-			this.len = length;
-		}
-		public String text;
-		public int len;
-	}
+	
 
 	public class TextChunkComparable implements Comparator<TextChunk>
 	{

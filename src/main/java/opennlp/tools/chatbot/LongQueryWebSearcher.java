@@ -2,17 +2,20 @@ package opennlp.tools.chatbot;
 
 import java.util.ArrayList;
 import java.util.List;
-import opennlp.tools.parse_thicket.kernel_interface.SnippetToParagraphFull;
+import java.util.logging.Logger;
+
 import opennlp.tools.parse_thicket.opinion_processor.EntityExtractionResult;
 import opennlp.tools.similarity.apps.BingQueryRunner;
 import opennlp.tools.similarity.apps.HitBase;
 import opennlp.tools.similarity.apps.utils.PageFetcher;
 
 public class LongQueryWebSearcher {
+	private static Logger LOG = Logger
+			.getLogger("opennlp.tools.chatbot.LongQueryWebSearcher");
 	private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();
 	private PageFetcher pFetcher = new PageFetcher();
 	private BingQueryRunner bSearcher = new BingQueryRunner();
-	private SnippetToParagraphFull paraFormer = new SnippetToParagraphFull();
+	private SnippetToParagraphAndSectionHeaderContent paraFormer = new SnippetToParagraphAndSectionHeaderContent();
 	
 	public List<ChatIterationResult> searchLongQuery(String queryOrig){
 		List<ChatIterationResult> chatIterationResults= new ArrayList<ChatIterationResult>();
@@ -20,18 +23,29 @@ public class LongQueryWebSearcher {
 		List<HitBase> results = bSearcher.runSearch(queryOrig, 6), augmResults = new ArrayList<HitBase>() ;
 		// populate with orig text
 		for(HitBase currSearchRes: results){
-			HitBase augmRes = paraFormer.formTextFromOriginalPageGivenSnippet(currSearchRes);
-			augmResults.add(augmRes);
+			try {
+	            HitBase augmRes = paraFormer.formTextFromOriginalPageGivenSnippet(currSearchRes);
+	            augmResults.add(augmRes);
+            } catch (Exception e) {
+	            e.printStackTrace();
+            }
 		}
 		
 		// extract phrases and entities
 		for(HitBase currSearchRes: augmResults){
-			String text = combineSentences(currSearchRes.getOriginalSentences());
-			if (text==null || text.length()<50)
-				text = currSearchRes.getAbstractText();
-			
-			EntityExtractionResult eeRes = extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
-			chatIterationResults.add(new ChatIterationResult(currSearchRes, eeRes, text));
+			try {
+				String text = null;
+				if (currSearchRes.getOriginalSentences()==null || currSearchRes.getOriginalSentences().isEmpty() ||
+						currSearchRes.getOriginalSentences().get(0).length()>50)
+					text = currSearchRes.getAbstractText();
+				else
+					text = combineSentences(currSearchRes.getOriginalSentences());
+	            
+	            EntityExtractionResult eeRes = extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
+	            chatIterationResults.add(new ChatIterationResult(currSearchRes, eeRes, text));
+            } catch (Exception e) {
+	            e.printStackTrace();
+            }
 		}
 		return chatIterationResults;
 	}

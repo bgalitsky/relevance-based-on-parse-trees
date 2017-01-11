@@ -1,12 +1,18 @@
 package opennlp.tools.chatbot;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
 
 import org.apache.commons.lang.StringUtils;
 
 public class ClarificationExpressionGenerator {
+	private static Logger LOG = Logger
+			.getLogger("opennlp.tools.chatbot.ClarificationExpressionGenerator");
 	// session data
 	private List<ChatIterationResult> answerAndClarificationOptions;
 	public String originalQuestion;
@@ -37,79 +43,100 @@ public class ClarificationExpressionGenerator {
 		int count =0;
 		for(ChatIterationResult extrPhrases: searchRes0){
 			try {
-	            List<String> candidates = extrPhrases.getEeResult().getExtractedNONSentimentPhrasesStr();
-	            if (candidates.isEmpty()) 
-	            	continue;
+				List<String> candidates = extrPhrases.getEeResult().getExtractedNONSentimentPhrasesStr();
+				if (candidates.isEmpty()) 
+					continue;
 
-	            // now find the longest and the first one
-	            String bestPhrase = ""; int maxLen = -1; int bestIndex = -1;
-	            for(int i=0; i< candidates.size(); i++){
-	            	if (candidates.get(i).length()>5 && meas.measureStringDistance(query, candidates.get(i))<0.7
-	            			&& acceptableClarifPhrase(candidates.get(i)))
-	            	{
-	            		extrPhrases.firstClarificationPhrase=candidates.get(i);
-	            		candidates.remove(extrPhrases.firstClarificationPhrase);
-	            		break;
-	            	}
-	            }
+				// now find the longest and the first one
+				String bestPhrase = ""; int maxLen = -1; int bestIndex = -1;
+				for(int i=0; i< candidates.size(); i++){
+					if (candidates.get(i).length()>5 && meas.measureStringDistance(query, candidates.get(i))<0.7
+							&& acceptableClarifPhrase(candidates.get(i)))
+					{
+						extrPhrases.firstClarificationPhrase=cleanPhrase(candidates.get(i));
+						candidates.remove(candidates.get(i));
+						break;
+					}
+				}
 
-	            for(String c: candidates){
-	            	if (c.length()>maxLen && 
-	            			(extrPhrases.firstClarificationPhrase==null || 
-	            			meas.measureStringDistance(c, extrPhrases.firstClarificationPhrase)<0.7)
-	            			&& acceptableClarifPhrase(c)
-	            			&& meas.measureStringDistance(c, query)<0.7){
-	            		bestPhrase = c;
-	            		maxLen = c.length();
-	            	}
-	            }
+				for(String c: candidates){
+					if (c.length()>maxLen && 
+							(extrPhrases.firstClarificationPhrase==null || 
+							meas.measureStringDistance(c, extrPhrases.firstClarificationPhrase)<0.7)
+							&& acceptableClarifPhrase(c)
+							&& meas.measureStringDistance(c, query)<0.7){
+						bestPhrase = c;
+						maxLen = c.length();
+					}
+				}
 
-	            extrPhrases.selectedClarificationPhrase=bestPhrase;
-	            searchRes0.set(count, extrPhrases);
-	            count++;
-            } catch (Exception e) {
-	            e.printStackTrace();
-            }
+				extrPhrases.selectedClarificationPhrase=cleanPhrase(bestPhrase);
+				searchRes0.set(count, extrPhrases);
+				count++;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 
 		String clarificationStr = "";
 		count = 0;
-		if (this.originalQuestion==null) // very first session
+		if (this.originalQuestion==null) {// very first session
 			for(ChatIterationResult extrPhrases: searchRes0){
-				
+
 				try {
-	                if (extrPhrases.selectedClarificationPhrase!=null && extrPhrases.selectedClarificationPhrase.length()>2){
-	                	int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
-	                	clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.selectedClarificationPhrase + "'["+count + "]. ";
-	                }
-	                // adding first clarification phrase
-	                if (extrPhrases.firstClarificationPhrase!=null && extrPhrases.firstClarificationPhrase.length()>2){
-	                	int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
-	                	clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.firstClarificationPhrase + "'["+count + "]. ";
-	                	if (count % 3== 0)
-	                		clarificationStr +="\n";
-	                }
-                } catch (Exception e) {
-	                e.printStackTrace();
-                }
+					if (extrPhrases.selectedClarificationPhrase!=null && extrPhrases.selectedClarificationPhrase.length()>2){
+						int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
+						clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.selectedClarificationPhrase + "'["+count + "]. ";
+					}
+					// adding first clarification phrase
+					if (extrPhrases.firstClarificationPhrase!=null && extrPhrases.firstClarificationPhrase.length()>2){
+						int randomIndex = new Float( Math.random()*(float)clarifPrefixes.length).intValue();
+						clarificationStr += clarifPrefixes[randomIndex] + extrPhrases.firstClarificationPhrase + "'["+count + "]. ";
+						if (count % 3== 0)
+							clarificationStr +="\n";
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
+				if  (sectionHeaderContent!=null){
+					Set<String> headers = sectionHeaderContent.keySet();
+					if (!headers.isEmpty()){
+						clarificationStr+= "\nThese are the other areas of interest:";
+						for(String header: headers){
+							clarificationStr += header + " | ";
+						}
+					}
+					clarificationStr+= "\n";
+				}
+
 				count++;
-			} else {
-				for(ChatIterationResult extrPhrases: searchRes0){
-					try {
-	                    if (extrPhrases.selectedClarificationPhrase.length()>2)
-	                    	clarificationStr +=  " ["+count + "] "+ extrPhrases.selectedClarificationPhrase + " | ";
-	                    if (extrPhrases.firstClarificationPhrase.length()>2)
-	                    	clarificationStr +=  " ["+count + "] "+ extrPhrases.firstClarificationPhrase + " | ";
-	                    count++;
-                    } catch (Exception e) {
-	                    e.printStackTrace();
-                    }
+			} 
+
+
+		}else {
+			for(ChatIterationResult extrPhrases: searchRes0){
+				try {
+					if (extrPhrases.selectedClarificationPhrase.length()>2)
+						clarificationStr +=  " ["+count + "] "+ extrPhrases.selectedClarificationPhrase + " | ";
+					if (extrPhrases.firstClarificationPhrase.length()>2)
+						clarificationStr +=  " ["+count + "] "+ extrPhrases.firstClarificationPhrase + " | ";
+					count++;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
+		}
 		this.originalQuestion = query;
 		answerAndClarificationOptions = searchRes0;
 		return clarificationStr;
+	}
+
+	private String cleanPhrase(String phrase){
+		//TODO further cleaning
+		return phrase.replace("-rrb-", "").replace("-lrb-", "");
 	}
 	/*
 	private List<String> selectBestPhrases(List<String> candidates){
@@ -158,7 +185,9 @@ public class ClarificationExpressionGenerator {
 		ph = ph.toLowerCase();
 
 		if (ph.startsWith("our") || ph.startsWith("my") || ph.startsWith("no ") || ph.startsWith("could ")
-				|| ph.startsWith("no "))
+				|| ph.startsWith("no ") || ph.startsWith("get ") || ph.startsWith("contact us") || ph.indexOf("editorial ")>-1 
+				|| ph.startsWith("any ") 
+				)
 			return false;
 
 		if (ph.length()<20)
@@ -187,16 +216,38 @@ public class ClarificationExpressionGenerator {
 		// no number is indicated but instead the choice via a phrase
 		double bestSim = -1.0; int bestIndex = -1;
 		int count = 0;
+		String bestCandidate = null;
 		for(ChatIterationResult extrPhrases:answerAndClarificationOptions){
-			double sim = meas.measureStringDistance(query, extrPhrases.selectedClarificationPhrase);
-			if (sim>bestSim){
-				bestSim=sim;
-				bestIndex = count;
+			List<String> candidates = new ArrayList<String>();
+			candidates.add(extrPhrases.selectedClarificationPhrase);
+			candidates.add(extrPhrases.firstClarificationPhrase);
+			Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
+			if  (sectionHeaderContent!=null){
+				Set<String> headers = sectionHeaderContent.keySet();
+				candidates.addAll(headers);
+			}
+			for(String cand: candidates){
+			double sim = meas.measureStringDistance(query, cand);
+				if (sim>bestSim){
+					bestSim=sim;
+					bestIndex = count;
+					bestCandidate = cand;
+				}
 			}
 			count++;
 
 		}
 		this.currBestIndex = bestIndex;
+		// now we need to figure out: whole doc or a section
+		try {
+	        ChatIterationResult extrPhrases = answerAndClarificationOptions.get(bestIndex);
+	        String answer =  extrPhrases.getSectionHeaderContent().get(bestCandidate);
+	        if (answer!=null)
+	        	return answer;
+        } catch (Exception e) {
+	       // if not section then the whole doc
+        }
+		
 		return answerAndClarificationOptions.get(bestIndex).paragraph;
 	}
 

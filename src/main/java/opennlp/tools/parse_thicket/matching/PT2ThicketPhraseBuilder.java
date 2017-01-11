@@ -52,7 +52,7 @@ public class PT2ThicketPhraseBuilder {
 			Tree ptree = pt.getSentences().get(nSent);
 			//ptree.pennPrint();
 			List<List<ParseTreeNode>> phrases = buildPT2ptPhrasesForASentence(ptree, sentence);
-			log.info(phrases.toString());
+			//log.info(phrases.toString());
 			phrasesAllSent.addAll(phrases);
 			sentNumPhrases.put(nSent, phrases);
 
@@ -67,7 +67,7 @@ public class PT2ThicketPhraseBuilder {
 		pt.setArcs(arcs);
 		
 		if (pt.getArcs().size()>20){
-			log.info(pt.toString());
+			//log.info(pt.toString());
 		}
 
 		List<List<ParseTreeNode>> expandedPhrases = expandTowardsThicketPhrases(phrasesAllSent, pt.getArcs(), sentNumPhrases, pt);
@@ -129,9 +129,9 @@ public class PT2ThicketPhraseBuilder {
 							List<ParseTreeNode> appended = append(lFromFound, lToFound);
 							if (thicketPhrasesAllSent.contains(appended))
 								continue;
-							log.info("rel: "+arc);
-							log.info("From "+lFromFound);
-							log.info("TO "+lToFound);
+							//log.info("rel: "+arc);
+							//log.info("From "+lFromFound);
+							//log.info("TO "+lToFound);
 							thicketPhrasesAllSent.add(append(lFromFound, lToFound));	
 							//break;
 						}

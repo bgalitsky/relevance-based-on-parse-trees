@@ -31,7 +31,7 @@ public class ChatIterationResult extends HitBase {
 		this.setAbstractText(currHit.getAbstractText());
 		this.setTitle(currHit.getTitle());
 		this.setUrl(currHit.getUrl());
-		
+		this.setSectionHeaderContent(currHit.getSectionHeaderContent());
 		
 		this.eeResult = eeRes;
 		this.paragraph = text;
@@ -40,6 +40,7 @@ public class ChatIterationResult extends HitBase {
 		this.setAbstractText(currHit.getAbstractText());
 		this.setTitle(currHit.getTitle());
 		this.setUrl(currHit.getUrl());
+		this.setSectionHeaderContent(currHit.getSectionHeaderContent());
 		
 		this.eeResult = eeRes;
 	}

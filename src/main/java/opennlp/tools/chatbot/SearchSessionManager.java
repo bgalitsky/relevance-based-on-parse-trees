@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class SearchSessionManager {
+	private static Logger LOG = Logger
+			.getLogger("opennlp.tools.chatbot.SearchSessionManager");
+
 	private LongQueryWebSearcher searcher = new LongQueryWebSearcher();
 	private ClarificationExpressionGenerator clarificationExpressionGenerator = new ClarificationExpressionGenerator();
 

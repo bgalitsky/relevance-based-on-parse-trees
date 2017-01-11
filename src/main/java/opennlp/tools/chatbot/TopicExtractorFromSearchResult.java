@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import opennlp.tools.apps.relevanceVocabs.SentimentVocab;
 import opennlp.tools.parse_thicket.ParseThicket;
@@ -22,7 +23,8 @@ import org.apache.commons.lang.StringUtils;
 
 public class TopicExtractorFromSearchResult {
 	private static Matcher matcher;
-
+	private static Logger LOG = Logger
+			.getLogger("opennlp.tools.chatbot.TopicExtractorFromSearchResult");
 	// sentiment vocabulary for phrase under the focus of sentiment
 	SentimentVocab sVocab = SentimentVocab.getInstance();
 	//This is used to create an XML with phrases. The same class for acro  & phrases

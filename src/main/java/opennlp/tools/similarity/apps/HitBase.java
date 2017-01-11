@@ -19,6 +19,7 @@ package opennlp.tools.similarity.apps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
@@ -50,6 +51,8 @@ public class HitBase {
 	private String pageContent;
 
 	private List<Fragment> fragments;
+
+	private Map<String, String> sectionHeaderContent;
 
 	public HitBase() {
 		super();
@@ -258,4 +261,14 @@ public class HitBase {
 		}
 		return hitsDedup;
 	}
+
+
+	public Map<String, String> getSectionHeaderContent() {
+		return sectionHeaderContent;
+	}
+
+	public void setSectionHeaderContent(Map<String, String> sectionHeaderContent) {
+		this.sectionHeaderContent = sectionHeaderContent;
+	}
+	
 }
