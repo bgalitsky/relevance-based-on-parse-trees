@@ -38,7 +38,8 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 	private PageFetcher pFetcher = new PageFetcher();
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.SnippetToParagraphAndSectionHeaderContent");
-	private PageByTagsParser pageParser = new PageByTagsParser();
+	private PageByTagsParser pageParser = new PageByTagsParser(); 
+	private static StringDistanceMeasurer meas = new StringDistanceMeasurer();
 	
 
 	private Pair<String[], Map<String, String>> extractSentencesAndSectionMapFromPage(String url)
@@ -184,10 +185,10 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 		// optimizing alignmemt score
 		public static String[] getFullOriginalSentenceFromWebpageBySnippetFragment(
 				String fragment, String[] sents) {
-			if (fragment.trim().length() < 15)
-				return null;
+			//if (fragment.trim().length() < 15)
+			//	return null;
 
-			StringDistanceMeasurer meas = new StringDistanceMeasurer();
+			//StringDistanceMeasurer meas = new StringDistanceMeasurer();
 			Double dist = 0.0;
 			String result = null, followSent = "";
 			for (int i = 0; i < sents.length; i++) {

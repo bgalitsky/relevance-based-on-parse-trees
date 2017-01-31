@@ -8,12 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import opennlp.tools.textsimilarity.TextProcessor;
+
 public class SearchSessionManager {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.SearchSessionManager");
 
-	private LongQueryWebSearcher searcher = new LongQueryWebSearcher();
-	private ClarificationExpressionGenerator clarificationExpressionGenerator = new ClarificationExpressionGenerator();
+	protected LongQueryWebSearcher searcher = new LongQueryWebSearcher();
+	protected ClarificationExpressionGenerator clarificationExpressionGenerator = new ClarificationExpressionGenerator();
 
 	private  Map<String, Integer> queryTypes = new HashMap<String, Integer>() ;
 	public SearchSessionManager(){
@@ -26,13 +28,12 @@ public class SearchSessionManager {
 		queryTypes.put("further system response", 22);
 
 		queryTypes.put("done with this session", 3);
-
-
-
 	}
+	
+	protected int queryType = 0;
 	public void	runSession(){
 		System.out.print("Welcome to 'Ask Boris' chatbot! Ask me something about personal finance");
-		int queryType = 0;
+		
 
 		while(true){
 			System.out.print("\nEnter your response or query >");
@@ -81,6 +82,17 @@ public class SearchSessionManager {
 						queryType = 0;
 						System.out.println("Now you can ask a NEW question");
 					}
+					else if (queryType == 3 && query.toLowerCase().indexOf("reduce ")>-1){
+						queryType = 0;
+						String domain = extractDomainFromQuery(query);
+						System.out.println("We are now trying to use the constraint on the domain " + domain);
+						clarificationExpressionGenerator.setDomain(domain);
+						List<ChatIterationResult> searchRes0 = searcher.searchLongQuery(clarificationExpressionGenerator.originalQuestion +
+								" site:"+domain);
+						System.out.println(searchRes0.get(0).getParagraph());
+						queryType = 0;
+						System.out.println("Now you can ask a NEW question");
+					}
 					else if (queryType == 3 && query.toLowerCase().indexOf("no")>-1){
 						queryType = 0;
 						System.out.println("We are now trying to use the constrainst from your previous replies...");
@@ -88,8 +100,8 @@ public class SearchSessionManager {
 									clarificationExpressionGenerator.clarificationQuery);
 						System.out.println("I think you will find this information useful:");
 						for(int i=0; i< searchRes0.size(); i++){
-							if (!clarificationExpressionGenerator.isEqualToAlreadyGivenAnswer(searchRes0.get(0).getParagraph())){
-								System.out.println(searchRes0.get(0).getParagraph());
+							if (!clarificationExpressionGenerator.isEqualToAlreadyGivenAnswer(searchRes0.get(i).getParagraph())){
+								System.out.println(searchRes0.get(i).getParagraph());
 								break;
 							}
 						}
@@ -101,7 +113,7 @@ public class SearchSessionManager {
 						if (selectedAnswer!=null){
 							System.out.println(selectedAnswer);
 							clarificationExpressionGenerator.latestAnswer = selectedAnswer;
-							System.out.println("Are you OK with this answer? yes/more/no/specify [different topic]");
+							System.out.println("Are you OK with this answer? yes/more/no/specify [different topic]/reduce search result to domain");
 							queryType = 3;
 						} else {
 							System.out.println(clarificationExpressionGenerator.getBestAvailableCurrentAnswer());
@@ -115,7 +127,19 @@ public class SearchSessionManager {
 		}
 	}
 
+	protected static String extractDomainFromQuery(String query) {
+	    String[] tokens = query.split(" ");
+	    for(String t: tokens){
+	    	int posDot =  t.lastIndexOf('.'), len = t.length();
+	    	if (posDot>2 && len-posDot<5 && len-posDot>1)
+	    		return t;
+	    	
+	    }
+	    
+	    return null;
+    }
 	public static void main(String[] args){
+		System.out.println( extractDomainFromQuery("reduce to finance.yahoo.com"));
 		System.setProperty("log4j.debug", "");
 		new SearchSessionManager() .runSession();
 	}

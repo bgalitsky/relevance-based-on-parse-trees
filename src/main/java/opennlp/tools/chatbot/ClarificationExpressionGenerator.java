@@ -19,6 +19,7 @@ public class ClarificationExpressionGenerator {
 	private int currBestIndex;
 	public String clarificationQuery;
 	public String latestAnswer;
+	public String domain;
 
 	// processors for use
 	private StringDistanceMeasurer meas = new StringDistanceMeasurer();
@@ -36,10 +37,29 @@ public class ClarificationExpressionGenerator {
 		answerAndClarificationOptions = null;
 		originalQuestion = null;
 		currBestIndex = -1;
-		clarificationQuery = null;;
+		clarificationQuery = null;
+		domain="";
 	}
 	public String generateClarification(String query, List<ChatIterationResult> searchRes0) {
-
+		if (searchRes0.isEmpty())
+			return "I got stuck searching for results, going back ...";
+		
+		//getEeResult() == null, then not canonical search path
+		if (searchRes0.get(0).getEeResult()==null) // not real search results, then expect clarification in title
+		{
+			String clarification = "I believe your query is about a product. These are the attributes of your interest:\n";
+			for(ChatIterationResult extrPhrases: searchRes0){
+				 clarification+=extrPhrases.getTitle() + " | ";
+				 extrPhrases.firstClarificationPhrase = extrPhrases.getTitle();
+				 extrPhrases.selectedClarificationPhrase = extrPhrases.getTitle();
+			}
+			this.originalQuestion = query;
+			answerAndClarificationOptions = searchRes0;
+			return clarification;
+		}
+					
+					
+		
 		int count =0;
 		for(ChatIterationResult extrPhrases: searchRes0){
 			try {
@@ -111,23 +131,39 @@ public class ClarificationExpressionGenerator {
 					}
 					clarificationStr+= "\n";
 				}
-
 				count++;
 			} 
-
-
 		}else {
 			for(ChatIterationResult extrPhrases: searchRes0){
+
 				try {
-					if (extrPhrases.selectedClarificationPhrase.length()>2)
-						clarificationStr +=  " ["+count + "] "+ extrPhrases.selectedClarificationPhrase + " | ";
-					if (extrPhrases.firstClarificationPhrase.length()>2)
-						clarificationStr +=  " ["+count + "] "+ extrPhrases.firstClarificationPhrase + " | ";
-					count++;
+					if (extrPhrases.selectedClarificationPhrase!=null && extrPhrases.selectedClarificationPhrase.length()>2){
+						clarificationStr +=  extrPhrases.selectedClarificationPhrase + "'["+count + "]. ";
+					}
+					// adding first clarification phrase
+					if (extrPhrases.firstClarificationPhrase!=null && extrPhrases.firstClarificationPhrase.length()>2){
+						clarificationStr +=  extrPhrases.firstClarificationPhrase + "'["+count + "]. ";
+						if (count % 3== 0)
+							clarificationStr +="\n";
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+
+				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
+				if  (sectionHeaderContent!=null){
+					Set<String> headers = sectionHeaderContent.keySet();
+					if (!headers.isEmpty()){
+						clarificationStr+= "\nThese are the other areas of interest:";
+						for(String header: headers){
+							clarificationStr += header + " | ";
+						}
+					}
+					clarificationStr+= "\n";
+				}
+
+				count++;
+			} 
 		}
 		this.originalQuestion = query;
 		answerAndClarificationOptions = searchRes0;
@@ -186,7 +222,9 @@ public class ClarificationExpressionGenerator {
 
 		if (ph.startsWith("our") || ph.startsWith("my") || ph.startsWith("no ") || ph.startsWith("could ")
 				|| ph.startsWith("no ") || ph.startsWith("get ") || ph.startsWith("contact us") || ph.indexOf("editorial ")>-1 
-				|| ph.startsWith("any ") 
+				|| ph.startsWith("any ") || ph.indexOf("also like")>-1 ||  ph.indexOf("also like")>-1 || ph.indexOf("clickred")>-1 || 
+				ph.startsWith("join ") || ph.indexOf("enjoy the article")>-1  || ph.indexOf("company info")>-1  
+				|| ph.indexOf("welcome to")>-1  || ph.indexOf(".")>-1  || ph.indexOf("company info")>-1  
 				)
 			return false;
 
@@ -218,23 +256,29 @@ public class ClarificationExpressionGenerator {
 		int count = 0;
 		String bestCandidate = null;
 		for(ChatIterationResult extrPhrases:answerAndClarificationOptions){
-			List<String> candidates = new ArrayList<String>();
-			candidates.add(extrPhrases.selectedClarificationPhrase);
-			candidates.add(extrPhrases.firstClarificationPhrase);
-			Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
-			if  (sectionHeaderContent!=null){
-				Set<String> headers = sectionHeaderContent.keySet();
-				candidates.addAll(headers);
-			}
-			for(String cand: candidates){
-			double sim = meas.measureStringDistance(query, cand);
-				if (sim>bestSim){
-					bestSim=sim;
-					bestIndex = count;
-					bestCandidate = cand;
-				}
-			}
-			count++;
+			try {
+	            List<String> candidates = new ArrayList<String>();
+	            candidates.add(extrPhrases.selectedClarificationPhrase);
+	            candidates.add(extrPhrases.firstClarificationPhrase);
+	            Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
+	            if  (sectionHeaderContent!=null){
+	            	Set<String> headers = sectionHeaderContent.keySet();
+	            	candidates.addAll(headers);
+	            }
+	            for(String cand: candidates){
+	            	if (cand==null)
+	            		continue;
+	            	double sim = meas.measureStringDistance(query, cand);
+	            	if (sim>bestSim){
+	            		bestSim=sim;
+	            		bestIndex = count;
+	            		bestCandidate = cand;
+	            	}
+	            }
+	            count++;
+            } catch (Exception e) {
+	            e.printStackTrace();
+            }
 
 		}
 		this.currBestIndex = bestIndex;
@@ -250,6 +294,10 @@ public class ClarificationExpressionGenerator {
 		
 		return answerAndClarificationOptions.get(bestIndex).paragraph;
 	}
+	public void setDomain(String domain) {
+	    // TODO Auto-generated method stub
+	    
+    }
 
 }
 
