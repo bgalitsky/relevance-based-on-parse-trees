@@ -48,10 +48,12 @@ public class ClarificationExpressionGenerator {
 		if (searchRes0.get(0).getEeResult()==null) // not real search results, then expect clarification in title
 		{
 			String clarification = "I believe your query is about a product. These are the attributes of your interest:\n";
+			int count = 0; 
 			for(ChatIterationResult extrPhrases: searchRes0){
-				 clarification+=extrPhrases.getTitle() + " | ";
+				 clarification+=extrPhrases.getTitle() + " ["+ count + "] | ";
 				 extrPhrases.firstClarificationPhrase = extrPhrases.getTitle();
 				 extrPhrases.selectedClarificationPhrase = extrPhrases.getTitle();
+				 count++;
 			}
 			this.originalQuestion = query;
 			answerAndClarificationOptions = searchRes0;

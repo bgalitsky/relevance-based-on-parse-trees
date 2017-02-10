@@ -41,16 +41,23 @@ public class ChatIterationResult extends HitBase {
 		this.setTitle(currHit.getTitle());
 		this.setUrl(currHit.getUrl());
 		this.setSectionHeaderContent(currHit.getSectionHeaderContent());
-		
+
 		this.eeResult = eeRes;
 	}
 	public String getParagraph() {
 		return this.paragraph;
 	}
-	
+
 	public String toString(){
-		return this.getTitle() + " => " + this.eeResult.getExtractedNerExactStr() + "\n" +
-				this.eeResult.getExtractedNONSentimentPhrasesStr()+"\n";
+		if ( this.eeResult!=null && this.eeResult.getExtractedNerExactStr()!=null 
+				&& this.eeResult.getExtractedNONSentimentPhrasesStr()!=null)
+			return this.getTitle() + " => " + this.eeResult.getExtractedNerExactStr() + "\n" +
+			this.eeResult.getExtractedNONSentimentPhrasesStr()+"\n";
+		else 
+			if (this.paragraph!=null)
+				return this.paragraph;
+			else 
+				return this.getTitle();
 	}
 }
 

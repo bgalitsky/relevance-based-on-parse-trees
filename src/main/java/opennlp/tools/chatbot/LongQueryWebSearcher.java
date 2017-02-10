@@ -14,14 +14,19 @@ import opennlp.tools.similarity.apps.utils.PageFetcher;
 public class LongQueryWebSearcher {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.LongQueryWebSearcher");
-	private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();
+	//private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();
 	private PageFetcher pFetcher = new PageFetcher();
 	private BingQueryRunner bSearcher = new BingQueryRunner();
 	private SnippetToParagraphAndSectionHeaderContent paraFormer = new SnippetToParagraphAndSectionHeaderContent();
 
 	public List<ChatIterationResult> searchLongQuery(String queryOrig){
 		if (isProductQuery(queryOrig)){
-			return searchProductQuery(queryOrig);
+			try {
+	            List<ChatIterationResult> res =  searchProductQuery(queryOrig);
+	            return res;
+            } catch (Exception e) {
+	            LOG.info("failed product page detail extraction. Proceeding with regular extraction path.");
+            }
 		}
 
 		List<ChatIterationResult> chatIterationResults= new ArrayList<ChatIterationResult>();
@@ -47,7 +52,8 @@ public class LongQueryWebSearcher {
 				else
 					text = combineSentences(currSearchRes.getOriginalSentences());
 
-				EntityExtractionResult eeRes = extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
+				EntityExtractionResult eeRes = null; //extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
+				
 				chatIterationResults.add(new ChatIterationResult(currSearchRes, eeRes, text));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -75,22 +81,110 @@ public class LongQueryWebSearcher {
 			String amazonUrl = currSearchRes.getUrl();
 			String content = pFetcher.fetchOrigHTML( amazonUrl); //">Technical Details</h2>","\">See More</\""
 			String areaWithAttrValues = StringUtils.substringBetween(content, "Technical Details","See More");
-			String[] aVareas = areaWithAttrValues.split("\"a-nowrap\"");
-			//class="a-nowrap">Battery Average Life
-			//		</th><td>330 Photos
-			//		</td></tr>
-			for(String aVarea: aVareas){
-				String attribute = StringUtils.substringBetween(aVarea, ">", "<").trim();
-				if (attribute == null || attribute.length()<3 || (!StringUtils.isAlphanumericSpace(attribute ) ))
-					continue;
-				String value = StringUtils.substringBetween(aVarea, "<td>", "</td>").trim();
-				if (value == null || value.length()<1 || (!StringUtils.isAlphanumericSpace(value ) ))
-					continue;
-				ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
-				result.setParagraph(attribute + " : " + value );
-				result.setTitle(attribute);
-				chatIterationResults.add(result);
+			if (areaWithAttrValues!=null){
+				String[] aVareas = areaWithAttrValues.split("\"a-nowrap\"");
+				//class="a-nowrap">Battery Average Life
+				//		</th><td>330 Photos
+				//		</td></tr>
+				for(String aVarea: aVareas){
+					String attribute = StringUtils.substringBetween(aVarea, ">", "<").trim();
+					if (attribute == null || attribute.length()<3 || (!StringUtils.isAlphanumericSpace(attribute ) ))
+						continue;
+					String value = StringUtils.substringBetween(aVarea, "<td>", "</td>").trim();
+					if (value == null || value.length()<1 || (!StringUtils.isAlphanumericSpace(value ) ))
+						continue;
+					value = extractValueFromHTML(value);
+					ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
+					result.setParagraph(attribute + " : " + value );
+					result.setTitle(attribute);
+					chatIterationResults.add(result);
+				}
+				if (!chatIterationResults.isEmpty())
+					return chatIterationResults;
 			}
+				areaWithAttrValues = StringUtils.substringBetween(content, "Product Information","Additional Information");
+				if (areaWithAttrValues!=null){
+					String[] aVareas = areaWithAttrValues.split("prodDetSectionEntry");
+					//class="a-nowrap">Battery Average Life
+					//		</th><td>330 Photos
+					//		</td></tr>
+					for(String aVarea: aVareas){
+						String attribute = StringUtils.substringBetween(aVarea, ">", "<").trim();
+						if (attribute == null || attribute.length()<3 /*|| (!StringUtils.isAlphanumericSpace(attribute ) )*/)
+							continue;
+						String value = StringUtils.substringBetween(aVarea, "<td", "</td>").trim();
+						if (value == null || value.length()<1 /*|| (!StringUtils.isAlphanumericSpace(value ) )*/)
+							continue;
+						value = extractValueFromHTML(value);
+						ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
+						result.setParagraph(attribute + " : " + value );
+						result.setTitle(attribute);
+						chatIterationResults.add(result);
+						
+					}
+					if (!chatIterationResults.isEmpty())
+						return chatIterationResults;
+				}
+				areaWithAttrValues = StringUtils.substringBetween(content, "Product Information","Customer Reviews");
+				if (areaWithAttrValues==null)
+					areaWithAttrValues = StringUtils.substringBetween(content, "Product Information",
+							"Sponsored Products Related To");
+				if (areaWithAttrValues==null)
+					areaWithAttrValues = StringUtils.substringBetween(content, "Product Information",
+							"Frequently Bought Together");
+				
+				if (areaWithAttrValues!=null){
+					String[] aVareas = areaWithAttrValues.split("prodDetSectionEntry");
+					if (aVareas==null || aVareas.length<1)
+						//<tr><td class="label">Size</td><td class="value">16-Inch Small/Medium</td></tr>
+						aVareas = areaWithAttrValues.split("class=\"label\"");
+					//class="a-nowrap">Battery Average Life
+					//		</th><td>330 Photos
+					//		</td></tr>
+					for(String aVarea: aVareas){
+						String attribute = StringUtils.substringBetween(aVarea, ">", "<");
+						if (attribute == null || attribute.length()<3 /*|| (!StringUtils.isAlphanumericSpace(attribute ) )*/)
+							continue;
+						attribute = attribute.trim(); 
+						String value = StringUtils.substringBetween(aVarea, "<td", "</td>");
+						if (value == null || value.length()<1 /*|| (!StringUtils.isAlphanumericSpace(value ) )*/)
+							continue;
+						value = extractValueFromHTML(value);
+						ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
+						result.setParagraph(attribute + " : " + value );
+						result.setTitle(attribute);
+						chatIterationResults.add(result);
+					}
+					return chatIterationResults;
+				}
+					
+				
+				
+				
+					areaWithAttrValues = StringUtils.substringBetween(content, "\">Shop now</a>","text/javascript");
+					if (areaWithAttrValues!=null){
+						String[] aVareas = areaWithAttrValues.split("attribute\"");
+						//class="a-nowrap">Battery Average Life
+						//		</th><td>330 Photos
+						//		</td></tr>
+						for(String aVarea: aVareas){
+							String attribute = StringUtils.substringBetween(aVarea, ">", "<").trim();
+							if (attribute == null || attribute.length()<3 )
+								continue;
+							String value = StringUtils.substringBetween(aVarea, "<td", "</td>").trim();
+							if (value == null || value.length()<1 /*|| (!StringUtils.isAlphanumericSpace(value ) )*/)
+								continue;
+							value = extractValueFromHTML(value);
+										
+							ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
+							result.setParagraph(attribute + " : " + value );
+							result.setTitle(attribute);
+							chatIterationResults.add(result);
+						}
+						return chatIterationResults;	
+					}
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -99,6 +193,17 @@ public class LongQueryWebSearcher {
 		return chatIterationResults;
 	}
 
+	private String extractValueFromHTML(String value){
+		int posStart = value.indexOf("\">");
+		if (posStart>0){
+			value = value.substring(posStart+3, value.length());
+		}
+		String valueReduced = StringUtils.substringBetween(value, ">", "<");
+		if (valueReduced!=null && valueReduced.length()>3)
+			value = valueReduced;
+		value = value.trim();
+		return value;
+	}
 
 	private String combineSentences(List<String> originalSentences) {
 		StringBuffer res = new StringBuffer();
@@ -132,7 +237,19 @@ public class LongQueryWebSearcher {
 
 	public static void main(String[] args){
 		String queryOrig = //"can I pay with one credit card for another";
-				"Sony DSC RX100 Sensor Digital Camera";
+				//"Sony DSC RX100 Sensor Digital Camera";
+				//"Acer V173 Djb 17-Inch LCD Monitor";
+				//"CUK HP 15z White Silver Student Notebook";
+				//"LG 24UD58-B 24-Inch 4K UHD IPS Monitor";
+				//"Kindle E-reader - Black Glare-Free Touchscreen Display";
+				//"HP OfficeJet Pro 6968 Wireless All-in-One Photo Printer ";
+		//"Brother FAX-2840 High Speed Mono Laser Fax Machine";
+			//	"Dell Inspiron 24 3000 Series All-In-One";
+			//	"Crucial 8GB Single DDR3L  Laptop Memory"; 
+			//	"Avera 32AER10N LED-LCD HDTV";
+			//	"Escort Passport 9500IX Radar Detector"; 
+			//	"Motorola Moto E Android Prepaid Phone";
+				"PUBLIC Bikes Women C1 Dutch  City Bike";
 		LongQueryWebSearcher searcher = new LongQueryWebSearcher();
 		List<ChatIterationResult> res = searcher.searchLongQuery(queryOrig);
 		System.out.println(res);

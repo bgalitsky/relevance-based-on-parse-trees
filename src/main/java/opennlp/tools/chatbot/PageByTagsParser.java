@@ -36,34 +36,33 @@ public class PageByTagsParser {
         }
     	  Elements h1links = doc.body().getElementsByTag("h1");
           for (Element link : h1links) {
-          	print("h1 :  %s", link);
+          	//print("h1 :  %s", link);
           	if (isAcceptable(link.toString()))
           		results.add(link.text());
           }
           
           Elements h2links = doc.body().getElementsByTag("h2");
           for (Element link : h2links) {
-          	print("h2 :  %s", link);
+          	//print("h2 :  %s", link);
           	if (isAcceptable(link.toString()))
           		results.add(link.text());
           }
           
           Elements h3links = doc.body().getElementsByTag("h3");
           for (Element link : h3links) {
-          	print("h3 :  %s", link);
+          	//print("h3 :  %s", link);
           	if (isAcceptable(link.toString()))
           		results.add(link.text());
           }
           Elements h4links = doc.body().getElementsByTag("h4");
           for (Element link : h4links) {
-          	print("h4 :  %s", link);
+          	//print("h4 :  %s", link);
           	if (isAcceptable(link.toString()))
           		results.add(link.text());
           }
           return results;
     }
-    
-    
+     
 	private boolean isAcceptable(String text) {
 		text = text.toLowerCase();
 		if (text.indexOf("class")>-1)
