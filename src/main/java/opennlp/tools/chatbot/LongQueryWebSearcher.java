@@ -1,10 +1,16 @@
 package opennlp.tools.chatbot;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 
 import opennlp.tools.parse_thicket.opinion_processor.EntityExtractionResult;
 import opennlp.tools.similarity.apps.BingQueryRunner;
@@ -14,10 +20,12 @@ import opennlp.tools.similarity.apps.utils.PageFetcher;
 public class LongQueryWebSearcher {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.LongQueryWebSearcher");
-	//private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();
+	private TopicExtractorFromSearchResult extractor = new TopicExtractorFromSearchResult();
 	private PageFetcher pFetcher = new PageFetcher();
 	private BingQueryRunner bSearcher = new BingQueryRunner();
 	private SnippetToParagraphAndSectionHeaderContent paraFormer = new SnippetToParagraphAndSectionHeaderContent();
+	private Tika tika = new Tika();
+	private int queryType;
 
 	public List<ChatIterationResult> searchLongQuery(String queryOrig){
 		if (isProductQuery(queryOrig)){
@@ -52,7 +60,7 @@ public class LongQueryWebSearcher {
 				else
 					text = combineSentences(currSearchRes.getOriginalSentences());
 
-				EntityExtractionResult eeRes = null; //extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
+				EntityExtractionResult eeRes = extractor.extractEntitiesSubtractOrigQuery(text, queryOrig);
 				
 				chatIterationResults.add(new ChatIterationResult(currSearchRes, eeRes, text));
 			} catch (Exception e) {
@@ -63,6 +71,11 @@ public class LongQueryWebSearcher {
 	}
 
 	private boolean isProductQuery(String queryOrig) {
+		if (this.queryType!=0)
+			return false;
+		if (queryOrig.toLowerCase().startsWith("product:"))
+			return true;
+		
 		String[] terms = queryOrig.split(" ");
 		for(String t: terms){
 			if (!StringUtils.isAlpha(t) || StringUtils.isAllUpperCase(t))
@@ -73,14 +86,18 @@ public class LongQueryWebSearcher {
 
 	public List<ChatIterationResult> searchProductQuery(String queryOrig){
 		List<ChatIterationResult> chatIterationResults= new ArrayList<ChatIterationResult>();
+		queryOrig = queryOrig.replace("product:", "");		
 
-		List<HitBase> results = bSearcher.runSearch("site:www.amazon.com "+ queryOrig, 6), augmResults = new ArrayList<HitBase>() ;
-		// populate with orig text
+		List<HitBase> results = bSearcher.runSearch("site:www.amazon.com "+ queryOrig, 6);
 		HitBase currSearchRes = results.get(0);
 		try {
 			String amazonUrl = currSearchRes.getUrl();
 			String content = pFetcher.fetchOrigHTML( amazonUrl); //">Technical Details</h2>","\">See More</\""
+			String cleanedContent = getCleanedContentFromHTML(content);
 			String areaWithAttrValues = StringUtils.substringBetween(content, "Technical Details","See More");
+			if (areaWithAttrValues ==null)
+				areaWithAttrValues = StringUtils.substringBetween(content, "Technical Details","Product Description");
+			
 			if (areaWithAttrValues!=null){
 				String[] aVareas = areaWithAttrValues.split("\"a-nowrap\"");
 				//class="a-nowrap">Battery Average Life
@@ -91,12 +108,13 @@ public class LongQueryWebSearcher {
 					if (attribute == null || attribute.length()<3 || (!StringUtils.isAlphanumericSpace(attribute ) ))
 						continue;
 					String value = StringUtils.substringBetween(aVarea, "<td>", "</td>").trim();
-					if (value == null || value.length()<1 || (!StringUtils.isAlphanumericSpace(value ) ))
+					if (value == null || value.length()<1 /*|| (!StringUtils.isAlphanumericSpace(value ) )*/)
 						continue;
 					value = extractValueFromHTML(value);
 					ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
 					result.setParagraph(attribute + " : " + value );
 					result.setTitle(attribute);
+					result.setPageContentCleaned(cleanedContent);
 					chatIterationResults.add(result);
 				}
 				if (!chatIterationResults.isEmpty())
@@ -119,6 +137,7 @@ public class LongQueryWebSearcher {
 						ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
 						result.setParagraph(attribute + " : " + value );
 						result.setTitle(attribute);
+						result.setPageContentCleaned(cleanedContent);
 						chatIterationResults.add(result);
 						
 					}
@@ -135,7 +154,7 @@ public class LongQueryWebSearcher {
 				
 				if (areaWithAttrValues!=null){
 					String[] aVareas = areaWithAttrValues.split("prodDetSectionEntry");
-					if (aVareas==null || aVareas.length<1)
+					if (aVareas==null || aVareas.length<2)
 						//<tr><td class="label">Size</td><td class="value">16-Inch Small/Medium</td></tr>
 						aVareas = areaWithAttrValues.split("class=\"label\"");
 					//class="a-nowrap">Battery Average Life
@@ -153,14 +172,12 @@ public class LongQueryWebSearcher {
 						ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
 						result.setParagraph(attribute + " : " + value );
 						result.setTitle(attribute);
+						result.setPageContentCleaned(cleanedContent);
 						chatIterationResults.add(result);
 					}
-					return chatIterationResults;
+					if (!chatIterationResults.isEmpty())
+						return chatIterationResults;
 				}
-					
-				
-				
-				
 					areaWithAttrValues = StringUtils.substringBetween(content, "\">Shop now</a>","text/javascript");
 					if (areaWithAttrValues!=null){
 						String[] aVareas = areaWithAttrValues.split("attribute\"");
@@ -179,24 +196,46 @@ public class LongQueryWebSearcher {
 							ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
 							result.setParagraph(attribute + " : " + value );
 							result.setTitle(attribute);
+							result.setPageContentCleaned(cleanedContent);
 							chatIterationResults.add(result);
 						}
-						return chatIterationResults;	
+						if (!chatIterationResults.isEmpty())
+							return chatIterationResults;	
 					}
+						areaWithAttrValues = StringUtils.substringBetween(content, "Product Details","Sponsored Products Related");
+						if (areaWithAttrValues!=null){
+							//<li><b>Domestic Shipping: </b>Item can be shipped within U.S.</li>
+							String[] aVareas = areaWithAttrValues.split("<li>");
 
-
+							for(String aVarea: aVareas){
+								String attribute = StringUtils.substringBetween(aVarea, "<b>", ":").trim();
+								if (attribute == null || attribute.length()<3 )
+									continue;
+								String value = StringUtils.substringBetween(aVarea, "</b>", "</li>").trim();
+								if (value == null || value.length()<1)
+									continue;
+								value = extractValueFromHTML(value);
+											
+								ChatIterationResult result = new ChatIterationResult(currSearchRes, null, areaWithAttrValues);
+								result.setParagraph(attribute + " : " + value );
+								result.setTitle(attribute);
+								result.setPageContentCleaned(cleanedContent);
+								chatIterationResults.add(result);
+							}
+							if (!chatIterationResults.isEmpty())
+								return chatIterationResults;	
+							
+					}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
 		return chatIterationResults;
 	}
 
 	private String extractValueFromHTML(String value){
 		int posStart = value.indexOf("\">");
 		if (posStart>0){
-			value = value.substring(posStart+3, value.length());
+			value = value.substring(posStart+2, value.length());
 		}
 		String valueReduced = StringUtils.substringBetween(value, ">", "<");
 		if (valueReduced!=null && valueReduced.length()>3)
@@ -234,7 +273,20 @@ public class LongQueryWebSearcher {
 		// we need to put '.'
 		return pageContent;
 	}
+	
+	private String getCleanedContentFromHTML(String rawContent){
+	String content = null;
 
+		try {
+			InputStream stream = new ByteArrayInputStream(rawContent.getBytes(StandardCharsets.UTF_8));
+			content = tika.parseToString(stream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TikaException e) {
+			e.printStackTrace();
+		}
+		return content;
+	}
 	public static void main(String[] args){
 		String queryOrig = //"can I pay with one credit card for another";
 				//"Sony DSC RX100 Sensor Digital Camera";
@@ -249,9 +301,19 @@ public class LongQueryWebSearcher {
 			//	"Avera 32AER10N LED-LCD HDTV";
 			//	"Escort Passport 9500IX Radar Detector"; 
 			//	"Motorola Moto E Android Prepaid Phone";
-				"PUBLIC Bikes Women C1 Dutch  City Bike";
+			//	"PUBLIC Bikes Women C1 Dutch  City Bike";
+			//	"Schwinn Women's Wayfare Hybrid Bike";
+			//	"Outmate 6 pcs Aluminum D-ring Locking Carabiner";
+			//	"Venture's Pal Lightweight Packable Durable Hiking Backpack";
+			//"Triple Eight Helmet with Sweatsaver Liner 123";
+				"Sony HD Video Recording HDRCX405";
 		LongQueryWebSearcher searcher = new LongQueryWebSearcher();
 		List<ChatIterationResult> res = searcher.searchLongQuery(queryOrig);
 		System.out.println(res);
 	}
+
+	public void setQueryType(int queryType) {
+	    this.queryType = queryType;
+	    
+    }
 }

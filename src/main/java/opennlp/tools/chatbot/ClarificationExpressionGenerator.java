@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
+import opennlp.tools.textsimilarity.TextProcessor;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -20,6 +21,83 @@ public class ClarificationExpressionGenerator {
 	public String clarificationQuery;
 	public String latestAnswer;
 	public String domain;
+	public String currentEntity = null;
+
+	public static Logger getLOG() {
+		return LOG;
+	}
+
+	public static void setLOG(Logger lOG) {
+		LOG = lOG;
+	}
+
+	public List<ChatIterationResult> getAnswerAndClarificationOptions() {
+		return answerAndClarificationOptions;
+	}
+
+	public void setAnswerAndClarificationOptions(List<ChatIterationResult> answerAndClarificationOptions) {
+		this.answerAndClarificationOptions = answerAndClarificationOptions;
+	}
+
+	public String getOriginalQuestion() {
+		return originalQuestion;
+	}
+
+	public void setOriginalQuestion(String originalQuestion) {
+		this.originalQuestion = originalQuestion;
+	}
+
+	public int getCurrBestIndex() {
+		return currBestIndex;
+	}
+
+	public void setCurrBestIndex(int currBestIndex) {
+		this.currBestIndex = currBestIndex;
+	}
+
+	public String getClarificationQuery() {
+		return clarificationQuery;
+	}
+
+	public void setClarificationQuery(String clarificationQuery) {
+		this.clarificationQuery = clarificationQuery;
+	}
+
+	public String getLatestAnswer() {
+		return latestAnswer;
+	}
+
+	public void setLatestAnswer(String latestAnswer) {
+		this.latestAnswer = latestAnswer;
+	}
+
+	public String getCurrentEntity() {
+		return currentEntity;
+	}
+
+	public void setCurrentEntity(String currentEntity) {
+		this.currentEntity = currentEntity;
+	}
+
+	public StringDistanceMeasurer getMeas() {
+		return meas;
+	}
+
+	public void setMeas(StringDistanceMeasurer meas) {
+		this.meas = meas;
+	}
+
+	public static String[] getClarifPrefixes() {
+		return clarifPrefixes;
+	}
+
+	public static void setClarifPrefixes(String[] clarifPrefixes) {
+		ClarificationExpressionGenerator.clarifPrefixes = clarifPrefixes;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
 
 	// processors for use
 	private StringDistanceMeasurer meas = new StringDistanceMeasurer();
@@ -39,10 +117,13 @@ public class ClarificationExpressionGenerator {
 		currBestIndex = -1;
 		clarificationQuery = null;
 		domain="";
+		currentEntity = null;
 	}
+	
 	public String generateClarification(String query, List<ChatIterationResult> searchRes0) {
 		if (searchRes0.isEmpty())
 			return "I got stuck searching for results, going back ...";
+
 		
 		//getEeResult() == null, then not canonical search path
 		if (searchRes0.get(0).getEeResult()==null) // not real search results, then expect clarification in title
@@ -57,6 +138,8 @@ public class ClarificationExpressionGenerator {
 			}
 			this.originalQuestion = query;
 			answerAndClarificationOptions = searchRes0;
+			// TODO: we assume no noise keywords in  the query such as "tell me about ..."
+			currentEntity = query;
 			return clarification;
 		}
 					
@@ -246,6 +329,8 @@ public class ClarificationExpressionGenerator {
 
 	public String matchUserResponseWithGeneratedOptions(String query) {
 		this.clarificationQuery = query;
+		if (StringUtils.isEmpty(query))
+			return answerAndClarificationOptions.get(0).paragraph;
 
 		if (StringUtils.isNumeric(query)){
 			int bestIndex = Integer.parseInt(query);
@@ -296,11 +381,33 @@ public class ClarificationExpressionGenerator {
 		
 		return answerAndClarificationOptions.get(bestIndex).paragraph;
 	}
-	public void setDomain(String domain) {
-	    // TODO Auto-generated method stub
-	    
+	public void setDomain(String domainCurr) {
+	    this.domain = domainCurr;	    
     }
 
+	public String searchProductPage(String query){
+		int endOfPageSearchQueryPos = -1;
+		String[] endOfPageSearchQueryMarker = new String[]{"this","that", " it", "product", "item", "this thing"}; 
+		for(String e: endOfPageSearchQueryMarker){
+			endOfPageSearchQueryPos = query.indexOf(e);
+			if (endOfPageSearchQueryPos>3){
+				query = query.substring(0, endOfPageSearchQueryPos);
+			}
+		}
+		String cleanContent = this.answerAndClarificationOptions.get(0).getPageContentCleaned();
+		List<String> sents = TextProcessor.splitToSentences(cleanContent);
+		double bestSim = -1; String bestS=null;
+		for(String s: sents){
+			double scoreCurr = meas.measureStringDistance(s, query);
+			if (scoreCurr>bestSim){
+				bestSim=scoreCurr;
+				bestS = s;
+			}
+		}
+		
+		String cleanedSent = bestS.replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
+		return bestS;
+	}
 }
 
 /*

@@ -8,7 +8,21 @@ public class ChatIterationResult extends HitBase {
 	public String paragraph;
 	public String selectedClarificationPhrase;
 	public String firstClarificationPhrase;
+	public String pageContentCleaned;
+	
 
+	public String getFirstClarificationPhrase() {
+		return firstClarificationPhrase;
+	}
+	public void setFirstClarificationPhrase(String firstClarificationPhrase) {
+		this.firstClarificationPhrase = firstClarificationPhrase;
+	}
+	public String getPageContentCleaned() {
+		return pageContentCleaned;
+	}
+	public void setPageContentCleaned(String pageContentCleaned) {
+		this.pageContentCleaned = pageContentCleaned;
+	}
 	public EntityExtractionResult getEeResult() {
 		return eeResult;
 	}
