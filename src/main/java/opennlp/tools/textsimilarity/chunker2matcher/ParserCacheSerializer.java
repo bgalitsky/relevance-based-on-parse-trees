@@ -57,6 +57,9 @@ public class ParserCacheSerializer {
   private static String RESOURCE_DIR = "src/test/resources/";
   public static String parseCacheFileName = "sentence_parseObject.dat";
   public static String parseCacheFileNameCSV = "sentence_parseObject.csv";
+  public static void setCacheFileName(String fileName){
+	  parseCacheFileName = fileName;
+  }
 
   public static void writeObject(Object objectToSerialize) {
     if (javaObjectSerialization) {

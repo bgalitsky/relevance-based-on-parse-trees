@@ -206,7 +206,7 @@ public class ClarificationExpressionGenerator {
 				}
 
 				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
-				if  (sectionHeaderContent!=null){
+				if  (sectionHeaderContent!=null && clarificationStr.length()<150){
 					Set<String> headers = sectionHeaderContent.keySet();
 					if (!headers.isEmpty()){
 						clarificationStr+= "\nThese are the other areas of interest:";
@@ -236,7 +236,9 @@ public class ClarificationExpressionGenerator {
 				}
 
 				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
-				if  (sectionHeaderContent!=null){
+				// too short clarification str so far
+				if  (sectionHeaderContent!=null && clarificationStr.length()<150
+						){
 					Set<String> headers = sectionHeaderContent.keySet();
 					if (!headers.isEmpty()){
 						clarificationStr+= "\nThese are the other areas of interest:";
@@ -408,6 +410,8 @@ public class ClarificationExpressionGenerator {
 		String cleanedSent = bestS.replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
 		return bestS;
 	}
+
+
 }
 
 /*

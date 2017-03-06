@@ -10,11 +10,13 @@ import java.util.logging.Logger;
 
 import opennlp.tools.chatbot.ChatIterationResult;
 import opennlp.tools.chatbot.SearchSessionManager;
+import opennlp.tools.chatbot.WebSearcherWrapper;
 import opennlp.tools.textsimilarity.TextProcessor;
 
 public class SearchSessionManagerWrapper extends SearchSessionManager {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.SearchSessionManagerWrapper");
+	WebSearcherWrapper searcherWithCaching = WebSearcherWrapper.getInstance();
 
 	public void reset(){
 		queryType = 0;
@@ -28,8 +30,8 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 		try {
 			if (query.equals("q"))
 				System.exit(0);
-			
-			if (query.toLowerCase().startsWith("change topic")){
+
+			if (query.toLowerCase().startsWith("change topic") ||query.toLowerCase().startsWith("new question") ){
 				queryType = 0;
 				clarificationExpressionGenerator.reset();
 				resp.responseMessage = "You can ask a NEW question now";
@@ -38,8 +40,19 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 
 			if (queryType == 0) {
 				//clarificationExpressionGenerator.reset();
+				
+				if (query.toLowerCase().startsWith("anything") || 
+						query.toLowerCase().indexOf(" up to")>-1 || query.toLowerCase().indexOf("what's up")>-1 
+						|| query.toLowerCase().indexOf(" want me to know")>-1){
+					queryType = 6;
+					resp.responseMessage = searcherWithCaching.produceAlertForRandomTopic();
+					queryType = 0;
+					logSilent("Now you can ask a NEW question");
+					resp.responseMessage += "\nNow you can ask a NEW question";
+					return resp;
+				}
 
-				List<ChatIterationResult> searchRes = searcher.searchLongQuery(query);
+				List<ChatIterationResult> searchRes = searcherWithCaching.searchLongQuery(query);
 				String clarificationStr = clarificationExpressionGenerator.generateClarification(query, searchRes);
 				// no clarification needed, so just give response as a first paragraph text
 				if (clarificationStr==null){ 
@@ -85,13 +98,13 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 					return resp;
 				}
 				else if (queryType == 3 && query.toLowerCase().indexOf("reduce ")>-1){
-					searcher.setQueryType(queryType);
+					searcherWithCaching.setQueryType(queryType);
 					queryType = 0;
 					String domain = extractDomainFromQuery(query);
 					logSilent("We are now trying to use the constraint on the domain " + domain);
 					clarificationExpressionGenerator.setDomain(domain);
-					List<ChatIterationResult> searchRes = searcher.searchLongQuery(clarificationExpressionGenerator.originalQuestion +
-							" site:"+domain);
+					List<ChatIterationResult> searchRes = searcherWithCaching.searchLongQuery(clarificationExpressionGenerator.originalQuestion +
+							" site:"+domain, 1);
 					logSilent(getAnswerNum(0, searchRes));
 					queryType = 0;
 					logSilent("Now you can ask a NEW question");
@@ -149,15 +162,36 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 					queryType = 0;
 					logSilent("\nNow you can ask a NEW question");
 					resp.responseMessage = "\nNow you can ask a NEW question";
-				} else {
-					String productPageSeaarchResult = clarificationExpressionGenerator.searchProductPage(query);
+
+				} else if (query.toLowerCase().startsWith("go beyond")){ // do external search on this product
+					resp.responseMessage = "Please formulate a query to search opinion/review sources\n";
+					queryType = 5;
+				} else if (query.toLowerCase().startsWith("come back")){
+					resp.responseMessage = "Please formulate a query to search the product page\n";
+				}
+				// do page search
+				else {
+					String productPageSearchResult = clarificationExpressionGenerator.searchProductPage(query);
 					resp.responseMessage = "Let me tell you more about "+clarificationExpressionGenerator.currentEntity + "\n";
-					resp.responseMessage += productPageSeaarchResult +
-							"\n More questions about this product?\n";
+					resp.responseMessage += productPageSearchResult +
+							"\n More questions about this product? or Go beyond the product page?\n";
 				}
 				return resp;
 			}
+			if (queryType == 5){ 
+				if (query.toLowerCase().startsWith("more questions") || query.toLowerCase().startsWith("keep searching")){
+					resp.responseMessage = "Please formulate a query to search opinion/review sources again\n";
+				}
 
+				else {//opinionated external source search
+					String opinionPageSearchResult = searcherWithCaching.searchExternalOpinionPage(query);
+					resp.responseMessage = "Let me tell you more about "+clarificationExpressionGenerator.currentEntity + "\n";
+					resp.responseMessage += opinionPageSearchResult +
+							"\n More questions about this product? Come back to product page? or Keep searching beyond the product page?\n";
+					queryType = 4;
+				}
+			}
+			
 		} catch (Exception ioe) {
 			ioe.printStackTrace();
 		}
@@ -181,8 +215,8 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 	}
 
 	private void logSilent(String msg) {
-		String version = "ver0.8";
-		LOG.info(version  + " | " + msg); 
+		//String version = "ver0.8";
+		//LOG.info(version  + " | " + msg); 
 	}
 
 	public static void main(String[] args){

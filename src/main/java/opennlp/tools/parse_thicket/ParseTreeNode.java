@@ -1,10 +1,11 @@
 package opennlp.tools.parse_thicket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ParseTreeNode implements IGeneralizer<ParseTreeNode>{
+public class ParseTreeNode implements IGeneralizer<ParseTreeNode>, Serializable{
 	String word; // word in normal form, lemma
 	// this is the POS tag of the token
 	String pos; 

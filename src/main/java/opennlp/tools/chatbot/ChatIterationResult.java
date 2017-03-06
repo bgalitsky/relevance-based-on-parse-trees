@@ -1,9 +1,13 @@
 package opennlp.tools.chatbot;
 
+import java.io.Serializable;
+
 import opennlp.tools.parse_thicket.opinion_processor.EntityExtractionResult;
 import opennlp.tools.similarity.apps.HitBase;
 
-public class ChatIterationResult extends HitBase {
+public class ChatIterationResult extends HitBase implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 	public EntityExtractionResult eeResult;
 	public String paragraph;
 	public String selectedClarificationPhrase;

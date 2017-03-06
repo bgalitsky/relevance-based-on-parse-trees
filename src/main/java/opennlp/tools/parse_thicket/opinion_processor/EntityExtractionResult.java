@@ -1,11 +1,12 @@
 package opennlp.tools.parse_thicket.opinion_processor;
 
+import java.io.Serializable;
 import java.util.List;
 
 import opennlp.tools.parse_thicket.ParseTreeNode;
 import opennlp.tools.similarity.apps.HitBase;
 
-public class EntityExtractionResult {
+public class EntityExtractionResult implements Serializable{
 	List<List<ParseTreeNode>> extractedNERs;
 	public List<String> extractedNERWords;
 	// phrases w/sentiments

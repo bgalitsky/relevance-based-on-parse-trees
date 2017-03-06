@@ -17,6 +17,7 @@
 
 package opennlp.tools.similarity.apps;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
 
 import org.apache.commons.lang.StringUtils;
 
-public class HitBase {
+public class HitBase implements Serializable{
 	private static final Logger LOG = Logger
 			.getLogger("opennlp.tools.similarity.apps.HitBase");
 
