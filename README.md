@@ -8,6 +8,7 @@ It is leveraged in search, content generation & enrichment, chat bots and other 
 OpenNLP.Similarity is an NLP engine which solves a number of text processing and search tasks based on OpenNLP and Stanford NLP parsers. It is designed to be used by a non-linguist software engineer to build linguistically-enabled: 
 <ul>
 <li>search engines</li>
+<li>chat bots</li>
 <li>recommendation systems</li>
 <li>dialogue systems</li>
 <li>text analysis and semantic processing engines</li>
@@ -55,6 +56,14 @@ OpenNLP similarity provides a series of techniques to support the overall conten
 ## Creating a simple project
 
   Create a project from [MyMatcher.java](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/MyMatcher.java).  
+  
+## Running a chat bot
+ First you need to set the resource directory. The simplest way is to download and unzip it from [here](https://1drv.ms/u/s!AlZzGY7TCKAChBamWca4TM1koMn6).
+ Then get a chat bot jar from [here](https://drive.google.com/open?id=0B-TymkYCBPsfZzFhQmNVQUtaTnc).
+ To run it (once the resource directory is set): java -jar cb<version>jar
+ It will take you to the prompt ">" to type your query.
+ An example session is in [examples] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/botSessionExample.rtf).
+ The entry point for chat bot integration is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/faq_bot/src/main/java/opennlp/tools/chatbot/wrapper)
  
 ## Engines and Systems of OpenNLP.Similarity
 
