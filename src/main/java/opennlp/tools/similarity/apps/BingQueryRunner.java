@@ -26,7 +26,8 @@ public class BingQueryRunner {
 
 	// request string
 	final String bingUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/search?q=", 
-			bingImageUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/images/search?q=";
+			bingImageUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/images/search?q=",
+			bingNewsUrlPattern ="https://api.cognitive.microsoft.com/bing/v5.0/news/search?q=";
 
 	// Main entry point. The same function from ver 3 but now new authentication and new reqiest string
 	public List<HitBase> runSearch(String queryOrig){
@@ -134,7 +135,7 @@ public class BingQueryRunner {
 					d = json.getJSONObject("webPages");
 					JSONArray results = d.getJSONArray("value");
 					int resultsLength = results.length();
-					for (int i = 0; i < resultsLength; i++) {
+					for (int i = 0; i < resultsLength && i< count; i++) {
 						final JSONObject aResult = results.getJSONObject(i);
 						HitBase sr = new HitBase();
 						sr.setDisplayUrl(aResult.getString("displayUrl"));
@@ -152,7 +153,7 @@ public class BingQueryRunner {
 					d = json.getJSONObject("relatedSearches");
 					JSONArray results = d.getJSONArray("value");
 					int resultsLength = results.length();
-					for (int i = 0; i < resultsLength; i++) {
+					for (int i = 0; i < resultsLength && i< count; i++) {
 						final JSONObject aResult = results.getJSONObject(i);
 						HitBase sr = new HitBase();
 						sr.setDisplayUrl(aResult.getString("webSearchUrl"));
@@ -175,6 +176,7 @@ public class BingQueryRunner {
 		return sresults;
 	}
 
+	
 	/*
 	 * "url": "https:\/\/www.bing.com\/cr?IG=68108732D8B34F73BA8717948A600CA8&CID=30FA793A2D26674C1E5F70C52C1766BD&rd=1&h=hC5Q6GkMgH2EyLdypYCuB1wVKEFjpSZF8haOW1hhq_U&v=1&
 	 * r=https%3a%2f%2fwww.quora.com%2fHow-do-I-pay-my-credit-card-bill-with-another-credit-card
@@ -227,6 +229,78 @@ public class BingQueryRunner {
 		}
 		return sresults;
 	}
+	
+	public List<HitBase> runNewsSearch(String queryOrig, int count){
+		List<HitBase> sresults = new ArrayList<HitBase>();
+		String query = "";
+		try {
+			query = URLEncoder.encode(queryOrig, Charset.defaultCharset().name());
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String bingUrl = String.format(bingNewsUrlPattern, query);
+		URL url;
+		URLConnection connection = null;
+		try {
+			url = new URL(bingUrl+query);
+			connection = url.openConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		connection.setRequestProperty("Ocp-Apim-Subscription-Key", accountKey);
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			try {
+				JSONObject json = new JSONObject(response.toString());
+				JSONObject d = null;
+				if (json.has("value")){
+					JSONArray results = json.getJSONArray("value");
+					int resultsLength = results.length();
+					for (int i = 0; i < resultsLength; i++) {
+						final JSONObject aResult = results.getJSONObject(i);
+						HitBase sr = new HitBase();
+						//sr.setDisplayUrl(aResult.getString("displayUrl"));
+
+						String encUrlFull = aResult.getString("url");
+						String encUrl = StringUtils.substringBetween(encUrlFull, "r=", "&");
+						String decodedURL = java.net.URLDecoder.decode(encUrl, "UTF-8");
+						sr.setUrl(decodedURL);
+						sr.setAbstractText(aResult.getString("description"));
+						sr.setTitle(aResult.getString("name"));
+						sresults.add(sr);
+					}
+				}
+				else  if (json.has("relatedSearches")){
+					d = json.getJSONObject("relatedSearches");
+					JSONArray results = d.getJSONArray("value");
+					int resultsLength = results.length();
+					for (int i = 0; i < resultsLength; i++) {
+						final JSONObject aResult = results.getJSONObject(i);
+						HitBase sr = new HitBase();
+						sr.setDisplayUrl(aResult.getString("webSearchUrl"));
+
+						String encUrlFull = aResult.getString("webSearchUrl");
+						String encUrl = StringUtils.substringBetween(encUrlFull, "r=", "&");
+						String decodedURL = java.net.URLDecoder.decode(encUrl, "UTF-8");
+						sr.setUrl(decodedURL);
+						sr.setAbstractText(aResult.getString("displayText"));
+						sr.setTitle(aResult.getString("text"));
+						sresults.add(sr);
+					}
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return sresults;
+	}
 
 	public void setKey(String key){
 		accountKey=key;
@@ -237,8 +311,9 @@ public class BingQueryRunner {
 
 	public static void main(String[] args){
 		// run search and print all results in a  line
-		System.out.println(new BingQueryRunner().runSearch("can I pay with one credit card for another"));
-		System.out.println(new BingQueryRunner().runImageSearch("latest iphone"));
+		System.out.println(new BingQueryRunner().runNewsSearch("credit card rate", 2));
+		//System.out.println(new BingQueryRunner().runSearch("can I pay with one credit card for another"));
+		//System.out.println(new BingQueryRunner().runImageSearch("latest iphone"));
 	}
 
 

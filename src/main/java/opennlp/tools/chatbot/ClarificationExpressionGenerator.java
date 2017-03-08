@@ -108,7 +108,7 @@ public class ClarificationExpressionGenerator {
 
 	private static String[] clarifPrefixes = new String[] { "Possibly associated with :'", "Possible related to :'",
 		"Did you mean: '", "Or is it about :'", "Could be connected with: '", "It can be related to :'",
-		"Purhaps it is concerning: '"
+		"Perhaps it is concerning: '"
 	};
 
 	public void reset(){
@@ -397,18 +397,21 @@ public class ClarificationExpressionGenerator {
 			}
 		}
 		String cleanContent = this.answerAndClarificationOptions.get(0).getPageContentCleaned();
-		List<String> sents = TextProcessor.splitToSentences(cleanContent);
-		double bestSim = -1; String bestS=null;
-		for(String s: sents){
-			double scoreCurr = meas.measureStringDistance(s, query);
-			if (scoreCurr>bestSim){
-				bestSim=scoreCurr;
-				bestS = s;
+		if (cleanContent  != null){
+			List<String> sents = TextProcessor.splitToSentences(cleanContent);
+			double bestSim = -1; String bestS=null;
+			for(String s: sents){
+				double scoreCurr = meas.measureStringDistance(s, query);
+				if (scoreCurr>bestSim){
+					bestSim=scoreCurr;
+					bestS = s;
+				}
 			}
+			
+			String cleanedSent = bestS.replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
+			return cleanedSent;
 		}
-		
-		String cleanedSent = bestS.replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
-		return bestS;
+		else return null;
 	}
 
 

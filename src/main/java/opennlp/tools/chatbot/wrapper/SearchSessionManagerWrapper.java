@@ -118,7 +118,7 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 					List<ChatIterationResult>  searchRes = searcher.searchLongQuery(clarificationExpressionGenerator.originalQuestion+  " " +
 							clarificationExpressionGenerator.clarificationQuery);
 					logSilent("I think you will find this information useful:");
-					resp.responseMessage = "We are now trying to use the constrainst from your previous replies..." +
+					resp.responseMessage = "We are now trying to use the constraints from your previous replies..." +
 							"\nI think you will find this information useful:\n";
 
 					for(int i=0; i< searchRes.size(); i++){
@@ -135,7 +135,12 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 				} 
 				else if (queryType == 3 && isSameEntityQuery(query)){
 					queryType = 4;
-					String productPageSeaarchResult = clarificationExpressionGenerator.searchProductPage(query);
+					String productPageSeaarchResult = "";
+                    try {
+	                    productPageSeaarchResult = clarificationExpressionGenerator.searchProductPage(query);
+                    } catch (Exception e) {
+	                    e.printStackTrace();
+                    }
 
 					resp.responseMessage = "Let me tell you more about "+clarificationExpressionGenerator.currentEntity + "\n";
 
