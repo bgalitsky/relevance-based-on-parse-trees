@@ -62,7 +62,7 @@ OpenNLP similarity provides a series of techniques to support the overall conten
  Then get a chat bot jar from [here](https://drive.google.com/open?id=0B-TymkYCBPsfZzFhQmNVQUtaTnc).
  To run it (once the resource directory is set): java -jar cb<version>jar
  It will take you to the prompt ">" to type your query.
- An example session is in [examples] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/botSessionExample.rtf).
+ An example session is in [examples] (https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/master/examples/botSessionExample.txt).
  The entry point for chat bot integration is [here](https://github.com/bgalitsky/relevance-based-on-parse-trees/tree/faq_bot/src/main/java/opennlp/tools/chatbot/wrapper)
  
 ## Engines and Systems of OpenNLP.Similarity
