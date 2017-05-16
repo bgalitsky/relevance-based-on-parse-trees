@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import opennlp.tools.stemmer.PStemmer;
 import opennlp.tools.similarity.apps.utils.Pair;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class TextProcessor {
 
