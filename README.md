@@ -3,6 +3,21 @@
 It is a project under Apache OpenNLP which subjects results of parsing, part-of-speech tagging and rhetoric parsing to machine learning.
 It is leveraged in search, content generation & enrichment, chat bots and other text processing domains where relevance assessment task is a key.
 
+## What is new?
+
+You can try chatbot in a command-line mode:
+ssh root@165.227.17.105
+
+pw = BeTheGuest123
+
+root@ubuntu-s-4vcpu-8gb-sfo2-01:/home/cb# cd /home/cb
+
+ To run current jar:
+root@ubuntu-s-4vcpu-8gb-sfo2-01:/home/cb# java -jar cb_0.14.jar
+
+Then you can chat with the bot from the Terminal
+
+
 ## What is OpenNLP.Similarity?
 
 OpenNLP.Similarity is an NLP engine which solves a number of text processing and search tasks based on OpenNLP and Stanford NLP parsers. It is designed to be used by a non-linguist software engineer to build linguistically-enabled: 
