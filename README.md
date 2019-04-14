@@ -6,16 +6,20 @@ It is leveraged in search, content generation & enrichment, chat bots and other 
 ## What is new?
 
 You can try a chatbot with the virtual dialogue feature in a command-line mode:
+
 ssh root@138.68.237.229
+
 pw = chatbot123
+
  cd home
+
  java -jar cb_virtDialog.jar
 
 Then you can chat with the bot from the Terminal
+
 [10-minutes video on Virtual Chatbot in financial domain](https://drive.google.com/open?id=1C8V_DpkF6Gu8hJPocHh7iZL6DCmEjHuX)
 
-[A longer video where users solve a nontrivial problem]
-(https://drive.google.com/open?id=0B-TymkYCBPsfV3JQSGU3TE9mRVk)
+[A longer video where users solve a nontrivial problem](https://drive.google.com/open?id=0B-TymkYCBPsfV3JQSGU3TE9mRVk)
 
 
 ## What is OpenNLP.Similarity?
