@@ -17,7 +17,11 @@ pw = chatbot123
 
 Then you can chat with the bot from the Terminal
 
-[10-minutes video on Virtual Chatbot in financial domain](https://drive.google.com/open?id=1C8V_DpkF6Gu8hJPocHh7iZL6DCmEjHuX)
+[A brief 2 min intro](https://drive.google.com/open?id=1vukxZriRnZokx6aIPm5D6TuShpZwlYJh)
+
+[5 min video on Virtual Chatbot in financial domain](https://drive.google.com/open?id=10bdoyDgiNNyfeByNJJ5VChzK5tWKH581)
+
+[10 min video on Virtual Chatbot in financial domain](https://drive.google.com/open?id=1C8V_DpkF6Gu8hJPocHh7iZL6DCmEjHuX)
 
 [A longer video where users solve a nontrivial problem](https://drive.google.com/open?id=0B-TymkYCBPsfV3JQSGU3TE9mRVk)
 
