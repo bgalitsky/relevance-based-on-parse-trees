@@ -5,7 +5,11 @@ It is leveraged in search, content generation & enrichment, chat bots and other 
 
 ## What is new?
 
-You can try a chatbot with the virtual dialogue feature in a command-line mode:
+You can try a chatbot with the virtual dialogue feature 
+
+[via UI](http://138.68.237.229:8080/eg/web-client/chatbot.html)
+
+Or in a command-line mode:
 
 ssh root@138.68.237.229
 
