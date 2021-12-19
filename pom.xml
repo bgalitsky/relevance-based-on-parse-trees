@@ -45,13 +45,6 @@
 	</distributionManagement>
 
 
-	<repositories>
-		<repository>
-			<id>net.billylieurance</id>
-			<name>BillyLieuranceNet</name>
-			<url>http://www.billylieurance.net/maven2</url>
-		</repository>
-	</repositories>
 	
 	<properties>
               <nd4j.version>0.4-rc3.4</nd4j.version> 
@@ -187,57 +180,51 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.billylieurance.azuresearch</groupId>
-			<artifactId>azure-bing-search-java</artifactId>
-			<version>0.11.0</version>
-		</dependency>
-		<dependency>
 			<groupId>edu.mit</groupId>
 			<artifactId>jverbnet</artifactId>
 			<version>1.2.0</version>
-			<systemPath>${project.basedir}/lib/edu.mit.jverbnet-1.2.0.jar</systemPath>
+			<systemPath>/Users/bgalitsky/Documents/relevance-based-on-parse-trees-master/lib/edu.mit.jverbnet-1.2.0.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-corenlp</artifactId>
-			<version>3.5.2</version>
+			<version>3.8.0</version>
 		</dependency>
-		<dependency>
-			<groupId>edu.stanford.nlp</groupId>
-			<artifactId>stanford-corenlp-model</artifactId>
-			<version>3.5.2</version>
-			<systemPath>${project.basedir}/lib/stanford-corenlp-3.5.2-models.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
+		
+		
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>ejml</artifactId>
 			<version>0.23</version>
-			<systemPath>${project.basedir}/lib/ejml-0.23.jar</systemPath>
+			<systemPath>/Users/bgalitsky/Documents/relevance-based-on-parse-trees-master/lib/ejml-0.23.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>0.23</version>
-			<systemPath>${project.basedir}/lib/joda-time.jar</systemPath>
+			<systemPath>/Users/bgalitsky/Documents/relevance-based-on-parse-trees-master/lib/joda-time.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
-		<dependency>
-			<groupId>edu.stanford.nlp</groupId>
-			<artifactId>jollyday</artifactId>
-			<version>0.23</version>
-			<systemPath>${project.basedir}/lib/jollyday.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
+		
+
+		
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>xom</artifactId>
 			<version>0.23</version>
-			<systemPath>${project.basedir}/lib/xom.jar</systemPath>
+			<systemPath>/Users/bgalitsky/Documents/relevance-based-on-parse-trees-master/lib/xom.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
+		
+		<dependency>
+		    <groupId>de.jollyday</groupId>
+		    <artifactId>jollyday</artifactId>
+		    <version>0.5.10</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.docx4j</groupId>
 			<artifactId>docx4j</artifactId>
@@ -245,32 +232,35 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.clulab</groupId>
-			<artifactId>processors_2.11</artifactId>
-			<version>5.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.clulab</groupId>
-			<artifactId>processors_2.11</artifactId>
-			<version>5.7.1</version>
-			<classifier>models</classifier>
-		</dependency>
-		<dependency>
-                 <groupId>org.deeplearning4j</groupId>
-                 <artifactId>deeplearning4j-ui</artifactId>
-                 <version>${dl4j.version}</version>
-               </dependency>
-               <dependency>
-                 <groupId>org.deeplearning4j</groupId>
-                 <artifactId>deeplearning4j-nlp</artifactId>
-                 <version>${dl4j.version}</version>
-               </dependency>
-               <dependency>
-                 <groupId>org.nd4j</groupId>
-                 <artifactId>nd4j-jblas</artifactId> 
-                 <version>${nd4j.version}</version>
-               </dependency>
-               <dependency>
+   <groupId>org.clulab</groupId>
+   <artifactId>processors-corenlp_2.11</artifactId>
+   <version>7.4.3</version>
+</dependency>
+<dependency>
+   <groupId>org.clulab</groupId>
+   <artifactId>processors-main_2.11</artifactId>
+   <version>7.4.3</version>
+</dependency>
+<dependency>
+   <groupId>org.clulab</groupId>
+   <artifactId>processors-odin_2.11</artifactId>
+   <version>7.4.3</version>
+</dependency>
+
+<dependency>
+    <groupId>org.clulab</groupId>
+    <artifactId>processors-modelsmain_2.11</artifactId>
+    <version>7.4.3</version>
+   <systemPath>/Users/bgalitsky/Documents/relevance-based-on-parse-trees-master/lib/processors-modelsmain_2.11-7.4.3.jar</systemPath>
+			<scope>system</scope>
+</dependency>
+
+<dependency>
+   <groupId>org.clulab</groupId>
+   <artifactId>processors-modelscorenlp_2.11</artifactId>
+   <version>7.4.3</version>
+</dependency>
+		             <dependency>
    				<groupId>org.jsoup</groupId>
     			<artifactId>jsoup</artifactId>
     			<version>1.7.2</version>
