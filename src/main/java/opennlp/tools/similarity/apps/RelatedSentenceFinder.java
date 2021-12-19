@@ -414,7 +414,7 @@ public class RelatedSentenceFinder {
 				if (downloadedPage != null && downloadedPage.length() > 100) {
 					item.setPageContent(downloadedPage);
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
-					pageContent = GeneratedSentenceProcessor
+					pageContent = UtteranceFilter
 							.normalizeForSentenceSplitting(pageContent);
 					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
 					//pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
@@ -530,12 +530,12 @@ public class RelatedSentenceFinder {
 					if ((syntScore > RELEVANCE_THRESHOLD || measScore > 0.5)
 							&& measScore < 0.8 && pageSentence.length() > 40) // >70
 					{
-						String pageSentenceProc = GeneratedSentenceProcessor
+						String pageSentenceProc = UtteranceFilter
 								.acceptableMinedSentence(pageSentence);
 						if (pageSentenceProc != null) {
-							pageSentenceProc = GeneratedSentenceProcessor
+							pageSentenceProc = UtteranceFilter
 									.processSentence(pageSentenceProc);
-							followSent = GeneratedSentenceProcessor.processSentence(followSent);
+							followSent = UtteranceFilter.processSentence(followSent);
 							if (followSent != null) {
 								pageSentenceProc += " "+ followSent;
 							}
@@ -589,14 +589,14 @@ public class RelatedSentenceFinder {
 				dist = distCurr;
 				try {
 					if (i < sents.length - 1 && sents[i + 1].length() > 60) { 
-						String f1 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+1]);
+						String f1 = UtteranceFilter.acceptableMinedSentence(sents[i+1]);
 						if (f1!=null){
 							followSent = f1;
 						}
 					}
 
 					if (i < sents.length - 2 && sents[i + 2].length() > 60) {
-						String f2 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+2]);
+						String f2 = UtteranceFilter.acceptableMinedSentence(sents[i+2]);
 						if (f2!=null){
 							followSent += " "+f2;
 						}
@@ -713,7 +713,7 @@ public class RelatedSentenceFinder {
 		{
 			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
 				continue;
-			if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
+			if (UtteranceFilter.acceptableMinedSentence(sentenceOrMultSent)==null){
 				//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 				continue;
 			}
@@ -777,7 +777,7 @@ public class RelatedSentenceFinder {
 				if (downloadedPage != null && downloadedPage.length() > 100) {
 					item.setPageContent(downloadedPage);
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
-					pageContent = GeneratedSentenceProcessor
+					pageContent = UtteranceFilter
 							.normalizeForSentenceSplitting(pageContent);
 					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
 					//pageContent = pageContent.trim().replaceAll("    [A-Z]", ". $0")// .replace("  ",
@@ -923,12 +923,12 @@ public class RelatedSentenceFinder {
 			if ((syntScore > RELEVANCE_THRESHOLD || measScore > 0.5)
 					&& measScore < 0.8 && pageSentence.length() > 40) // >70
 			{
-				String pageSentenceProc = GeneratedSentenceProcessor
+				String pageSentenceProc = UtteranceFilter
 						.acceptableMinedSentence(pageSentence);
 				if (pageSentenceProc != null) {
-					pageSentenceProc = GeneratedSentenceProcessor
+					pageSentenceProc = UtteranceFilter
 							.processSentence(pageSentenceProc);
-					followSent = GeneratedSentenceProcessor.processSentence(followSent);
+					followSent = UtteranceFilter.processSentence(followSent);
 					if (followSent != null) {
 						pageSentenceProc += " "+ followSent;
 					}

@@ -24,11 +24,6 @@ import java.util.logging.Logger;
 import opennlp.tools.jsmlearning.ProfileReaderWriter;
 import opennlp.tools.parse_thicket.Triple;
 
-import net.billylieurance.azuresearch.AzureSearchImageQuery;
-import net.billylieurance.azuresearch.AzureSearchImageResult;
-import net.billylieurance.azuresearch.AzureSearchResultSet;
-import net.billylieurance.azuresearch.AzureSearchWebQuery;
-import net.billylieurance.azuresearch.AzureSearchWebResult;
 
 public class YahooAnswersMiner extends BingQueryRunner{
 

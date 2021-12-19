@@ -1,9 +1,11 @@
 package opennlp.tools.chatbot;
 
+import java.io.Serializable;
+
 import opennlp.tools.parse_thicket.opinion_processor.EntityExtractionResult;
 import opennlp.tools.similarity.apps.HitBase;
 
-public class ChatIterationResult extends HitBase {
+public class ChatIterationResult extends HitBase implements Serializable{
 	public EntityExtractionResult eeResult;
 	public String paragraph;
 	public String selectedClarificationPhrase;
@@ -58,6 +60,9 @@ public class ChatIterationResult extends HitBase {
 
 		this.eeResult = eeRes;
 	}
+	public ChatIterationResult() {
+	    // TODO Auto-generated constructor stub
+    }
 	public String getParagraph() {
 		return this.paragraph;
 	}

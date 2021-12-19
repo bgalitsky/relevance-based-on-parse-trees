@@ -264,27 +264,27 @@ public class ContentGeneratorSupport {
 				dist = distCurr;
 				try {
 					if (i < sents.length - 1 && sents[i + 1].length() > 60) { 
-						String f1 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+1]);
+						String f1 = UtteranceFilter.acceptableMinedSentence(sents[i+1]);
 						if (f1!=null){
 							followSent = f1;
 						}
 					}
 
 					if (i < sents.length - 2 && sents[i + 2].length() > 60) {
-						String f2 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+2]);
+						String f2 = UtteranceFilter.acceptableMinedSentence(sents[i+2]);
 						if (f2!=null){
 							followSent += " "+f2;
 						}
 						
 					}
 					if (i < sents.length - 3 && sents[i + 3].length() > 60) {
-						String f3 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+3]);
+						String f3 = UtteranceFilter.acceptableMinedSentence(sents[i+3]);
 						if (f3!=null){
 							followSent += " "+f3;
 						}
 					}
 					if (i < sents.length - 4 && sents[i + 4].length() > 60) {
-						String f4 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+4]);
+						String f4 = UtteranceFilter.acceptableMinedSentence(sents[i+4]);
 						if (f4!=null){
 							followSent += " "+f4;
 						}
@@ -399,7 +399,7 @@ public class ContentGeneratorSupport {
 		{
 			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
 				continue;
-			if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
+			if (UtteranceFilter.acceptableMinedSentence(sentenceOrMultSent)==null){
 				System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 				continue;
 			}
@@ -443,7 +443,7 @@ public class ContentGeneratorSupport {
 			for(String sentence: furtherSplit ){
 				if (sentence==null || sentence.length()<20)
 					continue;
-				if (GeneratedSentenceProcessor.acceptableMinedSentence(sentence)==null){
+				if (UtteranceFilter.acceptableMinedSentence(sentence)==null){
 					//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 					continue;
 				}

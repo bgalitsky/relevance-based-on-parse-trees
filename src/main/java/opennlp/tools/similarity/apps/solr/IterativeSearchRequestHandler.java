@@ -42,11 +42,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.CachingWrapperFilter;
 import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -118,7 +115,7 @@ public class IterativeSearchRequestHandler extends SearchHandler {
 		NamedList values = rsp1.getValues();
 		ResultContext c = (ResultContext) values.get("response");
 		if (c!=null){			
-			DocList dList = c.docs;
+			DocList dList = c.getDocList();
 			if (dList.size()<1){
 				rsp2 = runSearchIteration(req, rsp2, "name");
 			}
@@ -131,7 +128,7 @@ public class IterativeSearchRequestHandler extends SearchHandler {
 		values = rsp2.getValues();
 		c = (ResultContext) values.get("response");
 		if (c!=null){
-			DocList dList = c.docs;
+			DocList dList = c.getDocList();
 			if (dList.size()<1){
 				rsp3 = runSearchIteration(req, rsp3, "content");
 			}
@@ -238,107 +235,11 @@ public DocList filterResultsBySyntMatchReduceDocSet(DocList docList,
 }
 
 
-public void handleRequestBody1(SolrQueryRequest req, SolrQueryResponse rsp)
-throws Exception {
-
-	// extract params from request
-	SolrParams params = req.getParams();
-	String q = params.get(CommonParams.Q);
-	String[] fqs = params.getParams(CommonParams.FQ);
-	int start = 0;
-	try { start = Integer.parseInt(params.get(CommonParams.START)); } 
-	catch (Exception e) { /* default */ }
-	int rows = 0;
-	try { rows = Integer.parseInt(params.get(CommonParams.ROWS)); } 
-	catch (Exception e) { /* default */ }
-	//SolrPluginUtils.setReturnFields(req, rsp);
-
-	// build initial data structures
-
-	SolrDocumentList results = new SolrDocumentList();
-	SolrIndexSearcher searcher = req.getSearcher();
-	Map<String,SchemaField> fields = req.getSchema().getFields();
-	int ndocs = start + rows;
-	Filter filter = buildFilter(fqs, req);
-	Set<Integer> alreadyFound = new HashSet<Integer>();
-
-	// invoke the various sub-handlers in turn and return results
-	doSearch1(results, searcher, q, filter, ndocs, req, 
-			fields, alreadyFound);
-
-	// ... more sub-handler calls here ...
-
-	// build and write response
-	float maxScore = 0.0F;
-	int numFound = 0;
-	List<SolrDocument> slice = new ArrayList<SolrDocument>();
-	for (Iterator<SolrDocument> it = results.iterator(); it.hasNext(); ) {
-		SolrDocument sdoc = it.next();
-		Float score = (Float) sdoc.getFieldValue("score");
-		if (maxScore < score) {
-			maxScore = score;
-		}
-		if (numFound >= start && numFound < start + rows) {
-			slice.add(sdoc);
-		}
-		numFound++;
-	}
-	results.clear();
-	results.addAll(slice);
-	results.setNumFound(numFound);
-	results.setMaxScore(maxScore);
-	results.setStart(start);
-	rsp.add("response", results);
-
-}
 
 
-private Filter buildFilter(String[] fqs, SolrQueryRequest req) 
-throws IOException, ParseException {
-	if (fqs != null && fqs.length > 0) {
-		BooleanQuery fquery = new BooleanQuery();
-		for (int i = 0; i < fqs.length; i++) {
-			QParser parser = null;
-			try {
-				parser = QParser.getParser(fqs[i], null, req);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				fquery.add(parser.getQuery(), Occur.MUST);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return new CachingWrapperFilter(new QueryWrapperFilter(fquery));
-	}
-	return null;
-}
 
-private void doSearch1(SolrDocumentList results,
-		SolrIndexSearcher searcher, String q, Filter filter, 
-		int ndocs, SolrQueryRequest req,
-		Map<String,SchemaField> fields, Set<Integer> alreadyFound) 
-throws IOException {
 
-	// build custom query and extra fields
-	Query query = null; //buildCustomQuery1(q);
-	Map<String,Object> extraFields = new HashMap<String,Object>();
-	extraFields.put("search_type", "search1");
-	boolean includeScore = 
-		req.getParams().get(CommonParams.FL).contains("score");
 
-	int  maxDocsPerSearcherType = 0;
-	float maprelScoreCutoff = 2.0f;
-	append(results, searcher.search(
-			query, filter, maxDocsPerSearcherType).scoreDocs,
-			alreadyFound, fields, extraFields, maprelScoreCutoff , 
-			searcher.getIndexReader(), includeScore);
-}
-
-// ... more doSearchXXX() calls here ...
 
 private void append(SolrDocumentList results, ScoreDoc[] more, 
 		Set<Integer> alreadyFound, Map<String,SchemaField> fields,

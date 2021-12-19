@@ -9,18 +9,37 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import opennlp.tools.chatbot.ChatIterationResult;
+import opennlp.tools.chatbot.LongQueryWebSearcher;
 import opennlp.tools.chatbot.SearchSessionManager;
 import opennlp.tools.textsimilarity.TextProcessor;
 
 public class SearchSessionManagerWrapper extends SearchSessionManager {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.SearchSessionManagerWrapper");
+	private long sessionId;
+	LongQueryWebSearcher searcherWithCaching = LongQueryWebSearcher.getInstance();
 
 	public void reset(){
 		queryType = 0;
 		clarificationExpressionGenerator.reset();
+		sessionId = (long) (Math.random()*10000000000l);
 	}
+	
+	private static SearchSessionManagerWrapper instance;
+	public synchronized static SearchSessionManagerWrapper getInstance() {
+	    if (instance == null)
+	      instance = new SearchSessionManagerWrapper();
 
+	    return instance;
+	  }
+
+	public BotResponse runSessionIteration(BotRequest request){
+		String query = request.getQuery();
+		BotResponse resp = runSessionIteraction(query);
+		resp.setUserId(request.getUserID());
+		resp.setSessionId(request.sessionId );
+		return resp;
+	}
 
 	public BotResponse runSessionIteraction(String query){
 		BotResponse resp = new BotResponse();
@@ -38,6 +57,16 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 
 			if (queryType == 0) {
 				//clarificationExpressionGenerator.reset();
+				if (query.toLowerCase().startsWith("anything") || 
+						query.toLowerCase().indexOf(" up to")>-1 || query.toLowerCase().indexOf("what's up")>-1 
+						|| query.toLowerCase().indexOf(" want me to know")>-1){
+					queryType = 6;
+					resp.responseMessage = searcherWithCaching.produceAlertForRandomTopic();
+					queryType = 0;
+					logSilent("Now you can ask a NEW question");
+					resp.responseMessage += "\nNow you can ask a NEW question";
+					return resp;
+				}
 
 				List<ChatIterationResult> searchRes = searcher.searchLongQuery(query);
 				String clarificationStr = clarificationExpressionGenerator.generateClarification(query, searchRes);
@@ -164,14 +193,14 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 		return resp;
 	}
 
-	private boolean isSameEntityQuery(String query) {
+	protected boolean isSameEntityQuery(String query) {
 		if ( (query.toLowerCase().indexOf("this")>-1) || (query.toLowerCase().indexOf("that")>-1) ||
 				(query.toLowerCase().indexOf("it ")>-1) || (query.toLowerCase().indexOf("its ")>-1))
 			return true;
 		return false;
 	}
 
-	private String getAnswerNum(int i, List<ChatIterationResult> searchResult) {
+	protected String getAnswerNum(int i, List<ChatIterationResult> searchResult) {
 		if (searchResult==null || searchResult.isEmpty())
 			return "I got stuck trying to find this answer. Lets try to go back...";
 		if (i>= searchResult.size())
@@ -179,10 +208,19 @@ public class SearchSessionManagerWrapper extends SearchSessionManager {
 
 		return searchResult.get(i).getParagraph();
 	}
+	
+	protected String getAnswerUrl(int i, List<ChatIterationResult> searchResult) {
+		if (searchResult==null || searchResult.isEmpty())
+			return "I got stuck trying to find this answer. Lets try to go back...";
+		if (i>= searchResult.size())
+			return  searchResult.get(0).getUrl();
 
-	private void logSilent(String msg) {
-		String version = "ver0.8";
-		LOG.info(version  + " | " + msg); 
+		return searchResult.get(i).getUrl();
+	}
+
+	protected void logSilent(String msg) {
+		//String version = "ver0.8";
+		//LOG.info(version  + " | " + msg); 
 	}
 
 	public static void main(String[] args){

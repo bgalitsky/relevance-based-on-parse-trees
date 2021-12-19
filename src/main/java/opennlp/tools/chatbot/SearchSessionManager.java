@@ -141,6 +141,6 @@ public class SearchSessionManager {
 	public static void main(String[] args){
 		System.out.println( extractDomainFromQuery("reduce to finance.yahoo.com"));
 		System.setProperty("log4j.debug", "");
-		new SearchSessionManager() .runSession();
+		new SearchSessionManager().runSession();
 	}
 }

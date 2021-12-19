@@ -15,9 +15,9 @@ public class ClarificationExpressionGenerator {
 	private static Logger LOG = Logger
 			.getLogger("opennlp.tools.chatbot.ClarificationExpressionGenerator");
 	// session data
-	private List<ChatIterationResult> answerAndClarificationOptions;
+	protected List<ChatIterationResult> answerAndClarificationOptions;
 	public String originalQuestion;
-	private int currBestIndex;
+	protected int currBestIndex;
 	public String clarificationQuery;
 	public String latestAnswer;
 	public String domain;
@@ -100,15 +100,15 @@ public class ClarificationExpressionGenerator {
 	}
 
 	// processors for use
-	private StringDistanceMeasurer meas = new StringDistanceMeasurer();
+	protected StringDistanceMeasurer meas = new StringDistanceMeasurer();
 
 	public boolean isEqualToAlreadyGivenAnswer(String answer){
 		return meas.measureStringDistance(this.latestAnswer, answer)>0.8;
 	}
 
-	private static String[] clarifPrefixes = new String[] { "Possibly associated with :'", "Possible related to :'",
+	protected static String[] clarifPrefixes = new String[] { "Possibly associated with :'", "Possible related to :'",
 		"Did you mean: '", "Or is it about :'", "Could be connected with: '", "It can be related to :'",
-		"Purhaps it is concerning: '"
+		"Perhaps it is concerning: '"
 	};
 
 	public void reset(){
@@ -124,11 +124,11 @@ public class ClarificationExpressionGenerator {
 		if (searchRes0.isEmpty())
 			return "I got stuck searching for results, going back ...";
 
-		
+		this.originalQuestion = query;
 		//getEeResult() == null, then not canonical search path
 		if (searchRes0.get(0).getEeResult()==null) // not real search results, then expect clarification in title
 		{
-			String clarification = "I believe your query is about a product. These are the attributes of your interest:\n";
+			String clarification = ""; //I believe your query is about a product. These are the attributes of your interest:\n";
 			int count = 0; 
 			for(ChatIterationResult extrPhrases: searchRes0){
 				 clarification+=extrPhrases.getTitle() + " ["+ count + "] | ";
@@ -136,10 +136,10 @@ public class ClarificationExpressionGenerator {
 				 extrPhrases.selectedClarificationPhrase = extrPhrases.getTitle();
 				 count++;
 			}
-			this.originalQuestion = query;
+			
 			answerAndClarificationOptions = searchRes0;
 			// TODO: we assume no noise keywords in  the query such as "tell me about ..."
-			currentEntity = query;
+			this.currentEntity = query;
 			return clarification;
 		}
 					
@@ -149,6 +149,9 @@ public class ClarificationExpressionGenerator {
 		for(ChatIterationResult extrPhrases: searchRes0){
 			try {
 				List<String> candidates = extrPhrases.getEeResult().getExtractedNONSentimentPhrasesStr();
+				if (candidates==null)
+					continue;
+				
 				if (candidates.isEmpty()) 
 					continue;
 
@@ -206,7 +209,7 @@ public class ClarificationExpressionGenerator {
 				}
 
 				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
-				if  (sectionHeaderContent!=null){
+				if  (sectionHeaderContent!=null && count<4){
 					Set<String> headers = sectionHeaderContent.keySet();
 					if (!headers.isEmpty()){
 						clarificationStr+= "\nThese are the other areas of interest:";
@@ -236,7 +239,7 @@ public class ClarificationExpressionGenerator {
 				}
 
 				Map<String, String> sectionHeaderContent = extrPhrases.getSectionHeaderContent();
-				if  (sectionHeaderContent!=null){
+				if  (sectionHeaderContent!=null && count<4){
 					Set<String> headers = sectionHeaderContent.keySet();
 					if (!headers.isEmpty()){
 						clarificationStr+= "\nThese are the other areas of interest:";
@@ -320,7 +323,7 @@ public class ClarificationExpressionGenerator {
 		return true;
 	}
 	public String getBestAvailableCurrentAnswer() {
-		if (this.currBestIndex==0 && answerAndClarificationOptions.size()>0)
+		if (this.currBestIndex==0 && answerAndClarificationOptions.size()>1)
 			return answerAndClarificationOptions.get(1).paragraph;
 		else
 			return answerAndClarificationOptions.get(0).paragraph;	
@@ -405,8 +408,8 @@ public class ClarificationExpressionGenerator {
 			}
 		}
 		
-		String cleanedSent = bestS.replace("   ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ");
-		return bestS;
+		String cleanedSent = bestS.replaceAll("( )+", " ").trim();
+		return cleanedSent;
 	}
 }
 

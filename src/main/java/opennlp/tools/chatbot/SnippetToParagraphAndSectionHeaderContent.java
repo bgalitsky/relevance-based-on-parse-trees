@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 
 import opennlp.tools.parse_thicket.Pair;
-import opennlp.tools.similarity.apps.GeneratedSentenceProcessor;
+import opennlp.tools.similarity.apps.UtteranceFilter;
 import opennlp.tools.similarity.apps.HitBase;
 import opennlp.tools.similarity.apps.utils.PageFetcher;
 import opennlp.tools.similarity.apps.utils.StringDistanceMeasurer;
@@ -128,7 +128,7 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 				}
 				else {
 					result.add(f);
-					LOG.info("Could not find the original sentence \n"+f +"\n in the page " );
+					//LOG.info("Could not find the original sentence \n"+f +"\n in the page " );
 				}
 
 			} catch (Exception e) {
@@ -148,7 +148,7 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 		{
 			if (sentenceOrMultSent==null || sentenceOrMultSent.length()<20)
 				continue;
-			if (GeneratedSentenceProcessor.acceptableMinedSentence(sentenceOrMultSent)==null){
+			if (UtteranceFilter.acceptableMinedSentence(sentenceOrMultSent)==null){
 				//System.out.println("Rejected sentence by GeneratedSentenceProcessor.acceptableMinedSentence = "+sentenceOrMultSent);
 				continue;
 			}
@@ -201,29 +201,41 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 					dist = distCurr;
 					try {
 						if (i < sents.length - 1 && sents[i + 1].length() > 60) { 
-							String f1 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+1]);
+							String f1 = UtteranceFilter.acceptableMinedSentence(sents[i+1]);
 							if (f1!=null){
 								followSent = f1;
 							}
 						}
 
 						if (i < sents.length - 2 && sents[i + 2].length() > 60) {
-							String f2 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+2]);
+							String f2 = UtteranceFilter.acceptableMinedSentence(sents[i+2]);
 							if (f2!=null){
 								followSent += " "+f2;
 							}
 							
 						}
 						if (i < sents.length - 3 && sents[i + 3].length() > 60) {
-							String f3 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+3]);
+							String f3 = UtteranceFilter.acceptableMinedSentence(sents[i+3]);
 							if (f3!=null){
 								followSent += " "+f3;
 							}
 						}
 						if (i < sents.length - 4 && sents[i + 4].length() > 60) {
-							String f4 = GeneratedSentenceProcessor.acceptableMinedSentence(sents[i+4]);
+							String f4 = UtteranceFilter.acceptableMinedSentence(sents[i+4]);
 							if (f4!=null){
 								followSent += " "+f4;
+							}
+						}
+						if (i < sents.length - 5 && sents[i + 5].length() > 60) {
+							String f5 = UtteranceFilter.acceptableMinedSentence(sents[i+5]);
+							if (f5!=null){
+								followSent += " "+f5;
+							}
+						}
+						if (i < sents.length - 6 && sents[i + 6].length() > 60) {
+							String f6 = UtteranceFilter.acceptableMinedSentence(sents[i+6]);
+							if (f6!=null){
+								followSent += " "+f6;
 							}
 						}
 						
@@ -234,6 +246,14 @@ public class SnippetToParagraphAndSectionHeaderContent  {
 				}
 			}
 			return new String[] { result, followSent };
+		}
+		
+		public static void main(String[] args){
+			SnippetToParagraphAndSectionHeaderContent exractor = new SnippetToParagraphAndSectionHeaderContent ();
+			Pair<String[], Map<String, String>> p = exractor.extractSentencesAndSectionMapFromPage("https://en.wikipedia.org/wiki/Blind_date");
+			System.out.println(p.getFirst());
+			System.out.println(p.getSecond());
+			
 		}
 }
 

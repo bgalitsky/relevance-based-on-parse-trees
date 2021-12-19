@@ -32,9 +32,6 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import net.billylieurance.azuresearch.AzureSearchImageResult;
-import net.billylieurance.azuresearch.AzureSearchResultSet;
-import net.billylieurance.azuresearch.AzureSearchWebResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.docx4j.XmlUtils;

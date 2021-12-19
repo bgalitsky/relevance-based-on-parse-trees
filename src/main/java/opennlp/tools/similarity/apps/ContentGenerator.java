@@ -228,7 +228,7 @@ public class ContentGenerator /*extends RelatedSentenceFinder*/ {
 				if (downloadedPage != null && downloadedPage.length() > 100) {
 					item.setPageContent(downloadedPage);
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
-					pageContent = GeneratedSentenceProcessor
+					pageContent = UtteranceFilter
 							.normalizeForSentenceSplitting(pageContent);
 					pageContent = ContentGeneratorSupport.cleanSpacesInCleanedHTMLpage(pageContent);
 			
@@ -357,12 +357,12 @@ public class ContentGenerator /*extends RelatedSentenceFinder*/ {
 			if ((syntScore > RELEVANCE_THRESHOLD || measScore > 0.5)
 					&& measScore < 0.8 && pageSentence.length() > 40) // >70
 			{
-				String pageSentenceProc = GeneratedSentenceProcessor
+				String pageSentenceProc = UtteranceFilter
 						.acceptableMinedSentence(pageSentence);
 				if (pageSentenceProc != null) {
-					pageSentenceProc = GeneratedSentenceProcessor
+					pageSentenceProc = UtteranceFilter
 							.processSentence(pageSentenceProc);
-					followSent = GeneratedSentenceProcessor.processSentence(followSent);
+					followSent = UtteranceFilter.processSentence(followSent);
 					if (followSent != null) {
 						pageSentenceProc += " "+ followSent;
 					}

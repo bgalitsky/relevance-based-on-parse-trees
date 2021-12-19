@@ -79,7 +79,8 @@ public class PageFetcher {
   public String fetchPage(final String url, final int timeout) {
     String fetchURL = addHttp(url);
 
-    log.info("fetch url " + fetchURL);
+    //log.info("fetch url " + fetchURL);
+    System.out.println("exploring "+ fetchURL);
 
     String pageContent = null;
     HttpURLConnection connection;
@@ -96,11 +97,11 @@ public class PageFetcher {
       pageContent = tika.parseToString(connection.getInputStream())
           .replace('\n', ' ').replace('\t', ' ');
     } catch (MalformedURLException e) {
-      log.severe(e.getMessage() + "\n" + e);
+      //log.severe(e.getMessage() + "\n" + e);
     } catch (IOException e) {
-      log.severe(e.getMessage() + "\n" + e);
+      //log.severe(e.getMessage() + "\n" + e);
     } catch (TikaException e) {
-      log.severe(e.getMessage() + "\n" + e);
+      //log.severe(e.getMessage() + "\n" + e);
     }
     return pageContent;
   }

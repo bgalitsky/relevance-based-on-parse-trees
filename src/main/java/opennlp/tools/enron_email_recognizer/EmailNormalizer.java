@@ -3,11 +3,15 @@ package opennlp.tools.enron_email_recognizer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 public class EmailNormalizer {
 	protected ArrayList<File> queue = new ArrayList<File>();
+	public static String subjectLinesFileName = "subjectLines.txt";
+	
+	protected List<String> emailSubjectsList = new ArrayList<String>();
 	
 	protected void addFilesPos(File file) {
 
@@ -17,7 +21,7 @@ public class EmailNormalizer {
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
 				addFilesPos(f);
-				System.out.println(f.getName());
+				//System.out.println(f.getName());
 			}
 		} else {
 			queue.add(file);
@@ -29,7 +33,7 @@ public class EmailNormalizer {
 	"Date:",
 	"From:",
 	"To:",
-	"Subject:",
+	//"Subject:",
 	"Mime-Version:",
 	"Content-T",
 	"X-From:",
@@ -47,7 +51,7 @@ public class EmailNormalizer {
 		"@", "<", ">"
 	};
 
-	private String OrigFolder = "maildir_ENRON_EMAILS", NewFolder = "data";
+	private String OrigFolder = "maildir", NewFolder = "data";
 
 	
 	
@@ -66,6 +70,10 @@ public class EmailNormalizer {
 			for(String h: headers){
 				if (l.startsWith(h)){
 					bAccept = false;
+				}
+				if (l.startsWith("Subject:")){
+					l = l.substring(7);
+					emailSubjectsList.add(l);
 				}
 			}
 			for(String h: prohibitedStrings){
@@ -91,10 +99,16 @@ public class EmailNormalizer {
 		for(File e: queue){
 			normalizeAndWriteIntoANewFile(e);
 		}
+		try {
+			FileUtils.writeLines(new File(subjectLinesFileName="subjectLines.txt"), emailSubjectsList, true);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args){
 		EmailNormalizer nrm = new EmailNormalizer();
-		nrm.normalizeDirectory(new File("/Users/bgalitsky/Documents/ENRON/maildir_ENRON_EMAILS"));
+		nrm.normalizeDirectory(new File("/Users/bgalitsk/Downloads/maildir"));
 	}
 }

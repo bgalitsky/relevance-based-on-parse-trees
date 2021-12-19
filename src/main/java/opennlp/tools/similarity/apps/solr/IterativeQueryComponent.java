@@ -59,7 +59,7 @@ public class IterativeQueryComponent extends QueryComponent{
 			nameValuePairs = rb.rsp.getValues();
 			ResultContext c = (ResultContext) nameValuePairs.get("response");
 			if (c!=null){			
-				DocList dList = c.docs;
+				DocList dList = c.getDocList();
 				if (dList.size()<1){
 					nameValuePairs.remove("response");
 					rb.rsp.setAllValues(nameValuePairs);
@@ -145,7 +145,7 @@ public class IterativeQueryComponent extends QueryComponent{
 		}
 		if (q == null) {
 			// normalize a null query to a query that matches nothing
-			q = new BooleanQuery();        
+			q = null; //new BooleanQuery();        
 		}
 		rb.setQuery( q );
 		try {

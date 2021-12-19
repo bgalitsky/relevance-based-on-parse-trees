@@ -24,7 +24,7 @@ import opennlp.tools.similarity.apps.utils.Utils;
 
 import org.apache.commons.lang.StringUtils;
 
-public class GeneratedSentenceProcessor {
+public class UtteranceFilter {
 
 	public static String[] occurs = new String[]{ "click here", "wikipedia", "retrieved", "isbn",
 		"http", "www.",
@@ -83,7 +83,7 @@ public class GeneratedSentenceProcessor {
 		String[] commas = StringUtils.split(sent, ',');
 		String[] spaces = StringUtils.split(sent, ' ');
 		if ((float) commas.length / (float) spaces.length > 0.5) {
-			System.out.println("Rejection: too many commas  in sent ='"+sent);
+			//System.out.println("Rejection: too many commas  in sent ='"+sent);
 			return null;
 		}
 
@@ -95,7 +95,7 @@ public class GeneratedSentenceProcessor {
 		// commented [x], to avoid rejection sentences with refs[]
 		String[] brakets = StringUtils.split(sent.replace('(', '#').replace(')', '#')/*.replace('[', '#').replace(']', '#')*/, '#');
 		if ((float) periods.length / (float) spaces.length > 0.2) {
-			System.out.println("Rejection: too many brakets in sent ='"+sent);
+			//System.out.println("Rejection: too many brakets in sent ='"+sent);
 			return null;
 		}
 		
@@ -129,10 +129,7 @@ public class GeneratedSentenceProcessor {
 				.replace("_should_find_orig_", "").replace(".   .", ". ")
 				.replace("amp;", " ").replace("1.", " ").replace("2.", " ")
 				.replace("3.", " ").replace("4.", " ").
-			/*	.replace("2009", "2011")
-				.replace("2008", "2011").replace("2006", "2011")
-				.replace("2007", "2011").
-			*/	replace("VIDEO:", " ").replace("Video:", " ")
+	replace("VIDEO:", " ").replace("Video:", " ")
 				.replace("no comments", " ").replace("  ", " ").replace("  ", " ")
 				.replace("(more.)", "").replace("more.", "").replace("<more>", "")
 				.replace("[more]", "").replace(".,", ".").replace("&lt;", "")
@@ -223,7 +220,7 @@ public class GeneratedSentenceProcessor {
 		
 		String sentence = "Accepted sentence: Educational. Video. About Us menu. Home. Nobel Prizes and Laureates. Nobel Prizes and Laureates. Physics Prize. Chemistry Prize. Medicine Prize. Literature Prize. Peace Prize. Prize in Economic Sciences. Quick Facts. Nomination. Nomination. Physics Prize. Chemistry Prize. Medicine Prize. Literature Prize. Peace Prize. Prize in Economic Sciences. Nomination Archive. Ceremonies. Ceremonies. Ceremony Archive. Nobel Banquet Menus. Nobel Banquet Dress Code. The Queen's Gowns. Eyewitness Reports. Alfred Nobel. Alfred Nobel. Alfred Nobel's Will. Alfred Nobel's Life. Private Library of Alfred Nobel. Books on Alfred Nobel. Events. Events. Nobel Week Dialogue. Nobel Prize Inspiration Initiative. Nobel Prize Concert. Exhibitions at the Nobel Museum. Exhibitions at the Nobel Peace Center. About Us. Nobel Prizes and Laureates. Physics PrizesChemistry PrizesMedicine PrizesLiterature PrizesPeace PrizesPrize in Economic Sciences. About the Nobel Prize in Physics 1921. Albert Einstein. Facts. Biographical. Nobel Lecture. Banquet Speech. Documentary. Photo Gallery. Questions and Answers. Other Resources. All Nobel Prizes in Physics. All Nobel Prizes in 1921. The Nobel Prize in Physics 1921. Albert Einstein. Questions and Answers. Question: When was Albert Einstein born . Answer: Albert Einstein was born on 14 March 1879. Question: Where was he born . Answer: He was born in Ulm, Germany. Question: When did he die . Answer: He died 18 April 1955 in Princeton, New Jersey, USA. Question: Who were his parents . Answer: His father was Hermann Einstein and his mother was Pauline Einstein (born Koch). Question: Did he have any sisters and brothers . Answer: He had one sister named Maja. Question: Did he marry and have children . Answer: He was married to Mileva Mari between 1903 and 1919. They had three children, Lieserl (born 1902), Hans Albert (born 1904) and Eduard (born 1910). He married Elsa L Kwenthal in 1919 and they lived together until her death in 1936. Question: Where did he receive his education . Answer: He received his main education at the following schools:. Catholic elementary school in Munich, Germany (1885-1888). Luitpold Gymnasium in Munich, Germany (1888-1894). Cantonal school in Aarau, Switzerland (1895-1896). Swiss Federal Institute of Technology in Zurich, Switzerland (1896-1900). Ph.D. from Zurich University, Switzerland (1905). Question: When was Albert Einstein awarded the Nobel Prize in Physics . Answer: The Nobel Prize Awarding Institution, the Royal Swedish Academy of Sciences, decided to reserve the Nobel Prize in Physics in 1921, and therefore no Physics Prize was awarded that year.";
 		
-		String res = GeneratedSentenceProcessor.acceptableMinedSentence(sentence);
+		String res = UtteranceFilter.acceptableMinedSentence(sentence);
 
 		String para = "About Albert Einstein     15 External links  16 Credits         Youth and schooling  Albert Einstein was born into a Jewish family";
 		para = "inventions of albert einstein                            what was albert einsteins invention                            invention of einstein                            what were albert einsteins inventions ";

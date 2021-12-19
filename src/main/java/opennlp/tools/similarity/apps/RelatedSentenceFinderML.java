@@ -118,7 +118,7 @@ public class RelatedSentenceFinderML extends RelatedSentenceFinder{
 				if (downloadedPage != null && downloadedPage.length() > 100) {
 					item.setPageContent(downloadedPage);
 					String pageContent = Utils.fullStripHTML(item.getPageContent());
-					pageContent = GeneratedSentenceProcessor
+					pageContent = UtteranceFilter
 							.normalizeForSentenceSplitting(pageContent);
 					pageContent = pageContent.trim().replaceAll("  [A-Z]", ". $0")// .replace("  ",
 							// ". ")
@@ -216,14 +216,14 @@ public class RelatedSentenceFinderML extends RelatedSentenceFinder{
 					if ((syntScore > RELEVANCE_THRESHOLD || measScore > 0.5 || mentalScore > 0.5)
 							&& measScore < 0.8 && pageSentence.length() > 40) // >70
 					{
-						String pageSentenceProc = GeneratedSentenceProcessor
+						String pageSentenceProc = UtteranceFilter
 								.acceptableMinedSentence(pageSentence);
 						if (pageSentenceProc != null) {
-							pageSentenceProc = GeneratedSentenceProcessor
+							pageSentenceProc = UtteranceFilter
 									.processSentence(pageSentenceProc);
 							if (followSent != null) {
 								pageSentenceProc += " "
-										+ GeneratedSentenceProcessor.processSentence(followSent);
+										+ UtteranceFilter.processSentence(followSent);
 							}
 
 							pageSentenceProc = Utils.convertToASCII(pageSentenceProc);
